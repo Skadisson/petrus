@@ -11,4 +11,19 @@ ___
 
 ___
 
+pip list -l
+<pre>
+Package      Version
+------------ ---------
+certifi      2019.6.16
+pip          19.1.1
+PyYAML       5.1.2
+setuptools   41.0.1
+Werkzeug     0.15.5
+wheel        0.33.4
+wincertstore 0.2
+</pre>
+
+___
+
 Disclaimer: In order to reuse parts of this repository, please contact me directly on GitHub. For reasons of security you can not run this application unless you possess certain environmental and temporary folders, files and API secrets, which will not be provided in this repository.
