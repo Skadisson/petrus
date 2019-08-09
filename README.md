@@ -5,6 +5,8 @@ Self-sufficient Python 3 web service package using SciKit-Learn to estimate time
 
 This application is running on Conda environments, provided by the Anaconda Machine Learning Framework.
 
+https://docs.atlassian.com/jira-servicedesk/REST/3.6.2/
+
 ___
 
 ![Petrus 2 Flow Chart](src/petrus_v2.jpg "Petrus 2 Flow Chart")
