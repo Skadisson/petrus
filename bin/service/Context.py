@@ -1,5 +1,5 @@
 from bin.service import Environment
-import operator
+from bin.service import Map
 
 
 class Context:
@@ -7,6 +7,7 @@ class Context:
 
     def __init__(self):
         self.environment = Environment.Environment()
+        self.mapper = Map.Map()
 
     def calculate_relevancy_for_tickets(self, tickets, keywords):
         relevancy = []
@@ -48,3 +49,14 @@ class Context:
         def get_key(item):
             return item['percentage']
         return sorted(relevancy, key=get_key, reverse=True)
+
+    def filter_similar_tickets(self, relevancy, cached_tickets):
+        similar_tickets = []
+        for rel_item in relevancy:
+            if rel_item['jira_key'] in cached_tickets:
+                similar_ticket = cached_tickets[rel_item['jira_key']]
+                normalized_similar_ticket = self.mapper.normalize_ticket(similar_ticket, rel_item['percentage'])
+                similar_tickets.append(normalized_similar_ticket)
+        hits = len(similar_tickets)
+
+        return similar_tickets, hits
