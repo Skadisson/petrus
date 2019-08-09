@@ -36,9 +36,7 @@ def petrus(request):
 
 if __name__ == '__main__':
     from werkzeug.serving import run_simple
-    file_path = os.path.realpath(__file__)
-    base_path = '\\'.join(file_path.split('\\')[0:-1]) + '\\'
-    env = Environment.Environment(base_path)
+    env = Environment.Environment()
     port = env.get_service_port()
     host = env.get_service_host()
     run_simple(hostname=host, port=port, application=petrus)
