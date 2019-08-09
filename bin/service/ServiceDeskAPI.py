@@ -94,7 +94,9 @@ class ServiceDeskAPI:
         ticket_endpoint = self.environment.get_endpoint_ticket()
         data_url = ticket_endpoint.format(jira_key)
         response, content = self.client.request(data_url, "GET")
-        return response, content
+        if response['status'] != '200':
+            raise Exception("Request failed with status code {}".format(response['status']))
+        return content.decode("utf-8")
 
     def request_info(self):
         info_endpoint = self.environment.get_endpoint_info()
