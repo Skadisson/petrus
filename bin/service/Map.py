@@ -30,3 +30,24 @@ class Map:
                     data = ticket_data[map_from_key]
                     return self.get_converted_value(key[map_from_key], data)
         return None
+
+    def normalize_ticket(self, ticket, relevancy_percentage=100.0):
+        normalized_ticket = {}
+        values = self.environment.get_map_values()
+        for field_name in values:
+            if field_name in ticket:
+                actual_value = ticket[field_name]
+            else:
+                actual_value = -1
+            if actual_value in values[field_name]:
+                normalized_value = values[field_name][actual_value]
+            else:
+                normalized_value = -1
+            normalized_ticket[field_name] = normalized_value
+        normalized_ticket['Relevancy'] = relevancy_percentage
+        normalized_ticket['Time_Spent'] = ticket['Time_Spent']
+        if 'Organization' in ticket and ticket['Organization'] is not None:
+            normalized_ticket['Organization'] = int(ticket['Organization'])
+        else:
+            normalized_ticket['Organization'] = -1
+        return normalized_ticket

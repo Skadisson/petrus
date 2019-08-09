@@ -67,6 +67,10 @@ class Environment:
         service_yaml = self.load_yaml('map')
         return service_yaml['Ticket']
 
+    def get_map_values(self):
+        service_yaml = self.load_yaml('map')
+        return service_yaml['Values']
+
     def get_path_cache(self):
         service_yaml = self.load_yaml('path')
         return service_yaml['cache']
