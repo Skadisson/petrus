@@ -50,10 +50,10 @@ class Context:
             return item['percentage']
         return sorted(relevancy, key=get_key, reverse=True)
 
-    def filter_similar_tickets(self, relevancy, cached_tickets):
+    def filter_similar_tickets(self, relevancy, cached_tickets, jira_key):
         similar_tickets = []
         for rel_item in relevancy:
-            if rel_item['jira_key'] in cached_tickets:
+            if rel_item['jira_key'] != jira_key and rel_item['jira_key'] in cached_tickets:
                 similar_ticket = cached_tickets[rel_item['jira_key']]
                 normalized_similar_ticket = self.mapper.normalize_ticket(similar_ticket, rel_item['percentage'])
                 similar_tickets.append(normalized_similar_ticket)

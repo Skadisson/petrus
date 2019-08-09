@@ -24,7 +24,7 @@ class Estimate:
             cached_tickets = self.cache.load_cached_tickets()
             relevancy = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket['Keywords'])
             normalized_ticket = self.mapper.normalize_ticket(mapped_ticket)
-            similar_tickets, hits = self.context.filter_similar_tickets(relevancy, cached_tickets)
+            similar_tickets, hits = self.context.filter_similar_tickets(relevancy, cached_tickets, self.jira_key)
             if hits > 0:
                 estimation = self.sci_kit.estimate(normalized_ticket, similar_tickets, 'Time_Spent', ['Relevancy', 'Priority', 'Type', 'Organization'])
             else:
