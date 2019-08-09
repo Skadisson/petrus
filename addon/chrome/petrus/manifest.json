@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+  "version": "1.0",
+  "name": "Petrus",
+  "description": "Update Jira ticket time estimation via Petrus",
+  "background": {
+    "scripts": ["event.js"],
+    "persistent": false
+  },
+  "icons": {
+    "16": "images/Petrus_16.png",
+    "48": "images/Petrus_48.png",
+    "128": "images/Petrus_128.png"
+  },
+  "browser_action": {
+    "default_icon": "images/Petrus_128.png",
+    "default_popup": "popup.html"
+  }
+}

@@ -1,0 +1,492 @@
+body {
+    background-color:black;
+    background-image:url("image/speedroad.jpg");
+    background-size:cover;
+
+    color:Cornsilk;
+    font-family:verdana;
+    font-size:26px;
+    line-height:26px;
+    overflow: hidden;
+}
+
+section {
+
+    position:relative;
+    display:block;
+
+}
+
+.sign {
+
+    font-size:26px;
+    text-align:center;
+
+}
+
+.number {
+
+    font-size:26px;
+    line-height:26px;
+    text-align:center;
+
+}
+
+.label {
+
+    color:black;
+    font-size:20px;
+    line-height:22px;
+    position:absolute;
+    text-align:center;
+    overflow:hidden;
+    top:60%;
+    left:10%;
+
+}
+
+.panel {
+
+    position: relative;
+    display:block;
+    border-radius: 50%;
+    overflow: hidden;
+    width: 300px;
+    height: 300px;
+    background-color:Cornsilk;
+    margin-top:7%;
+
+}
+
+.panel .pointer {
+
+    overflow: hidden;
+    background-color:Crimson;
+    width: 1px;
+    height: 150px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+
+    transform-origin: bottom center;
+
+}
+
+.panel .dot {
+
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    overflow: hidden;
+    display:block;
+    background-color:black;
+    position:absolute;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+
+.numbers {
+
+    position:relative;
+    display:block;
+    width:100%;
+    height:100%;
+    top:50%;
+    left:50%;
+
+}
+
+.letter {
+
+    font-size:20px;
+    line-height:22px;
+    height: 173px;
+    position: absolute;
+    display:block;
+    overflow:hidden;
+    width: 14px;
+    transform-origin: bottom center;
+    margin-left:-7px;
+    text-align:center;
+
+}
+
+.danger {
+
+    width: 0;
+    height: 0;
+    border-left: 110px solid transparent;
+    border-right: 110px solid transparent;
+    border-top: 120px solid Crimson;
+    border-radius: 50%;
+    position:absolute;
+    left:50%;
+    top:45%;
+    transform: rotate(108deg);
+
+}
+
+.screen {
+
+    position:absolute;
+    top: 0;
+    left: 0;
+    width:100%;
+    height:100%;
+
+}
+
+.dark {
+
+    background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0) 100%);
+    opacity:0.5;
+
+}
+
+.cyan-light {
+
+    background: linear-gradient(to bottom, rgba(0,255,255,1) 0%, rgba(0,179,179,0) 40%, rgba(0,0,0,0) 100%);
+    opacity:0.5;
+
+}
+
+.blue-light {
+
+    background: linear-gradient(135deg, rgba(17,0,255,1) 0%, rgba(12,0,179,0) 30%, rgba(0,0,0,0) 100%);
+    transition:all 0.5s ease-in-out;
+    animation:blinkOut normal 1.5s infinite ease-in-out;
+
+}
+
+@keyframes blinkOut {
+    0% {
+        opacity:0
+    }
+    50% {
+        opacity:1
+    }
+    100% {
+        opacity:0
+    }
+}
+
+.red-light {
+
+    background: linear-gradient(215deg, rgba(255,0,17,1) 0%, rgba(179,0,12,0) 30%, rgba(0,0,0,0) 100%);
+    transition:all 0.5s ease-in-out;
+    animation:blinkIn normal 1.5s infinite ease-in-out;
+
+}
+
+@keyframes blinkIn {
+    0% {
+        opacity:1
+    }
+    50% {
+        opacity:0
+    }
+    100% {
+        opacity:1
+    }
+}
+
+.road {
+
+    width:1024px;
+    height:1400px;
+    margin-left:-512px;
+    position:absolute;
+    display:block;
+    overflow:hidden;
+    top:0;
+    left:50%;
+    transform: perspective(700px) rotateX(-45deg) scale(1,0.7);
+
+}
+
+.headline {
+    position:fixed;
+    display:block;
+    left:-420px;
+    top:200px;
+    transform: rotate(270deg);
+    height:50px;
+    width:800px;
+    font-size:45px;
+    line-height:48px;
+    font-style:italic;
+    opacity:0.5;
+}
+
+.timer {
+    position:absolute;
+    display:block;
+    overflow:hidden;
+    left:0;
+    bottom:-4px;
+    width:100%;
+}
+
+.timer progress {
+    width:100%;
+    border:1px solid black;
+    height:2px;
+    background:black;
+}
+
+.timer progress[value] {
+    color:cyan;
+    animation-name: color-rotation;
+    animation-duration: 10s;
+    animation-iteration-count: infinite;
+}
+
+/* The animation code */
+@keyframes color-rotation {
+  0%   {color: Cornsilk;}
+  20%  {color: mediumseagreen;}
+  40%  {color: cyan;}
+  60%  {color: Crimson;}
+  80%  {color: Moccasin;}
+  100% {color: Cornsilk;}
+}
+
+
+.road p {
+
+    text-align:center;
+    font-weight: bold;
+    font-size:40px;
+    line-height:43px;
+    text-shadow: 0px 0px 15px rgba(0, 0, 0, 1);
+
+}
+
+[data-js="hot-projects"] {
+
+    position:absolute;
+    display:block;
+    overflow:hidden;
+    width:100%;
+    height:100%;
+
+}
+
+[data-js="tickets-per-hour"] {
+
+    position:absolute;
+    left:5%;
+    top:70%;
+
+}
+
+[data-js="tickets-per-hour"] .letter.letter-4 {
+
+    display:block;
+    transform: rotate(-120deg);
+    left: 0px;
+    top: 0px;
+
+}
+
+[data-js="tickets-per-hour"] .letter.letter-3 {
+
+    display:block;
+    transform: rotate(-60deg);
+    left: 0px;
+    top: 0px;
+
+}
+
+[data-js="tickets-per-hour"] .letter.letter-2 {
+
+    display:block;
+    transform: rotate(0deg);
+    left: 0px;
+    top: 0px;
+
+}
+
+[data-js="tickets-per-hour"] .letter.letter-1 {
+
+    display:block;
+    transform: rotate(60deg);
+    left: 0px;
+    top: 0px;
+
+}
+
+[data-js="tickets-per-hour"] .letter.letter-0 {
+
+    display:block;
+    transform: rotate(120deg);
+    left: 0px;
+    top: 0px;
+
+}
+
+[data-js="hours-total"] {
+
+    position:absolute;
+    right:5%;
+    top:70%;
+
+}
+
+[data-js="hours-total"] .letter {
+
+    width: 60px;
+    margin-left:-30px;
+
+}
+
+[data-js="hours-total"] .letter.letter-4 {
+
+    display:block;
+    transform: rotate(120deg);
+    left: 0px;
+    top: 0px;
+
+}
+
+[data-js="hours-total"] .letter.letter-3 {
+
+    display:block;
+    transform: rotate(60deg);
+    left: 0px;
+    top: 0px;
+
+}
+
+[data-js="hours-total"] .letter.letter-2 {
+
+    display:block;
+    transform: rotate(0deg);
+    left: 0px;
+    top: 0px;
+
+}
+
+[data-js="hours-total"] .letter.letter-1 {
+
+    display:block;
+    transform: rotate(-60deg);
+    left: 0px;
+    top: 0px;
+
+}
+
+[data-js="hours-total"] .letter.letter-0 {
+
+    display:block;
+    transform: rotate(-120deg);
+    left: 0px;
+    top: 0px;
+
+}
+
+[data-js="tickets-tracked"] {
+
+    display:block;
+    overflow:hidden;
+    position:absolute;
+    left:50%;
+    bottom:0;
+    width:200px;
+    margin-left:-100px;
+
+}
+
+.bars {
+
+    position:fixed;
+    top:0;
+    right:0;
+    width:15%;
+    height:70%;
+    overflow:hidden;
+    display:block;
+
+}
+
+.bar {
+
+    position:relative;
+    display:block;
+    background:mediumseagreen;
+    width:20%;
+    height:90%;
+    border-radius:10px;
+    float:right;
+    margin:10px;
+
+}
+
+.bar span {
+
+    display:inline-block;
+    font-size:18px;
+    line-height:20px;
+    text-align:center;
+    width:100%;
+    color:black;
+
+}
+
+.bars > span {
+
+    font-size:13px;
+    line-height:16px;
+    float:left;
+    display:inline-block;
+    margin-left:3%;
+    background:black;
+    border-radius:3px;
+    padding:3px;
+
+}
+
+.bar span i {
+
+    font-size:14px;
+    line-height:16px;
+    margin-left:-12px;
+
+}
+
+.bars span.bugfix {
+
+    margin-left:23%;
+    color:Crimson;
+
+}
+
+.bars span.maintenance {
+
+    color:cyan;
+
+}
+
+.bars span.support {
+
+    color:mediumseagreen;
+
+}
+
+.bar.support {
+    background:mediumseagreen;
+    box-shadow: 0 0 10px mediumseagreen;
+}
+
+.bar.maintenance {
+    background:cyan;
+    box-shadow: 0 0 10px cyan;
+}
+
+.bar.bugfix {
+    background:Crimson;
+    box-shadow: 0 0 10px Crimson;
+}
