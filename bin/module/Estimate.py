@@ -13,9 +13,13 @@ class Estimate:
         self.cache = Cache.Cache()
 
     def run(self):
-        ticket_data = self.sd_api.request_ticket_data(self.jira_key)
-        mapped_ticket = self.mapper.get_mapped_ticket(ticket_data)
-        success = self.cache.store_ticket(self.jira_key, mapped_ticket)
+        try:
+            ticket_data = self.sd_api.request_ticket_data(self.jira_key)
+            mapped_ticket = self.mapper.get_mapped_ticket(ticket_data)
+            success = self.cache.store_ticket(self.jira_key, mapped_ticket)
+        except Exception:
+            mapped_ticket = None
+            success = False
 
         items = [{
             'ticket': mapped_ticket
