@@ -29,8 +29,9 @@ class Estimate:
                     similar_ticket = cached_tickets[rel_item['jira_key']]
                     normalized_similar_ticket = self.mapper.normalize_ticket(similar_ticket, rel_item['percentage'])
                     similar_tickets.append(normalized_similar_ticket)
+            hits = len(similar_tickets)
             normalized_ticket = self.mapper.normalize_ticket(mapped_ticket)
-            if len(similar_tickets) > 0:
+            if hits > 0:
                 estimation = self.sci_kit.estimate(normalized_ticket, similar_tickets, 'Time_Spent', ['Relevancy', 'Priority', 'Type', 'Organization'])
             else:
                 estimation = None
@@ -40,9 +41,11 @@ class Estimate:
             mapped_ticket = None
             success = False
             estimation = None
+            hits = None
 
         items = [{
             'ticket': mapped_ticket,
-            'estimation': estimation
+            'estimation': estimation,
+            'hits': hits
         }]
         return items, success
