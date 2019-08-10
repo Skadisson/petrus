@@ -1,5 +1,6 @@
 {
   "manifest_version": 2,
+  "author": "Sebastian Schulz <schulz@konmedia.com>",
   "version": "1.0",
   "name": "Petrus",
   "description": "Update Jira ticket time estimation via Petrus",

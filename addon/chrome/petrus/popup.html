@@ -8,9 +8,16 @@
     <h2>Petrus</h2>
     <form id="update">
         <label for="jira_key">Enter Jira-Key</label>
-        <input type="text" name="jira_key" id="jira_key" placeholder="KMSERVICE" />
+        <input type="text" name="jira_key" id="jira_key" placeholder="jira key" />
         <button type="submit">Update</button>
         <span id="status-display"></span>
+    </form>
+    <form id="search" action="http://localhost:55888/" method="GET">
+        <label for="keywords">Enter keywords</label>
+        <input type="hidden" name="function" value="Search" />
+        <input type="text" name="keywords" id="keywords" placeholder="keywords" />
+        <button type="submit">Search</button>
+        <span id="link-list"></span>
     </form>
 </body>
 </html>
