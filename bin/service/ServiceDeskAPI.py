@@ -3,6 +3,7 @@ from bin.service import JiraSignature
 from bin.service import Cache
 import oauth2 as oauth
 from urllib import parse
+import json
 
 
 class ServiceDeskAPI:
@@ -102,9 +103,47 @@ class ServiceDeskAPI:
         if response['status'] != '200':
             raise Exception("Request failed with status code {}".format(response['status']))
         return content.decode("utf-8")
-        return None
 
     def request_info(self):
         info_endpoint = self.environment.get_endpoint_info()
         response, content = self.client.request(info_endpoint, "GET")
         return response, content
+
+    def update_ticket_times(self, jira_key, estimation, mapped_ticket):
+        ticket_endpoint = self.environment.get_endpoint_ticket().format(jira_key)
+        remaining_time = self.calculate_remaining_time(estimation, mapped_ticket)
+        estimation_hours = self.seconds_to_hours(estimation)
+        remaining_time_hours = self.seconds_to_hours(remaining_time)
+        request_content = {
+            "fields": {
+                'timetracking': {
+                    'originalEstimate': '{} h'.format(estimation_hours).replace('.', ','),
+                    'remainingEstimate': '{} h'.format(remaining_time_hours).replace('.', ',')
+                }
+            }
+        }
+        request_body = json.dumps(request_content)
+        body = request_body.encode('utf-8')
+        headers = {'Content-Type': 'application/json'}
+        resp, content = self.client.request(ticket_endpoint, headers=headers, method="PUT", body=body)
+        state = int(resp.get('status'))
+        success = state in [201, 204]
+
+        return success
+
+    @staticmethod
+    def seconds_to_hours(seconds):
+        return seconds / 60 / 60
+
+    @staticmethod
+    def calculate_remaining_time(estimation, mapped_ticket):
+        if mapped_ticket is not None:
+            if mapped_ticket["Time_Spent"] is None:
+                mapped_ticket["Time_Spent"] = 0
+            remaining = estimation - mapped_ticket["Time_Spent"]
+            if remaining <= 0:
+                remaining = 0
+        else:
+            remaining = 0
+
+        return remaining

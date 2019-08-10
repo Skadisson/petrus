@@ -17,25 +17,27 @@ class Estimate:
         self.sci_kit = SciKitLearn.SciKitLearn()
 
     def run(self):
+        mapped_ticket = None
+        success = False
+        estimation = None
+        hits = None
+
         try:
             ticket_data = self.sd_api.request_ticket_data(self.jira_key)
             mapped_ticket = self.mapper.get_mapped_ticket(ticket_data)
             success = self.cache.store_ticket(self.jira_key, mapped_ticket)
-            cached_tickets = self.cache.load_cached_tickets()
-            relevancy = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket['Keywords'])
-            normalized_ticket = self.mapper.normalize_ticket(mapped_ticket)
-            similar_tickets, hits = self.context.filter_similar_tickets(relevancy, cached_tickets, self.jira_key)
-            if hits > 0:
-                estimation = self.sci_kit.estimate(normalized_ticket, similar_tickets, 'Time_Spent', ['Relevancy', 'Priority', 'Type', 'Organization'])
-            else:
-                estimation = None
-                success = False
+            if success:
+                cached_tickets = self.cache.load_cached_tickets()
+                relevancy = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket['Keywords'])
+                normalized_ticket = self.mapper.normalize_ticket(mapped_ticket)
+                similar_tickets, hits = self.context.filter_similar_tickets(relevancy, cached_tickets, self.jira_key)
+                if hits > 0:
+                    estimation = self.sci_kit.estimate(normalized_ticket, similar_tickets, 'Time_Spent', ['Relevancy', 'Priority', 'Type', 'Organization'])
+                    success = self.sd_api.update_ticket_times(self.jira_key, estimation, mapped_ticket)
+                else:
+                    success = False
         except Exception as e:
             print(e)
-            mapped_ticket = None
-            success = False
-            estimation = None
-            hits = None
 
         items = [{
             'ticket': mapped_ticket,
