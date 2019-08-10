@@ -9,7 +9,7 @@ https://docs.atlassian.com/jira-servicedesk/REST/3.6.2/
 
 ___
 
-![Petrus 2 Flow Chart](src/petrus_v2.jpg "Petrus 2 Flow Chart")
+![Petrus 2 Flow Chart](src/petrus_v2.png "Petrus 2 Flow Chart")
 
 ___
 
