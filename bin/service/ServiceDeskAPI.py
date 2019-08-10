@@ -92,11 +92,16 @@ class ServiceDeskAPI:
 
     def request_ticket_data(self, jira_key):
         ticket_endpoint = self.environment.get_endpoint_ticket()
+        status_endpoint = self.environment.get_endpoint_status()
         data_url = ticket_endpoint.format(jira_key)
-        response, content = self.client.request(data_url, "GET")
-        if response['status'] != '200':
-            raise Exception("Request failed with status code {}".format(response['status']))
-        return content.decode("utf-8")
+        validate_url = status_endpoint.format(jira_key)
+        response, content = self.client.request(validate_url, "GET")
+        if response['status'] == '200':
+            response, content = self.client.request(data_url, "GET")
+            if response['status'] != '200':
+                raise Exception("Request failed with status code {}".format(response['status']))
+            return content.decode("utf-8")
+        return None
 
     def request_info(self):
         info_endpoint = self.environment.get_endpoint_info()
