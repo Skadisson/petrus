@@ -40,6 +40,8 @@ class Estimate:
         except Exception as e:
             print(e)
 
+        if mapped_ticket is not None:
+            mapped_ticket['ID'] = int(mapped_ticket['ID'])
         items = [{
             'ticket': mapped_ticket,
             'estimation': estimation,
