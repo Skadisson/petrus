@@ -1,5 +1,6 @@
 from bin.service import Environment
 import json
+from collections import Counter
 
 
 class Map:
@@ -15,7 +16,16 @@ class Map:
         for map_to_label in mapping:
             map_from_key = mapping[map_to_label]
             converted_data[map_to_label] = self.get_converted_value(map_from_key, ticket_data)
+        converted_data['Comments'] = Counter(self.parse_comments(converted_data['Comments']))
         return converted_data
+
+    def parse_comments(self, comments):
+        parsed_comments_words = []
+        for comment in comments:
+            parsed_words = comment['body'].split()
+            for parsed_word in parsed_words:
+                parsed_comments_words.append(parsed_word)
+        return parsed_comments_words
 
     def get_converted_value(self, key, ticket_data):
         key_is_string = isinstance(key, str)
