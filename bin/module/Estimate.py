@@ -27,24 +27,25 @@ class Estimate:
             if self.jira_key is not None:
                 ticket_data = self.sd_api.request_ticket_data(self.jira_key)
                 mapped_ticket = self.mapper.get_mapped_ticket(ticket_data)
-                mapped_ticket = self.sd_api.request_ticket_status(self.jira_key, mapped_ticket)
+                if mapped_ticket is not None:
+                    mapped_ticket['ID'] = int(mapped_ticket['ID'])
+                mapped_ticket = self.sd_api.request_ticket_status(mapped_ticket)
+                self.cache.store_jira_key_and_id(self.jira_key, mapped_ticket['ID'])
                 mapped_ticket = self.mapper.format_status_history(mapped_ticket)
-                success = self.cache.store_ticket(self.jira_key, mapped_ticket)
+                success = self.cache.store_ticket(mapped_ticket['ID'], mapped_ticket)
                 if success:
                     cached_tickets = self.cache.load_cached_tickets()
                     relevancy = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket['Keywords'])
                     normalized_ticket = self.mapper.normalize_ticket(mapped_ticket)
-                    similar_tickets, hits = self.context.filter_similar_tickets(relevancy, cached_tickets, self.jira_key)
+                    similar_tickets, hits = self.context.filter_similar_tickets(relevancy, cached_tickets, mapped_ticket['ID'])
                     if hits > 0:
                         estimation = self.sci_kit.estimate(normalized_ticket, similar_tickets, 'Time_Spent', ['Relevancy', 'Priority', 'Type', 'Organization'])
-                        success = self.sd_api.update_ticket_times(self.jira_key, estimation, mapped_ticket)
+                        success = self.sd_api.update_ticket_times(mapped_ticket['ID'], estimation, mapped_ticket)
                     else:
                         success = False
         except Exception as e:
             print(e)
 
-        if mapped_ticket is not None:
-            mapped_ticket['ID'] = int(mapped_ticket['ID'])
         if estimation is not None:
             estimation = float(estimation)
         items = [{

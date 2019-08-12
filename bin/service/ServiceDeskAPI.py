@@ -104,9 +104,9 @@ class ServiceDeskAPI:
             raise Exception("Request failed with status code {}".format(response['status']))
         return content.decode("utf-8")
 
-    def request_ticket_status(self, jira_key, mapped_ticket):
+    def request_ticket_status(self, mapped_ticket):
         status_endpoint = self.environment.get_endpoint_status()
-        status_url = status_endpoint.format(jira_key)
+        status_url = status_endpoint.format(mapped_ticket['ID'])
         response, content = self.client.request(status_url, "GET")
         if response['status'] != '200':
             raise Exception("Request failed with status code {}".format(response['status']))
@@ -119,8 +119,8 @@ class ServiceDeskAPI:
         response, content = self.client.request(info_endpoint, "GET")
         return response, content
 
-    def update_ticket_times(self, jira_key, estimation, mapped_ticket):
-        ticket_endpoint = self.environment.get_endpoint_ticket().format(jira_key)
+    def update_ticket_times(self, jira_id, estimation, mapped_ticket):
+        ticket_endpoint = self.environment.get_endpoint_ticket().format(jira_id)
         remaining_time = self.calculate_remaining_time(estimation, mapped_ticket)
         estimation_hours = self.seconds_to_hours(estimation)
         remaining_time_hours = self.seconds_to_hours(remaining_time)

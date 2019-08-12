@@ -87,6 +87,10 @@ class Environment:
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['ticket_link']
 
+    def get_path_jira_key(self):
+        service_yaml = self.load_yaml('path')
+        return service_yaml['jira_key']
+
     def load_yaml(self, name):
         file = open("{}env\\{}.yaml".format(self.base_path, name), "r", encoding='utf8')
         return yaml.load(file, Loader=Loader)

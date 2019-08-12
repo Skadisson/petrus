@@ -24,15 +24,49 @@ class Cache:
         file = open(token_file, "wb")
         pickle.dump(token, file)
 
-    def store_ticket(self, jira_key, ticket):
+    def store_ticket(self, jira_id, ticket):
         is_valid = self.validate_ticket_data(ticket)
         if is_valid:
             cache_file = self.environment.get_path_cache()
             content = self.load_cached_tickets()
-            content[jira_key] = ticket
+            content[jira_id] = ticket
             file = open(cache_file, "wb")
             pickle.dump(content, file)
         return is_valid
+
+    def load_jira_id_for_key(self, jira_key):
+        jira_key_path = self.environment.get_path_jira_key()
+        file_exists = os.path.exists(jira_key_path)
+        if file_exists:
+            file = open(jira_key_path, "rb")
+            content = pickle.load(file)
+            return content[jira_key]
+
+        return None
+
+    def load_jira_key_for_id(self, jira_id):
+        jira_key_path = self.environment.get_path_jira_key()
+        file_exists = os.path.exists(jira_key_path)
+        if file_exists:
+            file = open(jira_key_path, "rb")
+            content = pickle.load(file)
+            for content_id, key in content.items():
+                if content_id == jira_id:
+                    return key
+
+        return None
+
+    def store_jira_key_and_id(self, jira_key, jira_id):
+        jira_key_path = self.environment.get_path_jira_key()
+        file_exists = os.path.exists(jira_key_path)
+        if file_exists:
+            file = open(jira_key_path, "rb")
+            content = pickle.load(file)
+        else:
+            content = {}
+        content[jira_key] = jira_id
+        file = open(jira_key_path, "wb")
+        pickle.dump(content, file)
 
     @staticmethod
     def validate_ticket_data(ticket_data):
