@@ -104,6 +104,16 @@ class ServiceDeskAPI:
             raise Exception("Request failed with status code {}".format(response['status']))
         return content.decode("utf-8")
 
+    def request_ticket_status(self, jira_key, mapped_ticket):
+        status_endpoint = self.environment.get_endpoint_status()
+        status_url = status_endpoint.format(jira_key)
+        response, content = self.client.request(status_url, "GET")
+        if response['status'] != '200':
+            raise Exception("Request failed with status code {}".format(response['status']))
+        status_history_raw = content.decode("utf-8")
+        mapped_ticket['Status'] = json.loads(status_history_raw)
+        return mapped_ticket
+
     def request_info(self):
         info_endpoint = self.environment.get_endpoint_info()
         response, content = self.client.request(info_endpoint, "GET")

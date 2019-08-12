@@ -61,3 +61,14 @@ class Map:
         else:
             normalized_ticket['Organization'] = -1
         return normalized_ticket
+
+    @staticmethod
+    def format_status_history(mapped_ticket):
+        formatted_status_history = []
+        for status in mapped_ticket['Status']['values']:
+            formatted_status_history.append({
+                'type': status['status'],
+                'milliseconds': status['statusDate']['epochMillis']
+            })
+        mapped_ticket['Status'] = formatted_status_history
+        return mapped_ticket

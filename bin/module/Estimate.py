@@ -26,6 +26,8 @@ class Estimate:
             if self.jira_key is not None:
                 ticket_data = self.sd_api.request_ticket_data(self.jira_key)
                 mapped_ticket = self.mapper.get_mapped_ticket(ticket_data)
+                mapped_ticket = self.sd_api.request_ticket_status(self.jira_key, mapped_ticket)
+                mapped_ticket = self.mapper.format_status_history(mapped_ticket)
                 success = self.cache.store_ticket(self.jira_key, mapped_ticket)
                 if success:
                     cached_tickets = self.cache.load_cached_tickets()
