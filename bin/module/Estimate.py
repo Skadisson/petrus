@@ -21,6 +21,7 @@ class Estimate:
         success = False
         estimation = None
         hits = None
+        normalized_ticket = None
 
         try:
             if self.jira_key is not None:
@@ -49,6 +50,7 @@ class Estimate:
         items = [{
             'ticket': mapped_ticket,
             'estimation': estimation,
-            'hits': hits
+            'hits': hits,
+            'normal_ticket': normalized_ticket
         }]
         return items, success

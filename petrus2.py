@@ -27,8 +27,6 @@ def petrus(request):
         if months is not None:
             trend = Trend.Trend(months)
             items, success = trend.run()
-    else:
-        print('Invalid Request')
     response = {'success': success, 'items': items}
     json_response = json.dumps(response)
     return Response(json_response, mimetype='application/json')
