@@ -44,6 +44,8 @@ class Estimate:
 
         if mapped_ticket is not None:
             mapped_ticket['ID'] = int(mapped_ticket['ID'])
+        if estimation is not None:
+            estimation = float(estimation)
         items = [{
             'ticket': mapped_ticket,
             'estimation': estimation,

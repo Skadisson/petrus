@@ -43,7 +43,9 @@ class SciKitLearn:
         models = [
             gaussian_process.GaussianProcessRegressor(kernel=kernel, random_state=1337).fit(x, y),
             linear_model.LinearRegression(n_jobs=2).fit(x, y),
+            tree.DecisionTreeClassifier().fit(x, y),
             tree.DecisionTreeRegressor().fit(x, y),
+            tree.ExtraTreeRegressor().fit(x, y),
             naive_bayes.GaussianNB().fit(x, y),
             neural_network.MLPRegressor(
                 hidden_layer_sizes=(10,), activation='relu', solver='adam', alpha=0.001, batch_size='auto',
