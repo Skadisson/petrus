@@ -1,6 +1,10 @@
 from bin.service import Environment
+from bin.service import ServiceDeskAPI
+from bin.service import Map
+from shutil import copyfile
 import pickle
 import os
+import time
 
 
 class Cache:
@@ -8,6 +12,7 @@ class Cache:
 
     def __init__(self):
         self.environment = Environment.Environment()
+        self.mapper = Map.Map()
 
     def load_token(self):
         token_file = self.environment.get_path_token()
@@ -85,3 +90,39 @@ class Cache:
         else:
             content = {}
         return content
+
+    def load_jira_keys_and_ids(self):
+        cache_file = self.environment.get_path_jira_key()
+        file_exists = os.path.exists(cache_file)
+        if file_exists:
+            file = open(cache_file, "rb")
+            content = pickle.load(file)
+        else:
+            content = {}
+        return content
+
+    def update_all_tickets(self, sd_api):
+        success = True
+        failed_jira_keys = []
+        clean_cache = {}
+        jira_keys_and_ids = self.load_jira_keys_and_ids()
+        for jira_key in jira_keys_and_ids:
+            jira_id = jira_keys_and_ids[jira_key]
+            try:
+                raw_ticket_data = sd_api.request_ticket_data(jira_key)
+                mapped_ticket = self.mapper.get_mapped_ticket(raw_ticket_data)
+            except Exception as e:
+                print(e)
+                failed_jira_keys.append(jira_key)
+                success = False
+                continue
+            time.sleep(1)
+            clean_cache[jira_id] = mapped_ticket
+        cache_file = self.environment.get_path_cache()
+        file = open(cache_file, "wb")
+        pickle.dump(clean_cache, file)
+        return failed_jira_keys, success
+
+    def backup(self):
+        cache_file = self.environment.get_path_cache()
+        copyfile(cache_file, "{}.backup".format(cache_file))

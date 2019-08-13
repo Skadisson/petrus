@@ -14,6 +14,7 @@ class ServiceDeskAPI:
         self.token = None
         self.consumer = None
         self.client = None
+        self.cache = Cache.Cache()
         self.init_api()
 
     def init_api(self):
@@ -36,8 +37,7 @@ class ServiceDeskAPI:
         self.client.set_signature_method(JiraSignature.JiraSignature())
 
     def retrieve_token(self):
-        cache = Cache.Cache()
-        self.token = cache.load_token()
+        self.token = self.cache.load_token()
         if self.token is None or self.is_token_valid(self.token) is False:
             self.retrieve_token_url()
 

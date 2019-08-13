@@ -3,6 +3,8 @@ from bin.service import Environment
 from bin.module import Estimate
 from bin.module import Search
 from bin.module import Trend
+from bin.module import Update
+from bin.module import Backup
 import os
 import json
 
@@ -27,6 +29,12 @@ def petrus(request):
         if months is not None:
             trend = Trend.Trend(months)
             items, success = trend.run()
+    elif function == 'Update':
+        update = Update.Update()
+        items, success = update.run()
+    elif function == 'Backup':
+        backup = Backup.Backup()
+        items, success = backup.run()
     response = {'success': success, 'items': items}
     json_response = json.dumps(response)
     return Response(json_response, mimetype='application/json')
