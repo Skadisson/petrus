@@ -5,7 +5,6 @@ from bin.module import Search
 from bin.module import Trend
 from bin.module import Update
 from bin.module import Backup
-import os
 import json
 
 

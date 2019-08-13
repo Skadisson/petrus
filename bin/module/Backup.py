@@ -4,7 +4,8 @@ from bin.service import Cache
 class Backup:
     """Cache Backup"""
 
-    def run(self):
+    @staticmethod
+    def run():
         items = []
         success = True
         cache = Cache.Cache()

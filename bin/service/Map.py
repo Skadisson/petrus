@@ -19,7 +19,8 @@ class Map:
         converted_data['Comments'] = Counter(self.parse_comments(converted_data['Comments']))
         return converted_data
 
-    def parse_comments(self, comments):
+    @staticmethod
+    def parse_comments(comments):
         parsed_comments_words = []
         for comment in comments:
             parsed_words = comment['body'].split()

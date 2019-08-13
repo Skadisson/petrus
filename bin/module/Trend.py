@@ -5,7 +5,8 @@ class Trend:
     def __init__(self, months):
         print(months)
 
-    def run(self):
+    @staticmethod
+    def run():
         """TBI"""
         items = ['trend']
         success = True

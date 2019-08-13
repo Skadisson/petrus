@@ -1,5 +1,4 @@
 from bin.service import Environment
-from bin.service import ServiceDeskAPI
 from bin.service import Map
 from shutil import copyfile
 import pickle
