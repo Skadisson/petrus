@@ -97,8 +97,10 @@ class ServiceDeskAPI:
         data_url = ticket_endpoint.format(jira_key)
         validate_url = status_endpoint.format(jira_key)
         response, content = self.client.request(validate_url, "GET")
-        if response['status'] != '200':
+        if response['status'] == '404':
             raise Exception("Ticket {} does not exist".format(jira_key))
+        if response['status'] != '200':
+            raise Exception("Failed to load Ticket {} from service desk API".format(jira_key))
         response, content = self.client.request(data_url, "GET")
         if response['status'] != '200':
             raise Exception("Request failed with status code {}".format(response['status']))
