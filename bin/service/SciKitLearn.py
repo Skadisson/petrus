@@ -1,6 +1,7 @@
 from pandas import DataFrame
 from sklearn import linear_model, gaussian_process, tree, naive_bayes, neural_network
 import numpy
+from decimal import Decimal, ROUND_HALF_UP
 
 
 class SciKitLearn:
@@ -34,6 +35,8 @@ class SciKitLearn:
                 highest_score = score
                 highest_scoring_model = model
 
+        precision = Decimal((highest_score*100)).quantize(0, ROUND_HALF_UP)
+        print("Using model {} with a precision of {} %".format(highest_scoring_model.__class__.__name__, precision))
         return highest_scoring_model
 
     @staticmethod
