@@ -36,7 +36,7 @@ class SciKitLearn:
                 highest_scoring_model = model
 
         precision = Decimal((highest_score*100)).quantize(0, ROUND_HALF_UP)
-        print("Using model {} with a precision of {} % on {} data sets".format(highest_scoring_model.__class__.__name__, precision, len(x)))
+        print("Using model {} with a precision of {} % on {} contextual data sets".format(highest_scoring_model.__class__.__name__, precision, len(x)))
         return highest_scoring_model
 
     @staticmethod
