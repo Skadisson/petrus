@@ -66,6 +66,14 @@ class Map:
             normalized_ticket['Organization'] = int(ticket['Organization'])
         else:
             normalized_ticket['Organization'] = -1
+        if 'Comments' in ticket and ticket['Comments'] is not None:
+            normalized_ticket['Words'] = sum(ticket['Comments'].values())
+        else:
+            normalized_ticket['Words'] = 0
+        if 'Status' in ticket and ticket['Status'] is not None:
+            normalized_ticket['State_Changes'] = len(ticket['Status'])
+        else:
+            normalized_ticket['State_Changes'] = 0
         return normalized_ticket
 
     @staticmethod

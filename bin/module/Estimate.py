@@ -50,7 +50,7 @@ class Estimate:
                             normalized_ticket,
                             similar_tickets,
                             'Time_Spent',
-                            ['Relevancy', 'Priority', 'Type', 'Organization']
+                            ['Relevancy', 'Priority', 'State_Changes', 'Type', 'Organization', 'Words']
                         )
                         success = self.sd_api.update_ticket_times(mapped_ticket['ID'], estimation, mapped_ticket)
                     else:
