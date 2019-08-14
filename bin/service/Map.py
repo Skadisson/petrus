@@ -54,9 +54,14 @@ class Map:
                 normalized_value = values[field_name][actual_value]
             else:
                 normalized_value = -1
+            if normalized_value is None:
+                normalized_value = -1
             normalized_ticket[field_name] = normalized_value
         normalized_ticket['Relevancy'] = relevancy_percentage
-        normalized_ticket['Time_Spent'] = ticket['Time_Spent']
+        if ticket['Time_Spent'] is None:
+            normalized_ticket['Time_Spent'] = 0
+        else:
+            normalized_ticket['Time_Spent'] = ticket['Time_Spent']
         if 'Organization' in ticket and ticket['Organization'] is not None:
             normalized_ticket['Organization'] = int(ticket['Organization'])
         else:
