@@ -42,6 +42,10 @@ wheel           0.33.4
 wincertstore    0.2
 </pre>
 
+Inspect Code:
+Internationalization
+Spelling
+
 ___
 
 Disclaimer: In order to reuse parts of this repository, please contact me directly on GitHub. For reasons of security you can not run this application unless you possess certain environmental and temporary folders, files and API secrets, which will not be provided in this repository.
