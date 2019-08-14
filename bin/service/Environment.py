@@ -91,6 +91,10 @@ class Environment:
         service_yaml = self.load_yaml('path')
         return service_yaml['jira_key']
 
+    def get_path_log(self):
+        service_yaml = self.load_yaml('path')
+        return service_yaml['log']
+
     def load_yaml(self, name):
         file = open("{}env\\{}.yaml".format(self.base_path, name), "r", encoding='utf8')
         return yaml.load(file, Loader=Loader)

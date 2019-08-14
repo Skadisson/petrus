@@ -4,6 +4,7 @@ from shutil import copyfile
 import pickle
 import os
 import time
+import datetime
 
 
 class Cache:
@@ -111,7 +112,7 @@ class Cache:
                 raw_ticket_data = sd_api.request_ticket_data(jira_key)
                 mapped_ticket = self.mapper.get_mapped_ticket(raw_ticket_data)
             except Exception as e:
-                print(e)
+                self.add_log_entry(self.__class__.__name__, e)
                 failed_jira_keys.append(jira_key)
                 success = False
                 continue
@@ -125,3 +126,12 @@ class Cache:
     def backup(self):
         cache_file = self.environment.get_path_cache()
         copyfile(cache_file, "{}.backup".format(cache_file))
+
+    def add_log_entry(self, code_reference, message):
+        log_file = self.environment.get_path_log()
+        now = datetime.datetime.now()
+        current_time = now.strftime("%Y/%m/%d %H:%M:%S")
+        entry = "{}: {} - {}\n".format(current_time, code_reference, message)
+        file = open(log_file, "a")
+        file.write(entry)
+        file.close()

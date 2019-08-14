@@ -1,13 +1,14 @@
 from pandas import DataFrame
 from sklearn import linear_model, gaussian_process, tree, naive_bayes, neural_network
 from decimal import Decimal, ROUND_HALF_UP
+from bin.service import Cache
 
 
 class SciKitLearn:
     """Sci Kit Learn ML Stack"""
 
     def __init__(self):
-        """TBI"""
+        self.cache = Cache.Cache()
 
     def estimate(self, target_data, source_data, target_attribute, source_attributes):
 
@@ -21,7 +22,6 @@ class SciKitLearn:
         else:
             estimation = None
 
-        print("Predicted {} hours".format((estimation/60/60)))
         return estimation
 
     @staticmethod
@@ -35,8 +35,6 @@ class SciKitLearn:
                 highest_score = score
                 highest_scoring_model = model
 
-        precision = Decimal((highest_score*100)).quantize(0, ROUND_HALF_UP)
-        print("Using model {} with a precision of {} % on {} contextual data sets".format(highest_scoring_model.__class__.__name__, precision, len(x)))
         return highest_scoring_model
 
     @staticmethod

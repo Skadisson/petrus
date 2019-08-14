@@ -1,4 +1,5 @@
 from bin.service import Analyze
+from bin.service import Cache
 
 
 class Trend:
@@ -6,6 +7,7 @@ class Trend:
 
     def __init__(self, months):
         self.months = float(months)
+        self.cache = Cache.Cache()
 
     def run(self):
         success = True
@@ -22,7 +24,7 @@ class Trend:
             hours_total = analyze.hours_total(days)
             ticket_count = analyze.ticket_count(days)
         except Exception as e:
-            print(e)
+            self.cache.add_log_entry(self.__class__.__name__, e)
             success = False
 
         items = [{

@@ -71,7 +71,7 @@ class ServiceDeskAPI:
         access_token_response = dict(parse.parse_qsl(content))
         if b'oauth_problem' in access_token_response:
             access_problem = access_token_response[b'oauth_problem'].decode("utf-8")
-            print(access_problem)
+            self.cache.add_log_entry(self.__class__.__name__, access_problem)
             raise Exception("No rights")
         access_token_final = access_token_response[b'oauth_token'].decode("utf-8")
         access_secret_final = access_token_response[b'oauth_token_secret'].decode("utf-8")
@@ -88,7 +88,7 @@ class ServiceDeskAPI:
         self.client.set_signature_method(JiraSignature.JiraSignature())
         resp, content = self.request_info()
         if resp['status'] == '500':
-            print("Jira Server Error! Please try again later.")
+            self.cache.add_log_entry(self.__class__.__name__, "Jira responded with status 500")
         return resp['status'] == '200'
 
     def request_ticket_data(self, jira_key):
