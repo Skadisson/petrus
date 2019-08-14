@@ -21,6 +21,7 @@ class SciKitLearn:
         else:
             estimation = None
 
+        print("Predicted {} hours".format((estimation/60/60)))
         return estimation
 
     @staticmethod

@@ -3,6 +3,7 @@ from bin.service import Map
 from bin.service import Cache
 from bin.service import Context
 from bin.service import SciKitLearn
+import datetime
 
 
 class Estimate:
@@ -23,6 +24,8 @@ class Estimate:
         hits = None
         normalized_ticket = None
 
+        now = datetime.datetime.now()
+        print(now.strftime("%Y/%m/%d %H:%M"))
         try:
             if self.jira_key is not None:
                 ticket_data = self.sd_api.request_ticket_data(self.jira_key)
