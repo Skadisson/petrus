@@ -25,6 +25,8 @@ class Estimate:
 
         try:
             if self.jira_key is not None:
+                """TBI"""
+                generate_plot = True
                 ticket_data = self.sd_api.request_ticket_data(self.jira_key)
                 mapped_ticket = self.mapper.get_mapped_ticket(ticket_data)
                 if mapped_ticket is not None:
@@ -47,7 +49,8 @@ class Estimate:
                             normalized_ticket,
                             similar_tickets,
                             'Time_Spent',
-                            ['Relevancy', 'Priority', 'State_Changes', 'Type', 'Organization', 'Words']
+                            ['Relevancy', 'Priority', 'State_Changes', 'Type', 'Organization', 'Words'],
+                            generate_plot
                         )
                         success = self.sd_api.update_ticket_times(mapped_ticket['ID'], estimation, mapped_ticket)
                     else:

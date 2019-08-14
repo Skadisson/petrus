@@ -1,6 +1,8 @@
 from pandas import DataFrame
 from sklearn import linear_model, gaussian_process, tree, naive_bayes, neural_network
 from bin.service import Cache
+from matplotlib import pyplot
+import numpy
 
 
 class SciKitLearn:
@@ -9,7 +11,7 @@ class SciKitLearn:
     def __init__(self):
         self.cache = Cache.Cache()
 
-    def estimate(self, target_data, source_data, target_attribute, source_attributes):
+    def estimate(self, target_data, source_data, target_attribute, source_attributes, generate_plot=False):
 
         x, y = self.frame_data(source_data, target_attribute, source_attributes)
         models = self.shotgun_models(x, y)
@@ -20,6 +22,14 @@ class SciKitLearn:
             estimation = estimations[0]
         else:
             estimation = None
+
+        if generate_plot is True:
+            shape = numpy.pi * 3
+            pyplot.figure(1)
+            pyplot.scatter(x, y, s=shape, c='red', alpha=0.5)
+            pyplot.scatter(x, estimations, s=shape, c='black', alpha=0.5)
+            pyplot.title(model.__class__.__name__)
+            pyplot.show()
 
         return estimation
 
