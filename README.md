@@ -23,13 +23,13 @@ joblib          0.13.2
 numpy           1.17.0
 oauth2          1.9.0.post1
 pandas          0.25.0
-pip             19.1.1
+pip             19.2.2
 python-dateutil 2.8.0
 pytz            2019.2
 PyYAML          5.1.2
 scikit-learn    0.21.3
 scipy           1.3.1
-setuptools      41.0.1
+setuptools      41.1.0
 six             1.12.0
 sklearn         0.0
 tlslite         0.4.9
