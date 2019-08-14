@@ -18,12 +18,16 @@ pip list -l
 Package         Version
 --------------- -----------
 certifi         2019.6.16
+cycler          0.10.0
 httplib2        0.13.1
 joblib          0.13.2
+kiwisolver      1.1.0
+matplotlib      3.1.1
 numpy           1.17.0
 oauth2          1.9.0.post1
 pandas          0.25.0
 pip             19.2.2
+pyparsing       2.4.2
 python-dateutil 2.8.0
 pytz            2019.2
 PyYAML          5.1.2
