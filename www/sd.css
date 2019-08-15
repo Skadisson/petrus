@@ -505,6 +505,12 @@ section {
 
 }
 
+.tickets img {
+
+    width: 100%;
+
+}
+
 .tickets a,
 .tickets a:visited,
 .tickets a:hover,
