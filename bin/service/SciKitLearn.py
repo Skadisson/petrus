@@ -36,20 +36,18 @@ class SciKitLearn:
         plot_path = self.environment.get_path_plot()
         pyplot.figure(num=1, figsize=(12, 8), dpi=96)
         pyplot.title(model.__class__.__name__)
-        pyplot.xlim(-10, 110)
-        pyplot.ylim(-10, 110)
         x_label = "% of ... estimation (black) | "
-        time_percentages = round(y/y.max()*100)
+        time_hours = y/60/60
         df_estimations = DataFrame(estimations)
-        estimation_percentages = round(df_estimations/y.max()*100)
+        estimation_hours = df_estimations/60/60
         for attribute in source_attributes:
             color = colors.pop()
             attribute_percentages = round(x[attribute]/x[attribute].max()*100)
-            pyplot.scatter(attribute_percentages, time_percentages, s=shape, c=color, alpha=0.5)
+            pyplot.scatter(attribute_percentages, time_hours, s=shape, c=color, alpha=0.5)
             x_label += "{} ({}) | ".format(attribute, color)
-        pyplot.hlines(y=estimation_percentages, xmin=0, xmax=100)
+        pyplot.hlines(y=estimation_hours, xmin=0, xmax=100)
         pyplot.xlabel(x_label)
-        pyplot.ylabel("% of {}".format(target_attribute))
+        pyplot.ylabel("{} [h]".format(target_attribute))
         pyplot.savefig(fname=plot_path)
 
     @staticmethod
