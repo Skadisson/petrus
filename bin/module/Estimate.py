@@ -3,6 +3,7 @@ from bin.service import Map
 from bin.service import Cache
 from bin.service import Context
 from bin.service import SciKitLearn
+from bin.module import Trend
 
 
 class Estimate:
@@ -15,6 +16,7 @@ class Estimate:
         self.cache = Cache.Cache()
         self.context = Context.Context()
         self.sci_kit = SciKitLearn.SciKitLearn()
+        self.trend = Trend.Trend(1)
 
     def run(self):
         mapped_ticket = None
@@ -25,6 +27,7 @@ class Estimate:
 
         try:
             if self.jira_key is not None:
+                self.trend.run()
                 ticket_data = self.sd_api.request_ticket_data(self.jira_key)
                 mapped_ticket = self.mapper.get_mapped_ticket(ticket_data)
                 if mapped_ticket is not None:
