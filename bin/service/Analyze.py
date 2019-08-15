@@ -69,7 +69,7 @@ class Analyze:
                     continue
                 if jira_key not in problematic_tickets:
                     problematic_tickets[jira_key] = []
-                if ticket['Time_Spent'] > 14400 or ('State_Changes' in ticket and ticket['State_Changes'] > 4):
+                if ticket['Time_Spent'] is not None and (ticket['Time_Spent'] > 14400 or ('State_Changes' in ticket and ticket['State_Changes'] > 4)):
                     problematic_tickets[jira_key].append(ticket['Time_Spent'])
 
         problematic_tickets = self.sort_tickets(problematic_tickets)
