@@ -11,7 +11,7 @@ SD = (function() {
 
     function refresh(response) {
         self.rotatePointer("tickets-per-hour", response["tickets-per-hour"], 4);
-        self.rotatePointer("hours-total", response["hours-total"], 240);
+        self.rotatePointer("hours-total", response["hours-total"], 400);
         self.onTheRoad(response["hot-projects"]);
         self.updateTicketsTracked(response["tickets-tracked"]);
         self.updateLabel("tickets-per-hour", response["tickets-per-hour"]);
