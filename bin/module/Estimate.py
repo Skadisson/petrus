@@ -31,7 +31,7 @@ class Estimate:
                 ticket_data = self.sd_api.request_ticket_data(self.jira_key)
                 mapped_ticket = self.mapper.get_mapped_ticket(ticket_data)
                 if mapped_ticket is not None:
-                    mapped_ticket['ID'] = int(mapped_ticket['ID'])
+                    mapped_ticket['ID'] = str(mapped_ticket['ID'])
                 mapped_ticket = self.sd_api.request_ticket_status(mapped_ticket)
                 self.cache.store_jira_key_and_id(self.jira_key, mapped_ticket['ID'])
                 mapped_ticket = self.mapper.format_status_history(mapped_ticket)
