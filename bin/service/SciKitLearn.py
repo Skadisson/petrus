@@ -1,6 +1,7 @@
 from pandas import DataFrame
 from sklearn import linear_model, gaussian_process, tree, naive_bayes, neural_network
 from bin.service import Cache
+from bin.service import Environment
 from matplotlib import pyplot
 import numpy
 
@@ -10,8 +11,9 @@ class SciKitLearn:
 
     def __init__(self):
         self.cache = Cache.Cache()
+        self.environment = Environment.Environment()
 
-    def estimate(self, target_data, source_data, target_attribute, source_attributes, generate_plot=False):
+    def estimate(self, target_data, source_data, target_attribute, source_attributes):
 
         x, y = self.frame_data(source_data, target_attribute, source_attributes)
         models = self.shotgun_models(x, y)
@@ -23,15 +25,32 @@ class SciKitLearn:
         else:
             estimation = None
 
-        if generate_plot is True:
-            shape = numpy.pi * 3
-            pyplot.figure(1)
-            pyplot.scatter(x, y, s=shape, c='red', alpha=0.5)
-            pyplot.scatter(x, estimations, s=shape, c='black', alpha=0.5)
-            pyplot.title(model.__class__.__name__)
-            pyplot.show()
+        self.generate_plot(model, estimations, source_attributes, target_attribute, x, y)
 
         return estimation
+
+    def generate_plot(self, model, estimations, source_attributes, target_attribute, x, y):
+
+        shape = numpy.pi * 3
+        colors = ['red', 'green', 'blue', 'cyan', 'magenta', 'yellow']
+        plot_path = self.environment.get_path_plot()
+        pyplot.figure(num=1, figsize=(12, 8), dpi=96)
+        pyplot.title(model.__class__.__name__)
+        pyplot.xlim(-10, 110)
+        pyplot.ylim(-10, 110)
+        x_label = "% of ... estimation (black) | "
+        time_percentages = round(y/y.max()*100)
+        df_estimations = DataFrame(estimations)
+        estimation_percentages = round(df_estimations/y.max()*100)
+        for attribute in source_attributes:
+            color = colors.pop()
+            attribute_percentages = round(x[attribute]/x[attribute].max()*100)
+            pyplot.scatter(attribute_percentages, time_percentages, s=shape, c=color, alpha=0.5)
+            x_label += "{} ({}) | ".format(attribute, color)
+        pyplot.hlines(y=estimation_percentages, xmin=0, xmax=100)
+        pyplot.xlabel(x_label)
+        pyplot.ylabel("% of {}".format(target_attribute))
+        pyplot.savefig(fname=plot_path)
 
     @staticmethod
     def get_highest_scoring_model(models, x, y):
