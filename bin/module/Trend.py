@@ -47,7 +47,7 @@ class Trend:
     def output_trend_json(self, ticket_count, hours_total, hours_per_project, hours_per_type, problematic_tickets):
 
         trend_file = self.environment.get_path_trend()
-        tickets_per_hour = ticket_count / (self.months*30) / 24
+        tickets_per_hour = ticket_count / hours_total
         payed_hours = 0.0
         un_payed_hours = 0.0
         bb5_hours = 0.0
