@@ -53,9 +53,11 @@ class Context:
     def filter_similar_tickets(self, relevancy, cached_tickets, jira_id):
         similar_tickets = []
         for rel_item in relevancy:
-            if rel_item['jira_id'] != jira_id and rel_item['jira_id'] in cached_tickets:
-                similar_ticket = cached_tickets[rel_item['jira_id']]
-                normalized_similar_ticket = self.mapper.normalize_ticket(similar_ticket, rel_item['percentage'])
+            rel_jira_id = str(rel_item['jira_id'])
+            rel_percentage = rel_item['percentage']
+            if rel_jira_id != jira_id and rel_jira_id in cached_tickets:
+                similar_ticket = cached_tickets[rel_jira_id]
+                normalized_similar_ticket = self.mapper.normalize_ticket(similar_ticket, rel_percentage)
                 similar_tickets.append(normalized_similar_ticket)
         hits = len(similar_tickets)
 

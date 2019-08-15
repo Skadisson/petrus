@@ -18,6 +18,24 @@ class Estimate:
         self.sci_kit = SciKitLearn.SciKitLearn()
         self.trend = Trend.Trend(1)
 
+    def retrieve_ticket(self):
+        ticket_data = self.sd_api.request_ticket_data(self.jira_key)
+        mapped_ticket = self.mapper.get_mapped_ticket(ticket_data)
+        mapped_ticket = self.sd_api.request_ticket_status(mapped_ticket)
+        mapped_ticket = self.mapper.format_status_history(mapped_ticket)
+        return mapped_ticket
+
+    def format_tickets(self, mapped_ticket):
+        cached_tickets = self.cache.load_cached_tickets()
+        relevancy = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket['Keywords'])
+        normalized_ticket = self.mapper.normalize_ticket(mapped_ticket)
+        similar_tickets, hits = self.context.filter_similar_tickets(
+            relevancy,
+            cached_tickets,
+            mapped_ticket['ID']
+        )
+        return normalized_ticket, similar_tickets, hits
+
     def run(self):
         mapped_ticket = None
         success = False
@@ -28,23 +46,12 @@ class Estimate:
         try:
             if self.jira_key is not None:
                 self.trend.run()
-                ticket_data = self.sd_api.request_ticket_data(self.jira_key)
-                mapped_ticket = self.mapper.get_mapped_ticket(ticket_data)
-                if mapped_ticket is not None:
-                    mapped_ticket['ID'] = str(mapped_ticket['ID'])
-                mapped_ticket = self.sd_api.request_ticket_status(mapped_ticket)
-                self.cache.store_jira_key_and_id(self.jira_key, mapped_ticket['ID'])
-                mapped_ticket = self.mapper.format_status_history(mapped_ticket)
-                success = self.cache.store_ticket(mapped_ticket['ID'], mapped_ticket)
+                mapped_ticket = self.retrieve_ticket()
+                jira_id = str(mapped_ticket['ID'])
+                self.cache.store_jira_key_and_id(self.jira_key, jira_id)
+                success = self.cache.store_ticket(jira_id, mapped_ticket)
                 if success:
-                    cached_tickets = self.cache.load_cached_tickets()
-                    relevancy = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket['Keywords'])
-                    normalized_ticket = self.mapper.normalize_ticket(mapped_ticket)
-                    similar_tickets, hits = self.context.filter_similar_tickets(
-                        relevancy,
-                        cached_tickets,
-                        mapped_ticket['ID']
-                    )
+                    normalized_ticket, similar_tickets, hits = self.format_tickets(mapped_ticket)
                     if hits > 0:
                         estimation = self.sci_kit.estimate(
                             normalized_ticket,
@@ -52,7 +59,7 @@ class Estimate:
                             'Time_Spent',
                             ['Relevancy', 'Priority', 'State_Changes', 'Type', 'Organization', 'Words']
                         )
-                        success = self.sd_api.update_ticket_times(mapped_ticket['ID'], estimation, mapped_ticket)
+                        success = self.sd_api.update_ticket_times(jira_id, estimation, mapped_ticket)
                     else:
                         success = False
         except Exception as e:
