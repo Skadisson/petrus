@@ -21,7 +21,7 @@ class SciKitLearn:
         target_x, target_y = self.frame_data([target_data], target_attribute, source_attributes)
         estimations = model.predict(target_x)
         if estimations is not None and len(estimations) > 0:
-            estimation = estimations[0]
+            estimation = numpy.average(estimations)
         else:
             estimation = None
 
