@@ -102,7 +102,7 @@ SD = (function() {
     function updateProblematicTickets(problematic_tickets) {
         for(var i = 1; i <= 6; i++) {
             if(problematic_tickets.length >= i) {
-                $('.ticket-' + i).text(problematic_tickets[i][0] + ': ' + problematic_tickets[i][1] + ' h');
+                $('.ticket-' + i).html('<a href="https://jira.konmedia.com/browse/' + problematic_tickets[i][0] + '" target="_blank">' + problematic_tickets[i][0] + '</a>: ' + problematic_tickets[i][1] + ' h');
             }
         }
     }

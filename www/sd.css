@@ -504,3 +504,13 @@ section {
     line-height:22px;
 
 }
+
+.tickets a,
+.tickets a:visited,
+.tickets a:hover,
+.tickets a:link,
+.tickets a:active {
+
+    color:Cornsilk;
+
+}
