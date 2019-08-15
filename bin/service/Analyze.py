@@ -58,6 +58,21 @@ class Analyze:
         types = self.sort_tickets(types)
         return types
 
+    def problematic_tickets(self, for_days=30):
+        problematic_tickets = {}
+        for jira_id in self.tickets:
+            ticket = self.tickets[jira_id]
+            is_in_range = self.ticket_is_in_range(ticket, for_days)
+            if is_in_range is True:
+                ticket_id = int(ticket['ID'])
+                if ticket_id not in problematic_tickets:
+                    problematic_tickets[ticket_id] = []
+                if ticket['Time_Spent'] > 14400 or ('State_Changes' in ticket and ticket['State_Changes'] > 4):
+                    problematic_tickets[ticket_id].append(ticket['Time_Spent'])
+
+        problematic_tickets = self.sort_tickets(problematic_tickets)
+        return problematic_tickets
+
     @staticmethod
     def sort_tickets(seconds_spent_per_attribute):
         accumulated_hours_spent = {}
@@ -66,7 +81,7 @@ class Analyze:
             seconds_spent = seconds_spent_per_attribute[attribute]
             for seconds in seconds_spent:
                 hours = seconds / 60 / 60
-                accumulated_hours_spent[attribute] += hours
+                accumulated_hours_spent[attribute] += round(hours, 2)
         top_tickets = [
             (k, accumulated_hours_spent[k]) for k in sorted(accumulated_hours_spent,
                                                             key=accumulated_hours_spent.get,

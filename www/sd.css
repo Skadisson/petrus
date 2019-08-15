@@ -490,3 +490,17 @@ section {
     background:Crimson;
     box-shadow: 0 0 10px Crimson;
 }
+
+.tickets {
+
+    width:200px;
+    height:600px;
+    position:absolute;
+    display:block;
+    overflow:hidden;
+    top:0;
+    left:5%;
+    font-size:20px;
+    line-height:22px;
+
+}
