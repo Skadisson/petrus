@@ -55,7 +55,7 @@ class Cache:
         if file_exists:
             file = open(jira_key_path, "rb")
             content = pickle.load(file)
-            for content_id, key in content.items():
+            for key, content_id in content.items():
                 if content_id == jira_id:
                     return key
 

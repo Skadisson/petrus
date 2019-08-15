@@ -102,7 +102,7 @@ SD = (function() {
     function updateProblematicTickets(problematic_tickets) {
         for(var i = 1; i <= 6; i++) {
             if(problematic_tickets.length >= i) {
-                $('.ticket-' + i).text('id ' + problematic_tickets[i][0] + ': ' + problematic_tickets[i][1] + ' h');
+                $('.ticket-' + i).text(problematic_tickets[i][0] + ': ' + problematic_tickets[i][1] + ' h');
             }
         }
     }
