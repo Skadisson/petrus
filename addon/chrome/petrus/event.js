@@ -1,4 +1,4 @@
-// This function is called onload in the popup code
+// This function is called onLoad in the popup code
 function getPageDetails(callback) {
     // Inject the content script into the current page
     chrome.tabs.executeScript(null, { file: 'content.js' });

@@ -43,8 +43,8 @@ wincertstore    0.2
 </pre>
 
 Inspect Code:
-Internationalization
-Spelling
+SciKitLearn.py
+Expected type 'int', got 'DataFrame' instead
 
 ___
 

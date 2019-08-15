@@ -64,15 +64,24 @@ class Analyze:
             ticket = self.tickets[jira_id]
             is_in_range = self.ticket_is_in_range(ticket, for_days)
             if is_in_range is True:
-                jira_key = self.cache.load_jira_key_for_id(ticket['ID'])
-                if jira_key is None:
-                    continue
-                if jira_key not in problematic_tickets:
-                    problematic_tickets[jira_key] = []
-                if ticket['Time_Spent'] is not None and (ticket['Time_Spent'] > 14400 or ('State_Changes' in ticket and ticket['State_Changes'] > 4)):
-                    problematic_tickets[jira_key].append(ticket['Time_Spent'])
+                problematic_tickets = self.add_to_problematic_tickets(ticket, problematic_tickets)
 
         problematic_tickets = self.sort_tickets(problematic_tickets)
+        return problematic_tickets
+
+    def add_to_problematic_tickets(self, ticket, problematic_tickets):
+        jira_key = self.cache.load_jira_key_for_id(ticket['ID'])
+        if jira_key is None or ticket['Time_Spent'] is None:
+            return problematic_tickets
+
+        if jira_key not in problematic_tickets:
+            problematic_tickets[jira_key] = []
+        is_above_four_hours = ticket['Time_Spent'] > 14400
+        got_changed_over_four_times = 'State_Changes' in ticket and ticket['State_Changes'] > 4
+        has_sufficient_data = is_above_four_hours or got_changed_over_four_times
+        if has_sufficient_data:
+            problematic_tickets[jira_key].append(ticket['Time_Spent'])
+
         return problematic_tickets
 
     @staticmethod

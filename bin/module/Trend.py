@@ -12,6 +12,17 @@ class Trend:
         self.cache = Cache.Cache()
         self.environment = Environment.Environment()
 
+    def analyze_trend(self):
+        analyze = Analyze.Analyze()
+        days = self.months * 30
+        hours_per_project = analyze.hours_per_project(days)
+        hours_per_type = analyze.hours_per_type(days)
+        hours_total = analyze.hours_total(days)
+        ticket_count = analyze.ticket_count(days)
+        problematic_tickets = analyze.problematic_tickets(days)
+        self.output_trend_json(ticket_count, hours_total, hours_per_project, hours_per_type, problematic_tickets)
+        return hours_per_project, hours_total, ticket_count, hours_per_type
+
     def run(self):
         success = True
         hours_per_project = None
@@ -21,14 +32,7 @@ class Trend:
 
         if self.months > 0:
             try:
-                analyze = Analyze.Analyze()
-                days = self.months * 30
-                hours_per_project = analyze.hours_per_project(days)
-                hours_per_type = analyze.hours_per_type(days)
-                hours_total = analyze.hours_total(days)
-                ticket_count = analyze.ticket_count(days)
-                problematic_tickets = analyze.problematic_tickets(days)
-                self.output_trend_json(ticket_count, hours_total, hours_per_project, hours_per_type, problematic_tickets)
+                hours_per_project, hours_total, ticket_count, hours_per_type = self.analyze_trend()
             except Exception as e:
                 self.cache.add_log_entry(self.__class__.__name__, e)
                 success = False

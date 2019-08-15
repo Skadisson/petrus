@@ -108,20 +108,31 @@ class Cache:
         jira_keys_and_ids = self.load_jira_keys_and_ids()
         for jira_key in jira_keys_and_ids:
             jira_id = jira_keys_and_ids[jira_key]
-            try:
-                raw_ticket_data = sd_api.request_ticket_data(jira_key)
-                mapped_ticket = self.mapper.get_mapped_ticket(raw_ticket_data)
-            except Exception as e:
-                self.add_log_entry(self.__class__.__name__, e)
-                failed_jira_keys.append(jira_key)
-                success = False
-                continue
-            time.sleep(1)
-            clean_cache[str(jira_id)] = mapped_ticket
+            success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
+                sd_api,
+                jira_key,
+                failed_jira_keys,
+                clean_cache,
+                jira_id
+            )
         cache_file = self.environment.get_path_cache()
         file = open(cache_file, "wb")
         pickle.dump(clean_cache, file)
         return failed_jira_keys, success
+
+    def add_to_clean_cache(self, sd_api, jira_key, failed_jira_keys, clean_cache, jira_id):
+        success = True
+        try:
+            raw_ticket_data = sd_api.request_ticket_data(jira_key)
+            mapped_ticket = self.mapper.get_mapped_ticket(raw_ticket_data)
+        except Exception as e:
+            self.add_log_entry(self.__class__.__name__, e)
+            failed_jira_keys.append(jira_key)
+            success = False
+            return success
+        time.sleep(1)
+        clean_cache[str(jira_id)] = mapped_ticket
+        return success, clean_cache, failed_jira_keys
 
     def backup(self):
         cache_file = self.environment.get_path_cache()

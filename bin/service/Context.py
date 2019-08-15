@@ -14,12 +14,16 @@ class Context:
         keyword_total = len(keywords)
         if keyword_total is not 0:
             for jira_id in tickets:
-                ticket_data = tickets[jira_id]
-                ticket_relevancy = self.calculate_ticket_relevancy(ticket_data, keywords, jira_id)
-                if ticket_relevancy is not None and ticket_relevancy['percentage'] > 0:
-                    relevancy.append(ticket_relevancy)
+                relevancy = self.add_to_relevancy(tickets, jira_id, keywords, relevancy)
         sorted_relevancy = self.sort_relevancy(relevancy)
         return sorted_relevancy
+
+    def add_to_relevancy(self, tickets, jira_id, keywords, relevancy):
+        ticket_data = tickets[str(jira_id)]
+        ticket_relevancy = self.calculate_ticket_relevancy(ticket_data, keywords, jira_id)
+        if ticket_relevancy is not None and ticket_relevancy['percentage'] > 0:
+            relevancy.append(ticket_relevancy)
+        return relevancy
 
     def calculate_ticket_relevancy(self, ticket, keywords, jira_id):
         relevancy = None
