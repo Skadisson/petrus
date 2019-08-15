@@ -34,7 +34,7 @@ class Cache:
         if is_valid:
             cache_file = self.environment.get_path_cache()
             content = self.load_cached_tickets()
-            content[jira_id] = ticket
+            content[str(jira_id)] = ticket
             file = open(cache_file, "wb")
             pickle.dump(content, file)
         return is_valid
@@ -45,7 +45,7 @@ class Cache:
         if file_exists:
             file = open(jira_key_path, "rb")
             content = pickle.load(file)
-            return content[jira_key]
+            return str(content[jira_key])
 
         return None
 
@@ -69,7 +69,7 @@ class Cache:
             content = pickle.load(file)
         else:
             content = {}
-        content[jira_key] = jira_id
+        content[str(jira_key)] = str(jira_id)
         file = open(jira_key_path, "wb")
         pickle.dump(content, file)
 
@@ -117,7 +117,7 @@ class Cache:
                 success = False
                 continue
             time.sleep(1)
-            clean_cache[jira_id] = mapped_ticket
+            clean_cache[str(jira_id)] = mapped_ticket
         cache_file = self.environment.get_path_cache()
         file = open(cache_file, "wb")
         pickle.dump(clean_cache, file)

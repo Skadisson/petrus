@@ -34,7 +34,7 @@ class Context:
             ticket_link = self.environment.get_endpoint_ticket_link().format(jira_id)
             if percentage > 0:
                 relevancy = {
-                    "jira_id": jira_id,
+                    "jira_id": str(jira_id),
                     "percentage": percentage,
                     "hits": keyword_hits,
                     "link": ticket_link
