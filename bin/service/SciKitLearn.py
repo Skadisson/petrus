@@ -38,7 +38,7 @@ class SciKitLearn:
         plot_path = self.environment.get_path_plot()
         os.remove(plot_path)
         pyplot.figure(num=None, figsize=(12, 8), dpi=96)
-        pyplot.title(model.__class__.__name__ + " with {} training data sets".format(test_count))
+        pyplot.title(model.__class__.__name__ + " on {} subjects".format(test_count))
         x_label = "% of ... estimation (black) | "
         time_hours = y/60/60
         df_estimations = DataFrame(estimations)
