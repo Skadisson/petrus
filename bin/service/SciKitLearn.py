@@ -4,6 +4,7 @@ from bin.service import Cache
 from bin.service import Environment
 from matplotlib import pyplot
 import numpy
+import os
 
 
 class SciKitLearn:
@@ -15,6 +16,7 @@ class SciKitLearn:
 
     def estimate(self, target_data, source_data, target_attribute, source_attributes):
 
+        test_count = len(source_data)
         x, y = self.frame_data(source_data, target_attribute, source_attributes)
         models = self.shotgun_models(x, y)
         model = self.get_highest_scoring_model(models, x, y)
@@ -25,17 +27,18 @@ class SciKitLearn:
         else:
             estimation = None
 
-        self.generate_plot(model, estimations, source_attributes, target_attribute, x, y)
+        self.generate_plot(model, estimations, source_attributes, target_attribute, x, y, test_count)
 
         return estimation
 
-    def generate_plot(self, model, estimations, source_attributes, target_attribute, x, y):
+    def generate_plot(self, model, estimations, source_attributes, target_attribute, x, y, test_count):
 
         shape = numpy.pi * 3
         colors = ['red', 'green', 'blue', 'cyan', 'magenta', 'yellow']
         plot_path = self.environment.get_path_plot()
-        pyplot.figure(num=1, figsize=(12, 8), dpi=96)
-        pyplot.title(model.__class__.__name__)
+        os.remove(plot_path)
+        pyplot.figure(num=None, figsize=(12, 8), dpi=96)
+        pyplot.title(model.__class__.__name__ + " with {} training data sets".format(test_count))
         x_label = "% of ... estimation (black) | "
         time_hours = y/60/60
         df_estimations = DataFrame(estimations)
