@@ -87,13 +87,15 @@ class Map:
         mapped_ticket['Status'] = formatted_status_history
         return mapped_ticket
 
-    @staticmethod
-    def format_related_tickets(mapped_ticket):
+    def format_related_tickets(self, mapped_ticket):
         formatted_related_tickets = []
+        allowed_relations = self.environment.get_map_relation()
         for ticket_relation in mapped_ticket['Related']:
             if 'inwardIssue' in ticket_relation:
-                formatted_related_tickets.append(str(ticket_relation['inwardIssue']['id']))
+                if ticket_relation['type']['inward'] in allowed_relations:
+                    formatted_related_tickets.append(str(ticket_relation['inwardIssue']['id']))
             if 'outwardIssue' in ticket_relation:
-                formatted_related_tickets.append(str(ticket_relation['outwardIssue']['id']))
+                if ticket_relation['type']['outward'] in allowed_relations:
+                    formatted_related_tickets.append(str(ticket_relation['outwardIssue']['id']))
         mapped_ticket['Related'] = formatted_related_tickets
         return mapped_ticket
