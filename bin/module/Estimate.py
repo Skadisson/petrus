@@ -21,13 +21,14 @@ class Estimate:
     def retrieve_ticket(self):
         ticket_data = self.sd_api.request_ticket_data(self.jira_key)
         mapped_ticket = self.mapper.get_mapped_ticket(ticket_data)
+        mapped_ticket = self.mapper.format_related_tickets(mapped_ticket)
         mapped_ticket = self.sd_api.request_ticket_status(mapped_ticket)
         mapped_ticket = self.mapper.format_status_history(mapped_ticket)
         return mapped_ticket
 
     def format_tickets(self, mapped_ticket):
         cached_tickets = self.cache.load_cached_tickets()
-        relevancy = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket['Keywords'])
+        relevancy = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket)
         normalized_ticket = self.mapper.normalize_ticket(mapped_ticket)
         similar_tickets, hits = self.context.filter_similar_tickets(
             relevancy,

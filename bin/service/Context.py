@@ -9,23 +9,26 @@ class Context:
         self.environment = Environment.Environment()
         self.mapper = Map.Map()
 
-    def calculate_relevancy_for_tickets(self, tickets, keywords):
+    def calculate_relevancy_for_tickets(self, tickets, mapped_ticket):
+        keywords = mapped_ticket['Keywords']
+        relations = mapped_ticket['Related']
+
         relevancy = []
         keyword_total = len(keywords)
         if keyword_total is not 0:
             for jira_id in tickets:
-                relevancy = self.add_to_relevancy(tickets, jira_id, keywords, relevancy)
+                relevancy = self.add_to_relevancy(tickets, jira_id, keywords, relevancy, relations)
         sorted_relevancy = self.sort_relevancy(relevancy)
         return sorted_relevancy
 
-    def add_to_relevancy(self, tickets, jira_id, keywords, relevancy):
+    def add_to_relevancy(self, tickets, jira_id, keywords, relevancy, relations):
         ticket_data = tickets[str(jira_id)]
-        ticket_relevancy = self.calculate_ticket_relevancy(ticket_data, keywords, jira_id)
+        ticket_relevancy = self.calculate_ticket_relevancy(ticket_data, keywords, jira_id, relations)
         if ticket_relevancy is not None and ticket_relevancy['percentage'] > 0:
             relevancy.append(ticket_relevancy)
         return relevancy
 
-    def calculate_ticket_relevancy(self, ticket, keywords, jira_id):
+    def calculate_ticket_relevancy(self, ticket, keywords, jira_id, relations):
         relevancy = None
         keyword_total = len(keywords)
         keyword_hits = []
@@ -33,6 +36,8 @@ class Context:
             if keyword in keywords:
                 keyword_hits.append(keyword)
         hit_count = len(keyword_hits)
+        if jira_id in relations:
+            hit_count += 1
         if hit_count >= 2:
             percentage = hit_count / keyword_total * 100
             ticket_link = self.environment.get_endpoint_ticket_link().format(jira_id)

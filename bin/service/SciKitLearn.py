@@ -34,7 +34,7 @@ class SciKitLearn:
     def generate_plot(self, model, estimations, source_attributes, target_attribute, x, y, test_count):
 
         shape = numpy.pi * 3
-        colors = ['red', 'green', 'blue', 'cyan', 'magenta', 'yellow']
+        colors = ['red', 'green', 'blue', 'cyan', 'magenta', 'orange']
         plot_path = self.environment.get_path_plot()
         os.remove(plot_path)
         pyplot.figure(num=None, figsize=(12, 8), dpi=96)
