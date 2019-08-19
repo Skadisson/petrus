@@ -52,6 +52,7 @@ class SciKitLearn:
         pyplot.xlabel(x_label)
         pyplot.ylabel("{} [h]".format(target_attribute))
         pyplot.savefig(fname=plot_path)
+        pyplot.close()
 
     @staticmethod
     def get_highest_scoring_model(models, x, y):
