@@ -29,6 +29,9 @@ class SciKitLearn:
 
         self.generate_plot(model, estimations, source_attributes, target_attribute, x, y, test_count)
 
+        if estimation <= 0.25:
+            estimation = 0.25
+
         return estimation
 
     def generate_plot(self, model, estimations, source_attributes, target_attribute, x, y, test_count):
