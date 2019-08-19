@@ -29,8 +29,8 @@ class SciKitLearn:
 
         self.generate_plot(model, estimations, source_attributes, target_attribute, x, y, test_count)
 
-        if estimation <= 0.25:
-            estimation = 0.25
+        if estimation < 900:
+            estimation = 900
 
         return estimation
 
