@@ -122,15 +122,21 @@ class ServiceDeskAPI:
         return response, content
 
     def update_ticket_times(self, jira_id, estimation, mapped_ticket):
+        time_spent = float(mapped_ticket['Time_Spent'])
+        estimation = float(estimation)
         ticket_endpoint = self.environment.get_endpoint_ticket().format(jira_id)
-        remaining_time = self.calculate_remaining_time(estimation, mapped_ticket)
-        estimation_hours = self.seconds_to_hours(estimation)
-        remaining_time_hours = self.seconds_to_hours(remaining_time)
+        remaining_time = self.calculate_remaining_time(estimation, time_spent)
+        estimation_float_hours = self.seconds_to_hours(estimation)
+        remaining_float_hours = self.seconds_to_hours(remaining_time)
+        estimation_hours = int(estimation_float_hours)
+        estimation_minutes = round((float(estimation_float_hours) - estimation_hours) * 60, 0)
+        remaining_hours = int(remaining_float_hours)
+        remaining_minutes = round((float(remaining_float_hours) - remaining_hours) * 60, 0)
         request_content = {
             "fields": {
                 'timetracking': {
-                    'originalEstimate': '{} h'.format(estimation_hours).replace('.', ','),
-                    'remainingEstimate': '{} h'.format(remaining_time_hours).replace('.', ',')
+                    'originalEstimate': '{}h {}m'.format(estimation_hours, estimation_minutes).replace('.', ','),
+                    'remainingEstimate': '{}h {}m'.format(remaining_hours, remaining_minutes).replace('.', ',')
                 }
             }
         }
@@ -148,14 +154,8 @@ class ServiceDeskAPI:
         return seconds / 60 / 60
 
     @staticmethod
-    def calculate_remaining_time(estimation, mapped_ticket):
-        if mapped_ticket is not None:
-            if mapped_ticket["Time_Spent"] is None:
-                mapped_ticket["Time_Spent"] = 0
-            remaining = estimation - mapped_ticket["Time_Spent"]
-            if remaining <= 0:
-                remaining = 0
-        else:
+    def calculate_remaining_time(estimation, time_spent):
+        remaining = estimation - time_spent
+        if remaining <= 0:
             remaining = 0
-
         return remaining
