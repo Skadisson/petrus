@@ -23,6 +23,15 @@ class Trend:
         self.output_trend_json(ticket_count, hours_total, hours_per_project, hours_per_type, problematic_tickets)
         return hours_per_project, hours_total, ticket_count, hours_per_type
 
+    def generate_word_cloud(self):
+        analyze = Analyze.Analyze()
+        word_count, word_relations = analyze.word_count_and_relations()
+        word_cloud = {
+            'word_count': word_count,
+            'word_relations': word_relations
+        }
+        self.output_word_cloud_json(word_cloud)
+
     def run(self):
         success = True
         hours_per_project = None
@@ -33,6 +42,7 @@ class Trend:
         if self.months > 0:
             try:
                 hours_per_project, hours_total, ticket_count, hours_per_type = self.analyze_trend()
+                self.generate_word_cloud()
             except Exception as e:
                 self.cache.add_log_entry(self.__class__.__name__, e)
                 success = False
@@ -77,4 +87,10 @@ class Trend:
 
         file = open(trend_file, "w+")
         json.dump(obj=trend_content, fp=file)
+        file.close()
+
+    def output_word_cloud_json(self, word_cloud):
+        word_cloud_file = self.environment.get_path_word_cloud()
+        file = open(word_cloud_file, "w+")
+        json.dump(obj=word_cloud, fp=file)
         file.close()

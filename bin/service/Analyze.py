@@ -1,6 +1,7 @@
 from bin.service import Cache
 import time
 import datetime
+from collections import Counter
 
 
 class Analyze:
@@ -109,3 +110,18 @@ class Analyze:
     @staticmethod
     def timestamp_from_ticket_time(ticket_time):
         return time.mktime(datetime.datetime.strptime(ticket_time, "%Y-%m-%dT%H:%M:%S.%f%z").timetuple())
+
+    def word_count_and_relations(self):
+        words = []
+        word_relations = {}
+        for jira_id in self.tickets:
+            ticket = self.tickets[jira_id]
+            for keyword in ticket['Keywords']:
+                words.append(keyword)
+                if keyword not in word_relations:
+                    word_relations[keyword] = []
+                for related_keyword in ticket['Keywords']:
+                    if related_keyword is not keyword:
+                        word_relations[keyword].append(related_keyword)
+        word_count = Counter(words)
+        return word_count, word_relations
