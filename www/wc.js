@@ -17,23 +17,21 @@ function transform(d) {
 
 $.get("word_cloud.json", function(wc) {
 
+    /* https://www.d3indepth.com/force-layout/ */
     var links = [];
-    var nodes = {};
+    var nodes = [];
     var word_cloud = JSON.parse(wc);
+    for(word in word_cloud.word_count)
+        nodes.push({'name': word, 'weight': word_cloud.word_count[word]});
     for(word in word_cloud.word_relations) {
         related_words = word_cloud.word_relations[word];
         for(rel_index in related_words) {
             if(word && related_words[rel_index]) {
-                var word_weight = word_cloud.word_count[word];
                 var related_word = related_words[rel_index];
-                var related_weight = word_cloud.word_count[related_word]
                 link = {
                     'source': word,
-                    'target': related_word,
-                    'weight': word_weight
+                    'target': related_word
                 }
-                links.source = nodes[link.source] || (nodes[link.source] = {name: link.source, weight: link.weight});
-                links.target = nodes[link.target] || (nodes[link.target] = {name: link.target, weight: related_weight});
                 links.push(link);
             }
         }
@@ -42,16 +40,14 @@ $.get("word_cloud.json", function(wc) {
     var width = window.innerWidth,
       height = window.innerHeight;
 
-    var force = d3.layout.force()
+    var force = d3.forceSimulation()
       .nodes(d3.values(nodes))
-      .links(links)
+      .force('link', d3.forceLink().links(links))
       .size([width, height])
       .linkDistance(100)
       .charge(-300)
       .on("tick", tick)
       .start();
-
-    return;
 
     var svg = d3.select(".diagram").append("svg")
       .attr("width", width)
@@ -65,7 +61,7 @@ $.get("word_cloud.json", function(wc) {
       .data(["suit", "licensing", "resolved"])
       .enter().append("marker")
       .attr("id", function (d) {
-        return d;
+        return d.name;
       })
       .attr("viewBox", "0 -5 10 10")
       .attr("refX", 15)
@@ -98,5 +94,22 @@ $.get("word_cloud.json", function(wc) {
       .text(function (d) {
         return d.name;
       });
+
+    function tick() {
+      path.attr("d", linkArc);
+      circle.attr("transform", transform);
+      text.attr("transform", transform);
+    }
+
+    function linkArc(d) {
+      var dx = d.target.x - d.source.x,
+        dy = d.target.y - d.source.y,
+        dr = Math.sqrt(dx * dx + dy * dy);
+      return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+    }
+
+    function transform(d) {
+      return "translate(" + d.x + "," + d.y + ")";
+    }
 
 });
