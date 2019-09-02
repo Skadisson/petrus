@@ -2,6 +2,7 @@ from bin.service import Cache
 import time
 import datetime
 from collections import Counter
+import re
 
 
 class Analyze:
@@ -58,6 +59,25 @@ class Analyze:
 
         types = self.sort_tickets(types)
         return types
+
+    def hours_per_version(self, for_days=30):
+        versions = {}
+        for jira_id in self.tickets:
+            ticket = self.tickets[jira_id]
+            is_in_range = self.ticket_is_in_range(ticket, for_days)
+            if is_in_range is True and 'Keywords' in ticket:
+                version = None
+                for keyword in ticket['Keywords']:
+                    if re.match(r"bb[0-9.]", keyword):
+                        version = keyword
+                if version is not None:
+                    if version not in versions:
+                        versions[version] = []
+                    if ticket['Time_Spent'] is not None:
+                        versions[version].append(ticket['Time_Spent'])
+
+        versions = self.sort_tickets(versions)
+        return versions
 
     def problematic_tickets(self, for_days=30):
         problematic_tickets = {}

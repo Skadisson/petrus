@@ -17,11 +17,12 @@ class Trend:
         days = self.months * 30
         hours_per_project = analyze.hours_per_project(days)
         hours_per_type = analyze.hours_per_type(days)
+        hours_per_version = analyze.hours_per_version(days)
         hours_total = analyze.hours_total(days)
         ticket_count = analyze.ticket_count(days)
         problematic_tickets = analyze.problematic_tickets(days)
-        self.output_trend_json(ticket_count, hours_total, hours_per_project, hours_per_type, problematic_tickets)
-        return hours_per_project, hours_total, ticket_count, hours_per_type
+        self.output_trend_json(ticket_count, hours_total, hours_per_project, hours_per_type, hours_per_version, problematic_tickets)
+        return hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version
 
     def generate_word_cloud(self):
         analyze = Analyze.Analyze()
@@ -38,10 +39,11 @@ class Trend:
         hours_total = None
         ticket_count = None
         hours_per_type = None
+        hours_per_version = None
 
         if self.months > 0:
             try:
-                hours_per_project, hours_total, ticket_count, hours_per_type = self.analyze_trend()
+                hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version = self.analyze_trend()
                 self.generate_word_cloud()
             except Exception as e:
                 self.cache.add_log_entry(self.__class__.__name__, e)
@@ -54,11 +56,12 @@ class Trend:
             'ticket_count': ticket_count,
             'hours_total': hours_total,
             'hours_per_projects': hours_per_project,
-            'hours_per_type': hours_per_type
+            'hours_per_type': hours_per_type,
+            "hours_per_version": hours_per_version
         }]
         return items, success
 
-    def output_trend_json(self, ticket_count, hours_total, hours_per_project, hours_per_type, problematic_tickets):
+    def output_trend_json(self, ticket_count, hours_total, hours_per_project, hours_per_type, hours_per_version, problematic_tickets):
 
         trend_file = self.environment.get_path_trend()
         tickets_per_hour = ticket_count / hours_total
@@ -82,6 +85,7 @@ class Trend:
             "un-payed-hours": un_payed_hours,
             "bb5-hours": bb5_hours,
             "tickets-per-hour": tickets_per_hour,
+            "hours-per-version": hours_per_version,
             "problematic-tickets": problematic_tickets
         }
 
