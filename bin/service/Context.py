@@ -1,5 +1,6 @@
 from bin.service import Environment
 from bin.service import Map
+from bin.service import Cache
 
 
 class Context:
@@ -8,6 +9,7 @@ class Context:
     def __init__(self):
         self.environment = Environment.Environment()
         self.mapper = Map.Map()
+        self.cache = Cache.Cache()
 
     def calculate_relevancy_for_tickets(self, tickets, mapped_ticket):
         keywords = mapped_ticket['Keywords']
@@ -40,7 +42,8 @@ class Context:
             hit_count += 1
         if hit_count >= 2:
             percentage = hit_count / keyword_total * 100
-            ticket_link = self.environment.get_endpoint_ticket_link().format(jira_id)
+            jira_key = self.cache.load_jira_key_for_id(jira_id)
+            ticket_link = self.environment.get_endpoint_ticket_link().format(jira_key)
             if percentage > 0:
                 relevancy = {
                     "jira_id": str(jira_id),

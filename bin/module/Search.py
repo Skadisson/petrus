@@ -13,7 +13,7 @@ class Search:
     def run(self):
         tickets = self.cache.load_cached_tickets()
         formatted_keywords = self.format_keywords()
-        relevancy = self.context.calculate_relevancy_for_tickets(tickets, formatted_keywords)
+        relevancy = self.context.calculate_relevancy_for_tickets(tickets, {'Keywords': formatted_keywords, 'Related': []})
 
         items = [{
             'relevancy': relevancy,
