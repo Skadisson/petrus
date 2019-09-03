@@ -38,10 +38,11 @@ class Analyze:
             ticket = self.tickets[jira_id]
             is_in_range = self.ticket_is_in_range(ticket, for_days)
             if is_in_range is True and 'Project' in ticket:
-                if ticket['Project'] not in projects:
-                    projects[ticket['Project']] = []
-                if ticket['Time_Spent'] is not None:
-                    projects[ticket['Project']].append(ticket['Time_Spent'])
+                if ticket['Project'] is not None:
+                    if ticket['Project'] not in projects:
+                        projects[ticket['Project']] = []
+                    if ticket['Time_Spent'] is not None:
+                        projects[ticket['Project']].append(ticket['Time_Spent'])
 
         projects = self.sort_tickets(projects)
         return projects
