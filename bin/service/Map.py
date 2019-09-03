@@ -78,13 +78,16 @@ class Map:
 
     @staticmethod
     def format_status_history(mapped_ticket):
-        formatted_status_history = []
-        for status in mapped_ticket['Status']['values']:
-            formatted_status_history.append({
-                'type': status['status'],
-                'milliseconds': status['statusDate']['epochMillis']
-            })
-        mapped_ticket['Status'] = formatted_status_history
+        if mapped_ticket['Status'] is not None:
+            formatted_status_history = []
+            for status in mapped_ticket['Status']['values']:
+                formatted_status_history.append({
+                    'type': status['status'],
+                    'milliseconds': status['statusDate']['epochMillis']
+                })
+            mapped_ticket['Status'] = formatted_status_history
+        else:
+            mapped_ticket['Status'] = []
         return mapped_ticket
 
     def format_related_tickets(self, mapped_ticket):

@@ -93,14 +93,7 @@ class ServiceDeskAPI:
 
     def request_ticket_data(self, jira_key):
         ticket_endpoint = self.environment.get_endpoint_ticket()
-        status_endpoint = self.environment.get_endpoint_status()
         data_url = ticket_endpoint.format(jira_key)
-        validate_url = status_endpoint.format(jira_key)
-        response, content = self.client.request(validate_url, "GET")
-        if response['status'] == '404':
-            raise Exception("Ticket {} does not exist".format(jira_key))
-        if response['status'] != '200':
-            raise Exception("Failed to load Ticket {} from service desk API".format(jira_key))
         response, content = self.client.request(data_url, "GET")
         if response['status'] != '200':
             raise Exception("Request failed with status code {}".format(response['status']))
@@ -111,7 +104,8 @@ class ServiceDeskAPI:
         status_url = status_endpoint.format(mapped_ticket['ID'])
         response, content = self.client.request(status_url, "GET")
         if response['status'] != '200':
-            raise Exception("Request failed with status code {}".format(response['status']))
+            mapped_ticket['Status'] = None
+            return mapped_ticket
         status_history_raw = content.decode("utf-8")
         mapped_ticket['Status'] = json.loads(status_history_raw)
         return mapped_ticket
