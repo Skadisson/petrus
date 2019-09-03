@@ -20,9 +20,10 @@ class Trend:
         hours_per_version = analyze.hours_per_version(days)
         hours_total = analyze.hours_total(days)
         ticket_count = analyze.ticket_count(days)
+        hours_per_ticket = analyze.hours_per_ticket(days)
         problematic_tickets = analyze.problematic_tickets(days)
         self.output_trend_json(ticket_count, hours_total, hours_per_project, hours_per_type, hours_per_version, problematic_tickets)
-        return hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version
+        return hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version, hours_per_ticket
 
     def generate_word_cloud(self):
         analyze = Analyze.Analyze()
@@ -43,7 +44,7 @@ class Trend:
 
         if self.months > 0:
             try:
-                hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version = self.analyze_trend()
+                hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version, hours_per_ticket = self.analyze_trend()
                 self.generate_word_cloud()
             except Exception as e:
                 self.cache.add_log_entry(self.__class__.__name__, e)
@@ -55,9 +56,10 @@ class Trend:
         items = [{
             'ticket_count': ticket_count,
             'hours_total': hours_total,
-            'hours_per_projects': hours_per_project,
+            'hours_per_project': hours_per_project,
             'hours_per_type': hours_per_type,
-            "hours_per_version": hours_per_version
+            'hours_per_version': hours_per_version,
+            'hours_per_ticket': hours_per_ticket
         }]
         return items, success
 

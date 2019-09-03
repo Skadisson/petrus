@@ -80,6 +80,21 @@ class Analyze:
         versions = self.sort_tickets(versions)
         return versions
 
+    def hours_per_ticket(self, for_days=30):
+        tickets = {}
+        for jira_id in self.tickets:
+            ticket = self.tickets[jira_id]
+            jira_key = self.cache.load_jira_key_for_id(jira_id)
+            is_in_range = self.ticket_is_in_range(ticket, for_days)
+            if jira_key is not None and is_in_range is True:
+                if jira_key not in tickets:
+                    tickets[jira_key] = []
+                if ticket['Time_Spent'] is not None:
+                    tickets[jira_key].append(ticket['Time_Spent'])
+
+        tickets = self.sort_tickets(tickets)
+        return tickets
+
     def problematic_tickets(self, for_days=30):
         problematic_tickets = {}
         for jira_id in self.tickets:
