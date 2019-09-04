@@ -95,6 +95,10 @@ class Environment:
         service_yaml = self.load_yaml('path')
         return service_yaml['jira_key']
 
+    def get_path_mirror(self):
+        service_yaml = self.load_yaml('path')
+        return service_yaml['mirror']
+
     def get_path_log(self):
         service_yaml = self.load_yaml('path')
         return service_yaml['log']

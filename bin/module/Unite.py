@@ -21,8 +21,34 @@ class Unite:
             if self.method == "help":
                 response = {
                     "methods": self.methods,
-                    "keys": self.cache.load_jira_keys_and_ids()
+                    "mirrors": self.cache.load_mirrors()
                 }
                 items.append(response)
+            if self.method == "link":
+                if self.jira_key != "" and self.target_jira_key != "":
+                    self.cache.add_mirror(self.jira_key, self.target_jira_key)
+                    response = {
+                        "mirrors": self.cache.load_mirrors()
+                    }
+                    items.append(response)
+                else:
+                    response = {
+                        "methods": self.methods
+                    }
+                    items.append(response)
+                    success = False
+            if self.method == "unlink":
+                if self.jira_key != "" and self.target_jira_key != "":
+                    self.cache.remove_mirror(self.jira_key, self.target_jira_key)
+                    response = {
+                        "mirrors": self.cache.load_mirrors()
+                    }
+                    items.append(response)
+                else:
+                    response = {
+                        "methods": self.methods
+                    }
+                    items.append(response)
+                    success = False
 
         return items, success

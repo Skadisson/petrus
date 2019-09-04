@@ -101,6 +101,61 @@ class Cache:
             content = {}
         return content
 
+    def load_mirrors(self):
+        cache_file = self.environment.get_path_mirror()
+        file_exists = os.path.exists(cache_file)
+        if file_exists:
+            file = open(cache_file, "rb")
+            content = pickle.load(file)
+        else:
+            content = {}
+        return content
+
+    def store_mirrors(self, mirrors):
+        cache_file = self.environment.get_path_mirror()
+        file = open(cache_file, "wb")
+        pickle.dump(mirrors, file)
+
+    def add_mirror(self, jira_key, target_jira_key):
+        jira_id = self.load_jira_id_for_key(jira_key)
+        target_jira_id = self.load_jira_id_for_key(target_jira_key)
+        if jira_id != "":
+            self.add_jira_id_as_mirror(jira_id, [jira_key, target_jira_key])
+            return jira_id
+        if target_jira_id != "":
+            self.add_jira_id_as_mirror(target_jira_id, [jira_key, target_jira_key])
+            return target_jira_id
+        return ""
+
+    def remove_mirror(self, jira_key, target_jira_key):
+        jira_id = self.load_jira_id_for_key(jira_key)
+        target_jira_id = self.load_jira_id_for_key(target_jira_key)
+        if jira_id != "":
+            self.remove_mirrors_from_jira_id(jira_id, [jira_key, target_jira_key])
+            return jira_id
+        if target_jira_id != "":
+            self.remove_mirrors_from_jira_id(target_jira_id, [jira_key, target_jira_key])
+            return target_jira_id
+        return ""
+
+    def add_jira_id_as_mirror(self, jira_id, jira_keys):
+        mirrors = self.load_mirrors()
+        if jira_id not in mirrors:
+            mirrors[jira_id] = jira_keys
+        else:
+            for jira_key in jira_keys:
+                if jira_key not in mirrors[jira_id]:
+                    mirrors[jira_id].append(jira_key)
+        self.store_mirrors(mirrors)
+
+    def remove_mirrors_from_jira_id(self, jira_id, jira_keys):
+        mirrors = self.load_mirrors()
+        if jira_id in mirrors:
+            for jira_key in jira_keys:
+                if jira_key in mirrors[jira_id]:
+                    mirrors[jira_id].remove(jira_key)
+        self.store_mirrors(mirrors)
+
     def update_all_tickets(self, sd_api):
         success = True
         failed_jira_keys = []
