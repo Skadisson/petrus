@@ -116,7 +116,10 @@ class ServiceDeskAPI:
         return response, content
 
     def update_ticket_times(self, jira_id, estimation, mapped_ticket):
-        time_spent = float(mapped_ticket['Time_Spent'])
+        if mapped_ticket['Time_Spent'] is not None:
+            time_spent = float(mapped_ticket['Time_Spent'])
+        else:
+            time_spent = 0.0
         estimation = float(estimation)
         ticket_endpoint = self.environment.get_endpoint_ticket().format(jira_id)
         remaining_time = self.calculate_remaining_time(estimation, time_spent)

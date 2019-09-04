@@ -45,7 +45,8 @@ class Cache:
         if file_exists:
             file = open(jira_key_path, "rb")
             content = pickle.load(file)
-            return str(content[jira_key])
+            if jira_key in content:
+                return str(content[jira_key])
 
         return None
 
@@ -112,6 +113,8 @@ class Cache:
         return content
 
     def store_mirrors(self, mirrors):
+        if None in mirrors:
+            mirrors.pop(None, None)
         cache_file = self.environment.get_path_mirror()
         file = open(cache_file, "wb")
         pickle.dump(mirrors, file)
@@ -119,10 +122,10 @@ class Cache:
     def add_mirror(self, jira_key, target_jira_key):
         jira_id = self.load_jira_id_for_key(jira_key)
         target_jira_id = self.load_jira_id_for_key(target_jira_key)
-        if jira_id != "":
+        if jira_id != "" and jira_id is not None:
             self.add_jira_id_as_mirror(jira_id, [jira_key, target_jira_key])
             return jira_id
-        if target_jira_id != "":
+        if target_jira_id != "" and target_jira_id is not None:
             self.add_jira_id_as_mirror(target_jira_id, [jira_key, target_jira_key])
             return target_jira_id
         return ""
@@ -130,10 +133,10 @@ class Cache:
     def remove_mirror(self, jira_key, target_jira_key):
         jira_id = self.load_jira_id_for_key(jira_key)
         target_jira_id = self.load_jira_id_for_key(target_jira_key)
-        if jira_id != "":
+        if jira_id != "" and jira_id is not None:
             self.remove_mirrors_from_jira_id(jira_id, [jira_key, target_jira_key])
             return jira_id
-        if target_jira_id != "":
+        if target_jira_id != "" and target_jira_id is not None:
             self.remove_mirrors_from_jira_id(target_jira_id, [jira_key, target_jira_key])
             return target_jira_id
         return ""
