@@ -9,7 +9,7 @@ function estimate() {
     event.preventDefault();
 
     var jira_key = document.getElementById('jira_key');
-    var getUrl = 'http://localhost:55888/?function=Estimate&jira_key=' + encodeURIComponent(jira_key.value);
+    var getUrl = 'http://localhost:87654/?function=Estimate&jira_key=' + encodeURIComponent(jira_key.value);
     var formContentType = 'application/x-www-form-urlencoded';
     try {
         var xhr = new XMLHttpRequest();
