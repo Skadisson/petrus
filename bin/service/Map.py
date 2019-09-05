@@ -81,10 +81,13 @@ class Map:
         if mapped_ticket['Status'] is not None:
             formatted_status_history = []
             for status in mapped_ticket['Status']['values']:
+                millis = status['statusDate']['epochMillis']
                 formatted_status_history.append({
                     'type': status['status'],
-                    'milliseconds': status['statusDate']['epochMillis']
+                    'milliseconds': millis
                 })
+                if 'LastProcessed' not in mapped_ticket or mapped_ticket['LastProcessed'] < millis:
+                    mapped_ticket['LastProcessed'] = millis
             mapped_ticket['Status'] = formatted_status_history
         else:
             mapped_ticket['Status'] = []

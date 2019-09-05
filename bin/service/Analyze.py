@@ -138,7 +138,10 @@ class Analyze:
         return top_tickets
 
     def ticket_is_in_range(self, ticket, for_days=30):
-        time_updated = self.timestamp_from_ticket_time(ticket['Updated'])
+        if 'LastProcessed' not in ticket:
+            time_updated = self.timestamp_from_ticket_time(ticket['Updated'])
+        else:
+            time_updated = int(ticket['LastProcessed']) / 1000
         current_time_stamp = datetime.datetime.now().timestamp()
         max_gap = for_days * 24 * 60 * 60
         return time_updated >= (current_time_stamp - max_gap)
