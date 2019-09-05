@@ -459,14 +459,9 @@ section {
 
 .bars span.bugfix {
 
-    margin-left:23%;
+    margin-left:52%;
+    margin-right:6%;
     color:Crimson;
-
-}
-
-.bars span.maintenance {
-
-    color:cyan;
 
 }
 
@@ -479,11 +474,6 @@ section {
 .bar.support {
     background:mediumseagreen;
     box-shadow: 0 0 10px mediumseagreen;
-}
-
-.bar.maintenance {
-    background:cyan;
-    box-shadow: 0 0 10px cyan;
 }
 
 .bar.bugfix {

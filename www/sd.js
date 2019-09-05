@@ -16,7 +16,7 @@ SD = (function() {
         self.updateTicketsTracked(response["tickets-tracked"]);
         self.updateLabel("tickets-per-hour", response["tickets-per-hour"]);
         self.updateLabel("hours-total", response["hours-total"]);
-        self.updateBars(response["payed-hours"], response["bb5-hours"], response["un-payed-hours"]);
+        self.updateBars(response["payed-hours"], response["un-payed-hours"]);
         self.updateProblematicTickets(response["problematic-tickets"])
     }
 
@@ -83,18 +83,15 @@ SD = (function() {
 
     }
 
-    function updateBars(support, maintenance, bugfix) {
+    function updateBars(support, bugfix) {
 
-        var sum = support + maintenance + bugfix;
-        var supportPercent, maintenancePercent, bugfixPercent = 0;
+        var sum = support + bugfix;
+        var supportPercent, bugfixPercent = 0;
         if(support > 0)
             supportPercent = self.reduceToTwoDecimals(support / sum * 100);
-        if(maintenance > 0)
-            maintenancePercent = self.reduceToTwoDecimals(maintenance / sum * 100);
         if(bugfix > 0)
             bugfixPercent = self.reduceToTwoDecimals(bugfix / sum * 100);
         self.drawBar('support', supportPercent);
-        self.drawBar('maintenance', maintenancePercent);
         self.drawBar('bugfix', bugfixPercent);
 
     }

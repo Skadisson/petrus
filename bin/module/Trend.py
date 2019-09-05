@@ -69,15 +69,12 @@ class Trend:
         tickets_per_hour = ticket_count / hours_total
         payed_hours = 0.0
         un_payed_hours = 0.0
-        bb5_hours = 0.0
 
         for ticket_type in hours_per_type:
-            if ticket_type[0] in ['Fehler']:
+            if ticket_type[0] in ['Fehler', 'Maintenance']:
                 un_payed_hours += ticket_type[1]
             elif ticket_type[0] in ['Serviceanfrage', 'Aufgabe', 'Media Service']:
                 payed_hours += ticket_type[1]
-            elif ticket_type[0] in ['Maintenance']:
-                bb5_hours += ticket_type[1]
 
         trend_content = {
             "tickets-tracked": ticket_count,
@@ -85,7 +82,6 @@ class Trend:
             "hot-projects": hours_per_project,
             "payed-hours": payed_hours,
             "un-payed-hours": un_payed_hours,
-            "bb5-hours": bb5_hours,
             "tickets-per-hour": tickets_per_hour,
             "hours-per-version": hours_per_version,
             "problematic-tickets": problematic_tickets
