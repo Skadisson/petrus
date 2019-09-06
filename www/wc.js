@@ -20,52 +20,70 @@ $.get("word_cloud.json", function(wc) {
         links.push(link);
     }
 
-    var canvas = document.querySelector("canvas"),
-        context = canvas.getContext("2d"),
-        width = canvas.width,
-        height = canvas.height;
+    render();
+    $('[name=search]').on('keyup', render);
 
-    var simulation = d3.forceSimulation()
-        .force("link", d3.forceLink().id(function(d) { return d.name; }).strength(0.001))
-        .force("charge", d3.forceManyBody())
-        .force("center", d3.forceCenter(width / 2, height / 2));
+    function render(event=null) {
 
-    simulation
-      .nodes(nodes)
-      .on("tick", ticked);
+        var filtered_links = links;
+        var filtered_nodes = nodes;
+        if(event !== null) {
+            filtered_links = [];
+            var word = event.currentTarget.value;
+            for(i in links) {
+                if(links[i].source.name.match(word) || links[i].target.name.match(word)) {
+                    filtered_links.push(links[i]);
+                }
+            }
+        }
 
-    simulation.force("link")
-      .links(links);
+        var canvas = document.querySelector("canvas"),
+            context = canvas.getContext("2d"),
+            width = canvas.width,
+            height = canvas.height;
 
-    function ticked() {
-        context.clearRect(0, 0, width, height);
+        var simulation = d3.forceSimulation()
+            .force("link", d3.forceLink().id(function(d) { return d.name; }).strength(0.001))
+            .force("charge", d3.forceManyBody())
+            .force("center", d3.forceCenter(width / 2, height / 2));
 
-        context.beginPath();
-        links.forEach(drawLink);
-        context.strokeStyle = "#8df";
-        context.stroke();
+        simulation
+          .nodes(filtered_nodes)
+          .on("tick", ticked);
 
-        context.beginPath();
-        nodes.forEach(drawNode);
-        context.fill();
-        context.strokeStyle = "#fff";
-        context.stroke();
+        simulation.force("link")
+          .links(filtered_links);
+
+        function ticked() {
+            context.clearRect(0, 0, width, height);
+
+            context.beginPath();
+            filtered_links.forEach(drawLink);
+            context.strokeStyle = "#8df";
+            context.stroke();
+
+            context.beginPath();
+            filtered_nodes.forEach(drawNode);
+            context.fill();
+            context.strokeStyle = "#fff";
+            context.stroke();
+        }
+
+        function drawLink(d) {
+          context.moveTo(d.source.x, d.source.y);
+          context.lineTo(d.target.x, d.target.y);
+        }
+
+        function drawNode(d) {
+          var node_size = d.weight / max_weight;
+          var font_size = Math.max((node_size * 40), 10);
+          context.moveTo(d.x + 3, d.y);
+          context.arc(d.x, d.y, node_size, 0, 2 * Math.PI);
+          context.font = font_size + "px Arial bold";
+          context.fillStyle = 'rgba(0,0,0,0.75)';
+          context.fillText(d.name, d.x+3, d.y+3);
+        }
+
     }
-
-    function drawLink(d) {
-      context.moveTo(d.source.x, d.source.y);
-      context.lineTo(d.target.x, d.target.y);
-    }
-
-    function drawNode(d) {
-      var node_size = d.weight / max_weight;
-      var font_size = Math.max((node_size * 40), 10);
-      context.moveTo(d.x + 3, d.y);
-      context.arc(d.x, d.y, node_size, 0, 2 * Math.PI);
-      context.font = font_size + "px Arial bold";
-      context.fillStyle = 'rgba(0,0,0,0.75)';
-      context.fillText(d.name, d.x+3, d.y+3);
-    }
-
 
 });
