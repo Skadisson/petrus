@@ -26,7 +26,7 @@ $.get("word_cloud.json", function(wc) {
         height = canvas.height;
 
     var simulation = d3.forceSimulation()
-        .force("link", d3.forceLink().id(function(d) { return d.name; }))
+        .force("link", d3.forceLink().id(function(d) { return d.name; }).strength(0.001))
         .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(width / 2, height / 2));
 
@@ -42,7 +42,7 @@ $.get("word_cloud.json", function(wc) {
 
         context.beginPath();
         links.forEach(drawLink);
-        context.strokeStyle = "#ddd";
+        context.strokeStyle = "#8df";
         context.stroke();
 
         context.beginPath();
@@ -59,8 +59,11 @@ $.get("word_cloud.json", function(wc) {
 
     function drawNode(d) {
       var node_size = d.weight / max_weight;
+      var font_size = Math.max((node_size * 40), 10);
       context.moveTo(d.x + 3, d.y);
       context.arc(d.x, d.y, node_size, 0, 2 * Math.PI);
+      context.font = font_size + "px Arial bold";
+      context.fillStyle = 'rgba(0,0,0,0.75)';
       context.fillText(d.name, d.x+3, d.y+3);
     }
 
