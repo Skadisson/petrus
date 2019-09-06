@@ -33,6 +33,7 @@ class Trend:
             'word_relations': word_relations
         }
         self.output_word_cloud_json(word_cloud)
+        return word_cloud
 
     def run(self):
         success = True
@@ -41,11 +42,13 @@ class Trend:
         ticket_count = None
         hours_per_type = None
         hours_per_version = None
+        hours_per_ticket = None
+        word_cloud = None
 
         if self.months > 0:
             try:
                 hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version, hours_per_ticket = self.analyze_trend()
-                self.generate_word_cloud()
+                word_cloud = self.generate_word_cloud()
             except Exception as e:
                 self.cache.add_log_entry(self.__class__.__name__, e)
                 success = False
@@ -59,7 +62,8 @@ class Trend:
             'hours_per_project': hours_per_project,
             'hours_per_type': hours_per_type,
             'hours_per_version': hours_per_version,
-            'hours_per_ticket': hours_per_ticket
+            'hours_per_ticket': hours_per_ticket,
+            'word_cloud': word_cloud
         }]
         return items, success
 
@@ -92,7 +96,15 @@ class Trend:
         file.close()
 
     def output_word_cloud_json(self, word_cloud):
+        word_cloud_output = []
+        for source_word in word_cloud['word_relations']:
+            for target_word in word_cloud['word_relations'][source_word]:
+                word_cloud_output.append({
+                    "source": source_word,
+                    "target": target_word,
+                    "weight": word_cloud['word_count'][source_word]
+                })
         word_cloud_file = self.environment.get_path_word_cloud()
         file = open(word_cloud_file, "w+")
-        json.dump(obj=word_cloud, fp=file)
+        json.dump(obj=word_cloud_output, fp=file)
         file.close()

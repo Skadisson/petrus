@@ -1,115 +1,68 @@
-function tick() {
-  path.attr("d", linkArc);
-  circle.attr("transform", transform);
-  text.attr("transform", transform);
-}
-
-function linkArc(d) {
-  var dx = d.target.x - d.source.x,
-    dy = d.target.y - d.source.y,
-    dr = Math.sqrt(dx * dx + dy * dy);
-  return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
-}
-
-function transform(d) {
-  return "translate(" + d.x + "," + d.y + ")";
-}
-
 $.get("word_cloud.json", function(wc) {
 
-    /* https://www.d3indepth.com/force-layout/ */
     var links = [];
     var nodes = [];
+    var existing_nodes = [];
+    var max_weight = 0;
     var word_cloud = JSON.parse(wc);
-    for(word in word_cloud.word_count)
-        nodes.push({'name': word, 'weight': word_cloud.word_count[word]});
-    for(word in word_cloud.word_relations) {
-        related_words = word_cloud.word_relations[word];
-        for(rel_index in related_words) {
-            if(word && related_words[rel_index]) {
-                var related_word = related_words[rel_index];
-                link = {
-                    'source': word,
-                    'target': related_word
-                }
-                links.push(link);
-            }
+    for(var i in word_cloud) {
+        var relation = word_cloud[i];
+        if(relation.weight > max_weight)
+            max_weight = relation.weight;
+        if(existing_nodes.indexOf(relation.source) == -1) {
+            existing_nodes.push(relation.source);
+            nodes.push({'name': relation.source, 'weight': relation.weight});
         }
+        link = {
+            'source': relation.source,
+            'target': relation.target
+        }
+        links.push(link);
     }
 
-    var width = window.innerWidth,
-      height = window.innerHeight;
+    var canvas = document.querySelector("canvas"),
+        context = canvas.getContext("2d"),
+        width = canvas.width,
+        height = canvas.height;
 
-    var force = d3.forceSimulation()
-      .nodes(d3.values(nodes))
-      .force('link', d3.forceLink().links(links))
-      .size([width, height])
-      .linkDistance(100)
-      .charge(-300)
-      .on("tick", tick)
-      .start();
+    var simulation = d3.forceSimulation()
+        .force("link", d3.forceLink().id(function(d) { return d.name; }))
+        .force("charge", d3.forceManyBody())
+        .force("center", d3.forceCenter(width / 2, height / 2));
 
-    var svg = d3.select(".diagram").append("svg")
-      .attr("width", width)
-      .attr("height", height)
-      .attr('id', 'svg')
-      .call(d3.behavior.zoom().on("zoom", function () {
-        svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
-      }));
+    simulation
+      .nodes(nodes)
+      .on("tick", ticked);
 
-    svg.append("defs").selectAll("marker")
-      .data(["suit", "licensing", "resolved"])
-      .enter().append("marker")
-      .attr("id", function (d) {
-        return d.name;
-      })
-      .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 15)
-      .attr("refY", -1.5)
-      .attr("markerWidth", 6)
-      .attr("markerHeight", 6)
-      .attr("orient", "auto")
-      .append("path")
-      .attr("d", "M0,-5L10,0L0,5");
+    simulation.force("link")
+      .links(links);
 
-    var path = svg.append("g").selectAll("path")
-      .data(force.links())
-      .enter().append("path")
-      .attr("class", "link");
+    function ticked() {
+        context.clearRect(0, 0, width, height);
 
-    var circle = svg.append("g").selectAll("circle")
-      .data(force.nodes())
-      .enter().append("circle")
-      .attr("r", function (d) {
-        var minRadius = 0.2;
-        return minRadius + (d.weight * 1.1);
-      })
-      .call(force.drag);
+        context.beginPath();
+        links.forEach(drawLink);
+        context.strokeStyle = "#ddd";
+        context.stroke();
 
-    var text = svg.append("g").selectAll("text")
-      .data(force.nodes())
-      .enter().append("text")
-      .attr("x", 8)
-      .attr("y", ".31em")
-      .text(function (d) {
-        return d.name;
-      });
-
-    function tick() {
-      path.attr("d", linkArc);
-      circle.attr("transform", transform);
-      text.attr("transform", transform);
+        context.beginPath();
+        nodes.forEach(drawNode);
+        context.fill();
+        context.strokeStyle = "#fff";
+        context.stroke();
     }
 
-    function linkArc(d) {
-      var dx = d.target.x - d.source.x,
-        dy = d.target.y - d.source.y,
-        dr = Math.sqrt(dx * dx + dy * dy);
-      return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+    function drawLink(d) {
+      context.moveTo(d.source.x, d.source.y);
+      context.lineTo(d.target.x, d.target.y);
     }
 
-    function transform(d) {
-      return "translate(" + d.x + "," + d.y + ")";
+    function drawNode(d) {
+      var node_size = d.weight / max_weight;
+      context.moveTo(d.x + 3, d.y);
+      context.arc(d.x, d.y, node_size, 0, 2 * Math.PI);
+      context.fillText(d.name, d.x+3, d.y+3);
     }
+
 
 });
