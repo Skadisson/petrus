@@ -18,27 +18,30 @@ pip list -l
 Package         Version
 --------------- -----------
 certifi         2019.6.16
+colorclass      2.2.0
 cycler          0.10.0
 httplib2        0.13.1
 joblib          0.13.2
 kiwisolver      1.1.0
 matplotlib      3.1.1
-numpy           1.17.0
+numpy           1.17.1
 oauth2          1.9.0.post1
-pandas          0.25.0
-pip             19.2.2
+pandas          0.25.1
+pip             19.2.3
+pip-check       2.5.2
 pyparsing       2.4.2
 python-dateutil 2.8.0
 pytz            2019.2
 PyYAML          5.1.2
 scikit-learn    0.21.3
 scipy           1.3.1
-setuptools      41.1.0
+setuptools      41.2.0
 six             1.12.0
 sklearn         0.0
+terminaltables  3.1.0
 tlslite         0.4.9
-Werkzeug        0.15.5
-wheel           0.33.4
+Werkzeug        0.15.6
+wheel           0.33.6
 wincertstore    0.2
 </pre>
 
