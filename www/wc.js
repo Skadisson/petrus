@@ -42,6 +42,8 @@ $.get("word_cloud.json", function(wc) {
             width = canvas.width,
             height = canvas.height;
 
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
         var simulation = d3.forceSimulation()
             .force("link", d3.forceLink().id(function(d) { return d.name; }).strength(0.001))
             .force("charge", d3.forceManyBody())
