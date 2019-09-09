@@ -21,17 +21,17 @@ $.get("word_cloud.json", function(wc) {
     }
 
     render();
-    $('[name=search]').on('keyup', render);
 
     function render(event=null) {
 
         var filtered_links = links;
         var filtered_nodes = nodes;
-        if(event !== null) {
+        var query = document.location.href.match(/search=([0-9a-z /-_]*)/i);
+        if(query && typeof query[1] !== 'undefined') {
             filtered_links = [];
-            var word = event.currentTarget.value;
+            var word = query[1];
             for(i in links) {
-                if(links[i].source.name.match(word) || links[i].target.name.match(word)) {
+                if(links[i].source.match(word) || links[i].target.match(word)) {
                     filtered_links.push(links[i]);
                 }
             }
