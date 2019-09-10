@@ -122,10 +122,10 @@ class Cache:
     def add_mirror(self, jira_key, target_jira_key):
         jira_id = self.load_jira_id_for_key(jira_key)
         target_jira_id = self.load_jira_id_for_key(target_jira_key)
-        if jira_id != "" and jira_id is not None:
+        if jira_id != "" and jira_id is not None and target_jira_id != "" and target_jira_id is not None:
             self.add_jira_id_as_mirror(jira_id, [jira_key, target_jira_key])
             return jira_id
-        if target_jira_id != "" and target_jira_id is not None:
+        if target_jira_id != "" and target_jira_id is not None and jira_id != "" and jira_id is not None:
             self.add_jira_id_as_mirror(target_jira_id, [jira_key, target_jira_key])
             return target_jira_id
         return ""
