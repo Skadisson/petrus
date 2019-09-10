@@ -26,9 +26,10 @@ def petrus(request):
             items, success = search.run()
     elif function == 'Trend':
         months = request.args.get('months', None)
-        if months is not None:
-            trend = Trend.Trend(months)
-            items, success = trend.run()
+        year = request.args.get('year', None)
+        week_numbers = request.args.get('week_numbers', None)
+        trend = Trend.Trend(months, year, week_numbers)
+        items, success = trend.run()
     elif function == 'Update':
         update = Update.Update()
         items, success = update.run()

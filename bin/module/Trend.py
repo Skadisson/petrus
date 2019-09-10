@@ -7,21 +7,23 @@ import json
 class Trend:
     """Trend calculator"""
 
-    def __init__(self, months):
+    def __init__(self, months=0, year="", week_numbers=""):
         self.months = float(months)
+        self.year = str(year)
+        self.week_numbers = str(week_numbers)
         self.cache = Cache.Cache()
         self.environment = Environment.Environment()
 
     def analyze_trend(self):
         analyze = Analyze.Analyze()
         days = self.months * 30
-        hours_per_project = analyze.hours_per_project(days)
-        hours_per_type = analyze.hours_per_type(days)
-        hours_per_version = analyze.hours_per_version(days)
-        hours_total = analyze.hours_total(days)
-        ticket_count = analyze.ticket_count(days)
-        hours_per_ticket = analyze.hours_per_ticket(days)
-        problematic_tickets = analyze.problematic_tickets(days)
+        hours_per_project = analyze.hours_per_project(days, self.year, self.week_numbers)
+        hours_per_type = analyze.hours_per_type(days, self.year, self.week_numbers)
+        hours_per_version = analyze.hours_per_version(days, self.year, self.week_numbers)
+        hours_total = analyze.hours_total(days, self.year, self.week_numbers)
+        ticket_count = analyze.ticket_count(days, self.year, self.week_numbers)
+        hours_per_ticket = analyze.hours_per_ticket(days, self.year, self.week_numbers)
+        problematic_tickets = analyze.problematic_tickets(days, self.year, self.week_numbers)
         self.output_trend_json(ticket_count, hours_total, hours_per_project, hours_per_type, hours_per_version, problematic_tickets)
         return hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version, hours_per_ticket
 
@@ -45,15 +47,12 @@ class Trend:
         hours_per_ticket = None
         word_cloud = None
 
-        if self.months > 0:
-            try:
-                hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version, hours_per_ticket = self.analyze_trend()
-                word_cloud = self.generate_word_cloud()
-            except Exception as e:
-                self.cache.add_log_entry(self.__class__.__name__, e)
-                success = False
-
-        else:
+        try:
+            hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version, hours_per_ticket = \
+                self.analyze_trend()
+            word_cloud = self.generate_word_cloud()
+        except Exception as e:
+            self.cache.add_log_entry(self.__class__.__name__, e)
             success = False
 
         items = [{
