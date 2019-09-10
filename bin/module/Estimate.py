@@ -53,16 +53,16 @@ class Estimate:
                 success = self.cache.store_ticket(jira_id, mapped_ticket)
                 if success:
                     normalized_ticket, similar_tickets, hits = self.format_tickets(mapped_ticket)
-                    if hits > 0:
+                    if hits == 0:
+                        estimation = 900
+                    else:
                         estimation = self.sci_kit.estimate(
                             normalized_ticket,
                             similar_tickets,
                             'Time_Spent',
                             ['Relevancy', 'Priority', 'State_Changes', 'Type', 'Organization', 'Words']
                         )
-                        success = self.sd_api.update_ticket_times(jira_id, estimation, mapped_ticket)
-                    else:
-                        success = False
+                    success = self.sd_api.update_ticket_times(jira_id, estimation, mapped_ticket)
         except Exception as e:
             self.cache.add_log_entry(self.__class__.__name__, e)
 
