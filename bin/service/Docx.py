@@ -15,6 +15,8 @@ class Docx:
 
     def place_stats(self, ticket_count, hours_total, hours_per_type, months):
 
+        self.document.add_paragraph("").add_run("Durch Petrus automatisiert erstellt.").italic = True
+
         support_hours = 0.0
         bugfix_hours = 0.0
         for type_hours in hours_per_type:
