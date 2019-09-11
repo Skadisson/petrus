@@ -24,7 +24,7 @@ httplib2        0.13.1
 joblib          0.13.2
 kiwisolver      1.1.0
 matplotlib      3.1.1
-numpy           1.17.1
+numpy           1.17.2
 oauth2          1.9.0.post1
 pandas          0.25.1
 pip             19.2.3
