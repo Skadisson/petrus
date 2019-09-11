@@ -1,6 +1,7 @@
 from bin.service import Analyze
 from bin.service import Cache
 from bin.service import Environment
+from bin.service import Docx
 import json
 
 
@@ -37,6 +38,17 @@ class Trend:
         self.output_word_cloud_json(word_cloud)
         return word_cloud
 
+    def generate_docx(self):
+        analyze = Analyze.Analyze()
+        days = self.months * 30
+        hours_per_project = analyze.hours_per_project(days, self.year, self.week_numbers)
+        hours_per_type = analyze.hours_per_type(days, self.year, self.week_numbers)
+        hours_per_version = analyze.hours_per_version(days, self.year, self.week_numbers)
+        hours_total = analyze.hours_total(days, self.year, self.week_numbers)
+        ticket_count = analyze.ticket_count(days, self.year, self.week_numbers)
+        hours_per_ticket = analyze.hours_per_ticket(days, self.year, self.week_numbers)
+        return self.output_docx(ticket_count, hours_total, hours_per_type, hours_per_project, hours_per_version, hours_per_ticket)
+
     def run(self):
         success = True
         hours_per_project = None
@@ -46,11 +58,13 @@ class Trend:
         hours_per_version = None
         hours_per_ticket = None
         word_cloud = None
+        docx_path = None
 
         try:
             hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version, hours_per_ticket = \
                 self.analyze_trend()
             word_cloud = self.generate_word_cloud()
+            docx_path = self.generate_docx()
         except Exception as e:
             self.cache.add_log_entry(self.__class__.__name__, e)
             success = False
@@ -62,7 +76,8 @@ class Trend:
             'hours_per_type': hours_per_type,
             'hours_per_version': hours_per_version,
             'hours_per_ticket': hours_per_ticket,
-            'word_cloud': word_cloud
+            'word_cloud': word_cloud,
+            'docx_path': docx_path
         }]
         return items, success
 
@@ -107,3 +122,14 @@ class Trend:
         file = open(word_cloud_file, "w+")
         json.dump(obj=word_cloud_output, fp=file)
         file.close()
+
+    def output_docx(self, ticket_count, hours_total, hours_per_type, hours_per_project, hours_per_version, hours_per_ticket):
+        docx_generator = Docx.Docx()
+        docx_generator.place_headline()
+        docx_generator.place_stats(ticket_count, hours_total, hours_per_type, self.months)
+        docx_generator.place_versions(hours_per_version)
+        docx_generator.place_projects(hours_per_project)
+        docx_generator.place_tickets(hours_per_ticket)
+        docx_path = docx_generator.save()
+
+        return docx_path
