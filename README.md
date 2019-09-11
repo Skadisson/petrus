@@ -23,6 +23,7 @@ cycler          0.10.0
 httplib2        0.13.1
 joblib          0.13.2
 kiwisolver      1.1.0
+lxml            4.4.1
 matplotlib      3.1.1
 numpy           1.17.2
 oauth2          1.9.0.post1
@@ -31,6 +32,7 @@ pip             19.2.3
 pip-check       2.5.2
 pyparsing       2.4.2
 python-dateutil 2.8.0
+python-docx     0.8.10
 pytz            2019.2
 PyYAML          5.1.2
 scikit-learn    0.21.3
