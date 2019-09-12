@@ -2,13 +2,13 @@
 <html>
 <head>
     <script src="jquery-3.4.1.min.js" type="text/javascript"></script>
-    <title>Petrus 2</title>
+    <title>Petrus</title>
 </head>
 <body>
 
-    <h1>Petrus 2</h1>
+    <h1>Petrus</h1>
     <form id="search" action="" method="GET" autocomplete="off">
-        <label for="keywords">Enter keywords</label>
+        <label for="keywords">Enter at least two keywords (comma separated): </label>
         <input type="hidden" name="function" value="Search" />
         <input type="text" name="keywords" id="keywords" placeholder="keywords" />
         <button type="submit">Search</button>
@@ -19,7 +19,7 @@
         var urlParams = new URLSearchParams(window.location.search)
         var keywords = urlParams.get('keywords');
         $('#keywords').val(keywords);
-        var getUrl = 'http://localhost:55888/?function=Search&keywords=' + encodeURIComponent(keywords);
+        var getUrl = 'http://10.0.75.1:55888/?function=Search&keywords=' + encodeURIComponent(keywords);
         var formContentType = 'application/x-www-form-urlencoded';
         try {
             var xhr = new XMLHttpRequest();
