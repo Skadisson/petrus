@@ -16,10 +16,7 @@ function estimate() {
         xhr.open('GET', getUrl, true);
         xhr.setRequestHeader('Content-type', formContentType);
         xhr.onreadystatechange = function() {
-            if(xhr.responseText)
-                statusDisplay.innerHTML = xhr.responseText;
-            else
-                statusDisplay.innerHTML = 'Done.';
+            statusDisplay.innerHTML = 'Done.';
         };
         xhr.send();
     } catch(e) {
