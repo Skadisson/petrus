@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jquery-3.4.1.min.js" type="text/javascript"></script>
+    <title>Petrus 2</title>
+</head>
+<body>
+
+    <h1>Petrus 2</h1>
+    <form id="search" action="" method="GET" autocomplete="off">
+        <label for="keywords">Enter keywords</label>
+        <input type="hidden" name="function" value="Search" />
+        <input type="text" name="keywords" id="keywords" placeholder="keywords" />
+        <button type="submit">Search</button>
+        <span id="link-list"></span>
+    </form>
+
+    <script>
+        var urlParams = new URLSearchParams(window.location.search)
+        var keywords = urlParams.get('keywords');
+        $('#keywords').val(keywords);
+        var getUrl = 'http://localhost:55888/?function=Search&keywords=' + encodeURIComponent(keywords);
+        var formContentType = 'application/x-www-form-urlencoded';
+        try {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', getUrl, true);
+            xhr.setRequestHeader('Content-type', formContentType);
+            xhr.onreadystatechange = function() {
+                if(xhr.responseText) {
+                    $('#link-list').html('');
+                    result = JSON.parse(xhr.responseText).items[0].relevancy;
+                    for(index in result) {
+                        $('#link-list').append('<p><a href="' + result[index].link + '" target="_blank">' + result[index].title + ' (' + result[index].percentage + '%)</a></p>');
+                    }
+                }
+            };
+            xhr.send();
+        } catch(e) {
+            console.log(e.message);
+        }
+    </script>
+
+</body>
+</html>

@@ -44,7 +44,7 @@ def petrus(request):
         items, success = unite.run()
     response = {'success': success, 'items': items}
     json_response = json.dumps(response)
-    return Response(json_response, mimetype='application/json')
+    return Response(json_response, mimetype='application/json', headers={'Access-Control-Allow-Origin': '*'})
 
 
 if __name__ == '__main__':
