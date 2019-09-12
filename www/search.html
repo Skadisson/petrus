@@ -19,7 +19,7 @@
         var urlParams = new URLSearchParams(window.location.search)
         var keywords = urlParams.get('keywords');
         $('#keywords').val(keywords);
-        var getUrl = 'http://10.0.75.1:55888/?function=Search&keywords=' + encodeURIComponent(keywords);
+        var getUrl = 'http://192.168.6.152:55888/?function=Search&keywords=' + encodeURIComponent(keywords);
         var formContentType = 'application/x-www-form-urlencoded';
         try {
             var xhr = new XMLHttpRequest();
