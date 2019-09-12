@@ -6,13 +6,13 @@
 </head>
 <body background="images/Petrus_128.png" style="color:white;background-size:cover;background-position:center center;">
     <h2>Petrus</h2>
-    <form id="update">
+    <form id="update" autocomplete="off">
         <label for="jira_key">Enter Jira-Key</label>
         <input type="text" name="jira_key" id="jira_key" placeholder="jira key" />
         <button type="submit">Update</button>
         <span id="status-display"></span>
     </form>
-    <form id="search" action="http://localhost:55888/" method="GET">
+    <form id="search" action="http://localhost:55888/" method="GET" autocomplete="off">
         <label for="keywords">Enter keywords</label>
         <input type="hidden" name="function" value="Search" />
         <input type="text" name="keywords" id="keywords" placeholder="keywords" />
