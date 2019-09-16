@@ -44,12 +44,14 @@ class Context:
             percentage = hit_count / keyword_total * 100
             jira_key = self.cache.load_jira_key_for_id(jira_id)
             ticket_link = self.environment.get_endpoint_ticket_link().format(jira_key)
+            ticket_organization = str(ticket['Project'])
             if percentage > 0:
                 relevancy = {
                     "jira_id": str(jira_id),
                     "percentage": percentage,
                     "hits": keyword_hits,
-                    "link": ticket_link
+                    "link": ticket_link,
+                    "project": ticket_organization
                 }
                 if 'Title' in ticket:
                     relevancy['title'] = ticket['Title']
