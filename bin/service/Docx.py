@@ -1,5 +1,6 @@
 from docx import Document
 from datetime import datetime
+from bin.service import Environment
 
 
 class Docx:
@@ -7,6 +8,7 @@ class Docx:
 
     def __init__(self):
         self.document = Document()
+        self.environment = Environment.Environment()
 
     def place_headline(self):
         now = datetime.now()
@@ -57,6 +59,27 @@ class Docx:
             paragraph = self.document.add_paragraph('')
             paragraph.add_run("{}".format(project_hours[0])).bold = True
             paragraph.add_run(" - {} Stunden".format(round(project_hours[1], ndigits=2)))
+
+    def place_type_weight(self, hours_per_version, months):
+        bb_versions = self.environment.get_bb_versions()
+        weights = {}
+        for bb_type in bb_versions:
+            weights[bb_type] = 0.0
+        days = self.months_to_days(months)
+        self.document.add_heading('Gewichtung', level=1)
+        self.document.add_paragraph('Folgende brandbox Typen haben in {} Tagen getrackte Aufwände erzeugt.'.format(days))
+        for version_hours in hours_per_version:
+            version = version_hours[0]
+            hours = round(version_hours[1], ndigits=2)
+            for bb_type in bb_versions:
+                bb_type_versions = bb_versions[bb_type].split(" ")
+                if version in bb_type_versions:
+                    weights[bb_type] += hours
+        for bb_type in weights:
+            bb_type_versions = bb_versions[bb_type].split(" ")
+            paragraph = self.document.add_paragraph('')
+            paragraph.add_run("{} ({})".format(bb_type, ', '.join(bb_type_versions))).bold = True
+            paragraph.add_run(" - {} Stunden".format(weights[bb_type]))
 
     def place_versions(self, hours_per_version, months):
         days = self.months_to_days(months)

@@ -15,6 +15,10 @@ class Environment:
         file_path = os.path.realpath(__file__)
         self.base_path = '\\'.join(file_path.split('\\')[0:-3]) + '\\'
 
+    def get_bb_versions(self):
+        service_yaml = self.load_yaml('bb_versions')
+        return service_yaml
+
     def get_service_host(self):
         service_yaml = self.load_yaml('service')
         return service_yaml['host']
