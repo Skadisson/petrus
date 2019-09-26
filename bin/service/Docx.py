@@ -78,7 +78,7 @@ class Docx:
         for bb_type in weights:
             bb_type_versions = bb_versions[bb_type].split(" ")
             paragraph = self.document.add_paragraph('')
-            paragraph.add_run("{} ({})".format(bb_type, ', '.join(bb_type_versions))).bold = True
+            paragraph.add_run("{} ({})".format(bb_type, bb_type_versions[0] + ' - ' + bb_type_versions[-1])).bold = True
             paragraph.add_run(" - {} Stunden".format(weights[bb_type]))
 
     def place_versions(self, hours_per_version, months):
@@ -97,7 +97,10 @@ class Docx:
         for ticket_hours in hours_per_ticket:
             paragraph = self.document.add_paragraph('')
             paragraph.add_run("{}".format(ticket_hours[0])).bold = True
-            paragraph.add_run(" - {} Stunden".format(round(ticket_hours[1], ndigits=2)))
+            if ticket_hours[1] > 0.0:
+                paragraph.add_run(" - {} Stunden".format(round(ticket_hours[1], ndigits=2)))
+            else:
+                paragraph.add_run(" - n/a")
 
     def save(self):
         path = 'temp/trend.docx'
