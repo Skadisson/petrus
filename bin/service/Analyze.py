@@ -1,8 +1,12 @@
 from bin.service import Cache
+from bin.service import SciKitLearn
+from bin.service import Context
+from bin.service import Map
 import time
 import datetime
 from collections import Counter
 import re
+import numpy
 
 
 class Analyze:
@@ -11,6 +15,9 @@ class Analyze:
     def __init__(self):
         self.cache = Cache.Cache()
         self.tickets = self.cache.load_cached_tickets()
+        self.sci_kit = SciKitLearn.SciKitLearn()
+        self.context = Context.Context()
+        self.mapper = Map.Map()
 
     def ticket_count(self, for_days=0, year="", week_numbers=""):
         ticket_count = 0
@@ -94,6 +101,39 @@ class Analyze:
 
         tickets = self.sort_tickets(tickets)
         return tickets
+
+    def accuracy(self, for_days=0, year="", week_numbers=""):
+        accuracies = []
+        for jira_id in self.tickets:
+            ticket = self.tickets[jira_id]
+            jira_key = self.cache.load_jira_key_for_id(jira_id)
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            if jira_key is not None and is_in_range is True:
+                if ticket['Time_Spent'] is not None and ticket['Time_Spent'] > 0.0:
+                    normalized_ticket, similar_tickets, hits = self.format_tickets(ticket)
+                    if len(similar_tickets) > 0:
+                        estimation = self.sci_kit.estimate(
+                            normalized_ticket,
+                            similar_tickets,
+                            'Time_Spent',
+                            ['Relevancy', 'Priority', 'State_Changes', 'Type', 'Organization', 'Words']
+                        )
+                        accuracy = estimation / ticket['Time_Spent'] * 100
+                        accuracies.append(accuracy)
+
+        average_accuracy = numpy.average(accuracies)
+        return average_accuracy
+
+    def format_tickets(self, mapped_ticket):
+        cached_tickets = self.cache.load_cached_tickets()
+        relevancy = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket)
+        normalized_ticket = self.mapper.normalize_ticket(mapped_ticket)
+        similar_tickets, hits = self.context.filter_similar_tickets(
+            relevancy,
+            cached_tickets,
+            mapped_ticket['ID']
+        )
+        return normalized_ticket, similar_tickets, hits
 
     def problematic_tickets(self, for_days=0, year="", week_numbers=""):
         problematic_tickets = {}

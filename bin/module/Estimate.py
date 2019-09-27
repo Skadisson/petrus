@@ -3,7 +3,6 @@ from bin.service import Map
 from bin.service import Cache
 from bin.service import Context
 from bin.service import SciKitLearn
-from bin.module import Trend
 
 
 class Estimate:
