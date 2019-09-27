@@ -16,7 +16,6 @@ class Estimate:
         self.cache = Cache.Cache()
         self.context = Context.Context()
         self.sci_kit = SciKitLearn.SciKitLearn()
-        self.trend = Trend.Trend(1)
 
     def retrieve_ticket(self):
         ticket_data = self.sd_api.request_ticket_data(self.jira_key)
@@ -46,7 +45,6 @@ class Estimate:
 
         try:
             if self.jira_key is not None:
-                self.trend.run()
                 mapped_ticket = self.retrieve_ticket()
                 jira_id = str(mapped_ticket['ID'])
                 self.cache.store_jira_key_and_id(self.jira_key, jira_id)
