@@ -41,7 +41,7 @@ class Docx:
         paragraph.add_run("{} Stunden".format(hours_total)).bold = True
         paragraph.add_run(". Fehler-Support-Verhältnis war ")
         paragraph.add_run("{}:{}".format(bugfix_relation, support_relation)).bold = True
-        paragraph.add_run(". Durchschnittliche Bearbeitungszeit pro Ticket war ")
+        paragraph.add_run(". Durchschnittliche Bearbeitungszeit pro Ticket war damit ")
         paragraph.add_run("{}".format(round(average, ndigits=2))).bold = True
         paragraph.add_run(" Stunden.")
 
