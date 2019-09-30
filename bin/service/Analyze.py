@@ -70,6 +70,7 @@ class Analyze:
 
     def hours_per_version(self, for_days=0, year="", week_numbers=""):
         versions = {}
+        projects = {}
         for jira_id in self.tickets:
             ticket = self.tickets[jira_id]
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
@@ -81,11 +82,15 @@ class Analyze:
                 if version is not None:
                     if version not in versions:
                         versions[version] = []
+                    if version not in projects:
+                        projects[version] = []
                     if ticket['Time_Spent'] is not None:
                         versions[version].append(ticket['Time_Spent'])
+                        if ticket['Project'] is not None and ticket['Project'] not in projects[version]:
+                            projects[version].append(ticket['Project'])
 
         versions = self.sort_tickets(versions)
-        return versions
+        return versions, projects
 
     def hours_per_ticket(self, for_days=0, year="", week_numbers=""):
         tickets = {}

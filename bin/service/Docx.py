@@ -67,9 +67,10 @@ class Docx:
             paragraph.add_run("{}".format(project_hours[0])).bold = True
             paragraph.add_run(" - {} Stunden".format(round(project_hours[1], ndigits=2)))
 
-    def place_type_weight(self, hours_per_version, months):
+    def place_type_weight(self, hours_per_version, projects_per_version, months):
         bb_versions = self.environment.get_bb_versions()
         weights = {}
+        projects = {}
         for bb_type in bb_versions:
             weights[bb_type] = 0.0
         days = self.months_to_days(months)
@@ -82,11 +83,17 @@ class Docx:
                 bb_type_versions = bb_versions[bb_type].split(" ")
                 if version in bb_type_versions:
                     weights[bb_type] += hours
+                    if version in projects_per_version:
+                        if bb_type not in projects:
+                            projects[bb_type] = []
+                        for project in projects_per_version[version]:
+                            if project not in projects[bb_type]:
+                                projects[bb_type].append(project)
         for bb_type in weights:
             bb_type_versions = bb_versions[bb_type].split(" ")
             paragraph = self.document.add_paragraph('')
             paragraph.add_run("{} ({})".format(bb_type, bb_type_versions[0] + ' - ' + bb_type_versions[-1])).bold = True
-            paragraph.add_run(" - {} Stunden".format(weights[bb_type]))
+            paragraph.add_run(" - {} Stunden auf {} Projekte".format(weights[bb_type], len(projects[bb_type])))
 
     def place_versions(self, hours_per_version, months):
         days = self.months_to_days(months)

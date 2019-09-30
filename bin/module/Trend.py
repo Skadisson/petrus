@@ -20,14 +20,14 @@ class Trend:
         days = self.months * 30
         hours_per_project = analyze.hours_per_project(days, self.year, self.week_numbers)
         hours_per_type = analyze.hours_per_type(days, self.year, self.week_numbers)
-        hours_per_version = analyze.hours_per_version(days, self.year, self.week_numbers)
+        hours_per_version, projects_per_version = analyze.hours_per_version(days, self.year, self.week_numbers)
         hours_total = analyze.hours_total(days, self.year, self.week_numbers)
         ticket_count = analyze.ticket_count(days, self.year, self.week_numbers)
         hours_per_ticket = analyze.hours_per_ticket(days, self.year, self.week_numbers)
         problematic_tickets = analyze.problematic_tickets(days, self.year, self.week_numbers)
         accuracy = analyze.accuracy(days, self.year, self.week_numbers)
-        self.output_trend_json(ticket_count, hours_total, hours_per_project, hours_per_type, hours_per_version, problematic_tickets, accuracy)
-        return hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version, hours_per_ticket, accuracy
+        self.output_trend_json(ticket_count, hours_total, hours_per_project, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, accuracy)
+        return hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, accuracy
 
     def generate_word_cloud(self):
         analyze = Analyze.Analyze()
@@ -38,17 +38,6 @@ class Trend:
         }
         self.output_word_cloud_json(word_cloud)
         return word_cloud
-
-    def generate_docx(self, accuracy=100):
-        analyze = Analyze.Analyze()
-        days = self.months * 30
-        hours_per_project = analyze.hours_per_project(days, self.year, self.week_numbers)
-        hours_per_type = analyze.hours_per_type(days, self.year, self.week_numbers)
-        hours_per_version = analyze.hours_per_version(days, self.year, self.week_numbers)
-        hours_total = analyze.hours_total(days, self.year, self.week_numbers)
-        ticket_count = analyze.ticket_count(days, self.year, self.week_numbers)
-        hours_per_ticket = analyze.hours_per_ticket(days, self.year, self.week_numbers)
-        return self.output_docx(ticket_count, hours_total, hours_per_type, hours_per_project, hours_per_version, hours_per_ticket, accuracy)
 
     def run(self):
         success = True
@@ -61,12 +50,13 @@ class Trend:
         word_cloud = None
         docx_path = None
         accuracy = None
+        projects_per_version = None
 
         try:
-            hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version, hours_per_ticket, accuracy = \
+            hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, accuracy = \
                 self.analyze_trend()
             word_cloud = self.generate_word_cloud()
-            docx_path = self.generate_docx(accuracy)
+            docx_path = self.output_docx(hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, accuracy)
         except Exception as e:
             self.cache.add_log_entry(self.__class__.__name__, e)
             success = False
@@ -78,13 +68,14 @@ class Trend:
             'hours_per_project': hours_per_project,
             'hours_per_type': hours_per_type,
             'hours_per_version': hours_per_version,
+            'projects_per_version': projects_per_version,
             'hours_per_ticket': hours_per_ticket,
             'word_cloud': word_cloud,
             'docx_path': docx_path
         }]
         return items, success
 
-    def output_trend_json(self, ticket_count, hours_total, hours_per_project, hours_per_type, hours_per_version, problematic_tickets, accuracy):
+    def output_trend_json(self, ticket_count, hours_total, hours_per_project, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, accuracy):
 
         trend_file = self.environment.get_path_trend()
         tickets_per_hour = ticket_count / hours_total
@@ -106,6 +97,7 @@ class Trend:
             "un-payed-hours": un_payed_hours,
             "tickets-per-hour": tickets_per_hour,
             "hours-per-version": hours_per_version,
+            "projects-per-version": projects_per_version,
             "problematic-tickets": problematic_tickets
         }
 
@@ -127,11 +119,11 @@ class Trend:
         json.dump(obj=word_cloud_output, fp=file)
         file.close()
 
-    def output_docx(self, ticket_count, hours_total, hours_per_type, hours_per_project, hours_per_version, hours_per_ticket, accuracy):
+    def output_docx(self, hours_per_project, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, accuracy):
         docx_generator = Docx.Docx()
         docx_generator.place_headline()
         docx_generator.place_stats(ticket_count, hours_total, hours_per_type, self.months, accuracy)
-        docx_generator.place_type_weight(hours_per_version, self.months)
+        docx_generator.place_type_weight(hours_per_version, projects_per_version, self.months)
         docx_generator.place_versions(hours_per_version, self.months)
         docx_generator.place_projects(hours_per_project, self.months)
         docx_generator.place_tickets(hours_per_ticket, self.months)
