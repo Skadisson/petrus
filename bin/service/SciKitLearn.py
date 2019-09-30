@@ -39,7 +39,9 @@ class SciKitLearn:
         shape = numpy.pi * 3
         colors = ['red', 'green', 'blue', 'cyan', 'magenta', 'orange']
         plot_path = self.environment.get_path_plot()
-        os.remove(plot_path)
+        is_existing = os.path.exists(plot_path)
+        if is_existing:
+            os.remove(plot_path)
         pyplot.figure(num=None, figsize=(12, 8), dpi=96)
         pyplot.title(model.__class__.__name__ + " on {} subjects".format(test_count))
         x_label = "% of ... estimation (black) | "
