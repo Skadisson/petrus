@@ -95,8 +95,7 @@ class SciKitLearn:
             linear_model.ElasticNet().fit(x, y),
             linear_model.SGDRegressor().fit(x, y),
             linear_model.Ridge().fit(x, y),
-            linear_model.PassiveAggressiveRegressor().fit(x, y),
-            neural_network.BernoulliRBM().fit(x, y)
+            linear_model.PassiveAggressiveRegressor().fit(x, y)
         ]
 
         return models
