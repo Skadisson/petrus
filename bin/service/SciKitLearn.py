@@ -91,7 +91,12 @@ class SciKitLearn:
             ).fit(x, y),
             linear_model.Lasso(alpha=0.1, copy_X=True, fit_intercept=True, max_iter=1000,
                                normalize=False, positive=False, precompute=False, random_state=None,
-                               selection='cyclic', tol=0.0001, warm_start=False).fit(x, y)
+                               selection='cyclic', tol=0.0001, warm_start=False).fit(x, y),
+            linear_model.ElasticNet().fit(x, y),
+            linear_model.SGDRegressor().fit(x, y),
+            linear_model.Ridge().fit(x, y),
+            linear_model.PassiveAggressiveRegressor().fit(x, y),
+            neural_network.BernoulliRBM().fit(x, y)
         ]
 
         return models

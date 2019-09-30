@@ -35,15 +35,17 @@ class Docx:
         bugfix_relation = round((bugfix_hours / hours_sum) * 100)
 
         days = self.months_to_days(months)
-        paragraph = self.document.add_paragraph("In den letzten {} Tagen wurden ".format(days))
+        paragraph = self.document.add_paragraph("In den letzten ")
+        paragraph.add_run("{} Tagen".format(days)).bold = True
+        paragraph.add_run(" wurden ")
         paragraph.add_run("{} Tickets".format(ticket_count)).bold = True
         paragraph.add_run(" getrackt. Insgesamter getrackter Aufwand war ")
         paragraph.add_run("{} Stunden".format(hours_total)).bold = True
         paragraph.add_run(". Fehler-Support-Verhältnis war ")
         paragraph.add_run("{}:{}".format(bugfix_relation, support_relation)).bold = True
         paragraph.add_run(". Durchschnittliche Bearbeitungszeit pro Ticket war damit ")
-        paragraph.add_run("{}".format(round(average, ndigits=2))).bold = True
-        paragraph.add_run(" Stunden. Petrus hat dabei durchschnittlich eine Genauigkeit von ")
+        paragraph.add_run("{} Stunden".format(round(average, ndigits=2))).bold = True
+        paragraph.add_run(". Petrus hat dabei durchschnittlich eine Genauigkeit von ")
         paragraph.add_run("{} %".format(round(accuracy, ndigits=0))).bold = True
         paragraph.add_run(" an den Tag gelegt.")
 
