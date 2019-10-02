@@ -121,8 +121,9 @@ class Docx:
                 paragraph.add_run(" - n/a")
 
     def place_plot(self):
+        self.document.add_heading('Aufwände pro Kalender-Woche', level=1)
         plot_path = self.environment.get_path_plot()
-        self.document.add_picture(plot_path, width=Inches(7))
+        self.document.add_picture(plot_path, width=Inches(6))
 
     def save(self):
         path = 'temp/trend.docx'
