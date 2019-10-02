@@ -135,7 +135,8 @@ class Analyze:
                             'Estimation': self.seconds_to_hours(estimation)
                         })
 
-        self.sci_kit.generate_plot("Plot für {} Tage".format(for_days), ['Time'], ['Estimation', 'Time_Spent'], times)
+        times_sorted = sorted(times, key=lambda k: k['Time'])
+        self.sci_kit.generate_plot("Plot für {} Tage".format(for_days), ['Time'], ['Estimation', 'Time_Spent'], times_sorted)
 
         average_accuracy = numpy.average(accuracies)
         return average_accuracy
