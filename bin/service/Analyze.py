@@ -110,6 +110,7 @@ class Analyze:
     def accuracy(self, for_days=0, year="", week_numbers=""):
         accuracies = []
         times = []
+        total = {}
         for jira_id in self.tickets:
             ticket = self.tickets[jira_id]
             jira_key = self.cache.load_jira_key_for_id(jira_id)
@@ -129,14 +130,23 @@ class Analyze:
 
                         time_spent = ticket['Time_Spent']
                         time_updated = self.timestamp_from_ticket_time(ticket['Updated'])
+                        date_uploaded = datetime.datetime.fromtimestamp(time_updated)
+                        calendar_week = date_uploaded.strftime("%V")
+                        calendar_year = date_uploaded.strftime("%Y")
+                        calendar_marker = "{}.{}".format(calendar_year, calendar_week)
+                        if calendar_marker not in total:
+                            total[calendar_marker] = 0
+                        total[calendar_marker] += int(self.seconds_to_hours(time_spent))
+
                         times.append({
-                            'Time': datetime.datetime.fromtimestamp(time_updated).strftime("%V"),
+                            'Date': calendar_marker,
                             'Time_Spent': self.seconds_to_hours(time_spent),
-                            'Estimation': self.seconds_to_hours(estimation)
+                            'Estimation': self.seconds_to_hours(estimation),
+                            'Total': total[calendar_marker]
                         })
 
-        times_sorted = sorted(times, key=lambda k: k['Time'])
-        self.sci_kit.generate_plot("Plot für {} Tage".format(for_days), ['Time'], ['Estimation', 'Time_Spent'], times_sorted)
+        times_sorted = sorted(times, key=lambda k: k['Date'])
+        self.sci_kit.generate_plot("Plot für {} Tage".format(for_days), ['Date'], ['Estimation', 'Time_Spent', 'Total'], times_sorted)
 
         average_accuracy = numpy.average(accuracies)
         return average_accuracy

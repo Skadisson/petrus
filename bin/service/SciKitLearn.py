@@ -40,7 +40,7 @@ class SciKitLearn:
         if is_existing:
             os.remove(plot_path)
         pyplot.figure(num=None, figsize=(12, 8), dpi=96)
-        pyplot.ylim(0, 50)
+        pyplot.ylim(0, 80)
         pyplot.title(title)
 
         x_label = ""
@@ -56,6 +56,7 @@ class SciKitLearn:
                 color = colors.pop()
                 pyplot.scatter(x[x_attribute], y[y_attribute], s=shape, c=color, alpha=0.5)
                 y_label += "{} ({}) | ".format(y_attribute, color)
+
         x_label += " [KW]"
         y_label += " [h]"
 
