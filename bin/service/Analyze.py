@@ -109,6 +109,7 @@ class Analyze:
 
     def accuracy(self, for_days=0, year="", week_numbers=""):
         accuracies = []
+        times = []
         for jira_id in self.tickets:
             ticket = self.tickets[jira_id]
             jira_key = self.cache.load_jira_key_for_id(jira_id)
@@ -126,8 +127,22 @@ class Analyze:
                         accuracy = estimation / ticket['Time_Spent'] * 100
                         accuracies.append(accuracy)
 
+                        time_spent = ticket['Time_Spent']
+                        time_updated = self.timestamp_from_ticket_time(ticket['Updated'])
+                        times.append({
+                            'Time': datetime.datetime.fromtimestamp(time_updated).strftime("%V"),
+                            'Time_Spent': self.seconds_to_hours(time_spent),
+                            'Estimation': self.seconds_to_hours(estimation)
+                        })
+
+        self.sci_kit.generate_plot("Plot für {} Tage".format(for_days), ['Time'], ['Estimation', 'Time_Spent'], times)
+
         average_accuracy = numpy.average(accuracies)
         return average_accuracy
+
+    @staticmethod
+    def seconds_to_hours(seconds):
+        return seconds / 60 / 60
 
     def format_tickets(self, mapped_ticket):
         cached_tickets = self.cache.load_cached_tickets()

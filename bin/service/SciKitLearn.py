@@ -16,7 +16,6 @@ class SciKitLearn:
 
     def estimate(self, target_data, source_data, target_attribute, source_attributes):
 
-        test_count = len(source_data)
         x, y = self.frame_data(source_data, target_attribute, source_attributes)
         models = self.shotgun_models(x, y)
         model = self.get_highest_scoring_model(models, x, y)
@@ -27,14 +26,12 @@ class SciKitLearn:
         else:
             estimation = None
 
-        self.generate_plot(model, estimations, source_attributes, target_attribute, x, y, test_count)
-
         if estimation < 900:
             estimation = 900
 
         return estimation
 
-    def generate_plot(self, model, estimations, source_attributes, target_attribute, x, y, test_count):
+    def generate_plot(self, title, x_attributes, y_attributes, data_sets):
 
         shape = numpy.pi * 3
         colors = ['red', 'green', 'blue', 'cyan', 'magenta', 'orange']
@@ -43,19 +40,27 @@ class SciKitLearn:
         if is_existing:
             os.remove(plot_path)
         pyplot.figure(num=None, figsize=(12, 8), dpi=96)
-        pyplot.title(model.__class__.__name__ + " on {} subjects".format(test_count))
-        x_label = "% of ... estimation (black) | "
-        time_hours = y/60/60
-        df_estimations = DataFrame(estimations)
-        estimation_hours = df_estimations/60/60
-        for attribute in source_attributes:
-            color = colors.pop()
-            attribute_percentages = round(x[attribute]/x[attribute].max()*100)
-            pyplot.scatter(attribute_percentages, time_hours, s=shape, c=color, alpha=0.5)
-            x_label += "{} ({}) | ".format(attribute, color)
-        pyplot.hlines(y=estimation_hours, xmin=0, xmax=100)
+        pyplot.ylim(0, 50)
+        pyplot.title(title)
+
+        x_label = ""
+        y_label = ""
+
+        df_data_sets = DataFrame(data_sets)
+        x = df_data_sets[x_attributes]
+        y = df_data_sets[y_attributes]
+
+        for x_attribute in x_attributes:
+            x_label += "{} ".format(x_attribute)
+            for y_attribute in y_attributes:
+                color = colors.pop()
+                pyplot.scatter(x[x_attribute], y[y_attribute], s=shape, c=color, alpha=0.5)
+                y_label += "{} ({}) | ".format(y_attribute, color)
+        x_label += " [KW]"
+        y_label += " [h]"
+
         pyplot.xlabel(x_label)
-        pyplot.ylabel("{} [h]".format(target_attribute))
+        pyplot.ylabel(y_label)
         pyplot.savefig(fname=plot_path)
         pyplot.close()
 
