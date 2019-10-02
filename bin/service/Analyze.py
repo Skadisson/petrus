@@ -132,17 +132,15 @@ class Analyze:
                         time_updated = self.timestamp_from_ticket_time(ticket['Updated'])
                         date_uploaded = datetime.datetime.fromtimestamp(time_updated)
                         calendar_week = date_uploaded.strftime("%V")
-                        calendar_year = date_uploaded.strftime("%Y")
-                        calendar_marker = "{}.{}".format(calendar_year, calendar_week)
-                        if calendar_marker not in total:
-                            total[calendar_marker] = 0
-                        total[calendar_marker] += int(self.seconds_to_hours(time_spent))
+                        if calendar_week not in total:
+                            total[calendar_week] = 0
+                        total[calendar_week] += int(self.seconds_to_hours(time_spent))
 
                         times.append({
-                            'Date': calendar_marker,
+                            'Date': calendar_week,
                             'Time_Spent': self.seconds_to_hours(time_spent),
                             'Estimation': self.seconds_to_hours(estimation),
-                            'Total': total[calendar_marker]
+                            'Total': total[calendar_week]
                         })
 
         times_sorted = sorted(times, key=lambda k: k['Date'])

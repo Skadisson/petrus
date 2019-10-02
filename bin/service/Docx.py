@@ -1,4 +1,5 @@
 from docx import Document
+from docx.shared import Inches
 from datetime import datetime
 from bin.service import Environment
 
@@ -118,6 +119,10 @@ class Docx:
                 paragraph.add_run(" - {} Stunden".format(round(ticket_hours[1], ndigits=2)))
             else:
                 paragraph.add_run(" - n/a")
+
+    def place_plot(self):
+        plot_path = self.environment.get_path_plot()
+        self.document.add_picture(plot_path, width=Inches(7))
 
     def save(self):
         path = 'temp/trend.docx'

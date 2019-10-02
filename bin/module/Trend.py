@@ -127,6 +127,7 @@ class Trend:
         docx_generator.place_versions(hours_per_version, self.months)
         docx_generator.place_projects(hours_per_project, self.months)
         docx_generator.place_tickets(hours_per_ticket, self.months)
+        docx_generator.place_plot()
         docx_path = docx_generator.save()
 
         return docx_path
