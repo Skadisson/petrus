@@ -111,6 +111,10 @@ class Environment:
         service_yaml = self.load_yaml('path')
         return service_yaml['plot']
 
+    def get_path_graph(self):
+        service_yaml = self.load_yaml('path')
+        return service_yaml['graph']
+
     def get_path_trend(self):
         service_yaml = self.load_yaml('path')
         return service_yaml['trend']

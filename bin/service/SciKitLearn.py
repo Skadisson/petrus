@@ -2,7 +2,7 @@ from pandas import DataFrame
 from sklearn import linear_model, gaussian_process, tree, naive_bayes, neural_network
 from bin.service import Cache
 from bin.service import Environment
-from matplotlib import pyplot
+from matplotlib import pyplot, colors
 import numpy
 import os
 
@@ -33,14 +33,38 @@ class SciKitLearn:
 
     def generate_plot(self, title, x_attributes, y_attributes, data_sets):
 
-        shape = numpy.pi * 3
-        colors = ['red', 'green', 'blue', 'cyan', 'magenta', 'orange']
+        short_colors = ['red', 'green', 'blue', 'cyan', 'magenta', 'orange']
         plot_path = self.environment.get_path_plot()
         is_existing = os.path.exists(plot_path)
         if is_existing:
             os.remove(plot_path)
+
+        self.generate_pyplot(title, x_attributes, y_attributes, data_sets, short_colors, plot_path, 80)
+
+    def generate_graph(self, title, x_attributes, data_sets):
+
+        all_colors = list(colors.CSS4_COLORS.keys())
+        graph_path = self.environment.get_path_graph()
+        is_existing = os.path.exists(graph_path)
+        if is_existing:
+            os.remove(graph_path)
+
+        y_attributes = []
+        for data_set in data_sets:
+            keys = list(data_set.keys())
+            for key in keys:
+                if key is not 'Date' and key not in y_attributes:
+                    y_attributes.append(key)
+
+        self.generate_pyplot(title, x_attributes, y_attributes, data_sets, all_colors, graph_path)
+
+    @staticmethod
+    def generate_pyplot(title, x_attributes, y_attributes, data_sets, short_colors, plot_path, y_lim=0):
+
+        shape = numpy.pi * 3
         pyplot.figure(num=None, figsize=(12, 8), dpi=96)
-        pyplot.ylim(0, 80)
+        if y_lim > 0:
+            pyplot.ylim(0, y_lim)
         pyplot.title(title)
 
         x_label = ""
@@ -53,7 +77,7 @@ class SciKitLearn:
         for x_attribute in x_attributes:
             x_label += "{} ".format(x_attribute)
             for y_attribute in y_attributes:
-                color = colors.pop()
+                color = short_colors.pop()
                 pyplot.scatter(x[x_attribute], y[y_attribute], s=shape, c=color, alpha=0.5)
                 y_label += "{} ({}) | ".format(y_attribute, color)
 

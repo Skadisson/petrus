@@ -1,8 +1,12 @@
 var petrusSearch;
 
-PS = (function() {
+PS = (function(window, document, $) {
+
+    'use strict';
 
     var self;
+
+    var $body;
 
     var construct = function() {
         self = this;
@@ -12,12 +16,13 @@ PS = (function() {
     function init() {
         var urlParams = new URLSearchParams(window.location.search);
         var keywords = urlParams.get('keywords');
-        console.log(keywords);
-        $('#keywords').val(keywords);
-        $('#search').on('submit', self.search);
+        $body = $('body');
+        $('#keywords', $body).val(keywords);
+        $body.on('#search', 'submit', self.search);
     }
 
     function search(event) {
+        console.log('search');
 
         event.preventDefault();
 
@@ -50,6 +55,6 @@ PS = (function() {
 
     return construct;
 
-})();
+})(window, document, jQuery);
 
 petrusSearch = new PS();

@@ -111,6 +111,7 @@ class Analyze:
         accuracies = []
         times = []
         total = {}
+        organizations = {}
         for jira_id in self.tickets:
             ticket = self.tickets[jira_id]
             jira_key = self.cache.load_jira_key_for_id(jira_id)
@@ -129,12 +130,20 @@ class Analyze:
                         accuracies.append(accuracy)
 
                         time_spent = ticket['Time_Spent']
+                        hours_spent = int(self.seconds_to_hours(time_spent))
+                        organization = ticket['Project']
                         time_updated = self.timestamp_from_ticket_time(ticket['Updated'])
                         date_uploaded = datetime.datetime.fromtimestamp(time_updated)
                         calendar_week = date_uploaded.strftime("%V")
                         if calendar_week not in total:
                             total[calendar_week] = 0
-                        total[calendar_week] += int(self.seconds_to_hours(time_spent))
+                        if calendar_week not in organizations:
+                            organizations[calendar_week] = {}
+                        if organization is not None and organization not in organizations[calendar_week]:
+                            organizations[calendar_week][organization] = 0
+                        total[calendar_week] += hours_spent
+                        if organization is not None:
+                            organizations[calendar_week][organization] += hours_spent
 
                         times.append({
                             'Date': calendar_week,
@@ -145,6 +154,16 @@ class Analyze:
 
         times_sorted = sorted(times, key=lambda k: k['Date'])
         self.sci_kit.generate_plot("Plot für {} Tage".format(for_days), ['Date'], ['Estimation', 'Time_Spent', 'Total'], times_sorted)
+
+        orga_times = []
+        for calendar_week in organizations:
+            for organization in organizations[calendar_week]:
+                orga_time = {'Date': calendar_week}
+                orga_time[str(organization)] = organizations[calendar_week][organization]
+                orga_times.append(orga_time)
+
+        orgas_sorted = sorted(orga_times, key=lambda k: k['Date'])
+        self.sci_kit.generate_graph("Plot für {} Tage".format(for_days), ['Date'], orgas_sorted)
 
         average_accuracy = numpy.average(accuracies)
         return average_accuracy
