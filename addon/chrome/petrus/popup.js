@@ -34,7 +34,11 @@ function ping() {
         xhr.open('GET', getUrl, true);
         xhr.setRequestHeader('Content-type', formContentType);
         xhr.onreadystatechange = function() {
-            document.getElementById('is-online').innerHTML = 'online';
+            if(xhr.status == 200) {
+                document.getElementById('is-online').innerHTML = 'online';
+            } else {
+                document.getElementById('is-online').innerHTML = 'offline';
+            }
         };
         xhr.send();
     } catch(e) {
