@@ -25,7 +25,25 @@ function estimate() {
     statusDisplay.innerHTML = 'Saving...';
 }
 
+function ping() {
+    document.getElementById('is-online').innerHTML = 'pending';
+    var getUrl = 'http://192.168.6.152:55888/?function=Ping';
+    var formContentType = 'application/x-www-form-urlencoded';
+    try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', getUrl, true);
+        xhr.setRequestHeader('Content-type', formContentType);
+        xhr.onreadystatechange = function() {
+            document.getElementById('is-online').innerHTML = 'online';
+        };
+        xhr.send();
+    } catch(e) {
+        document.getElementById('is-online').innerHTML = 'offline';
+    }
+}
+
 window.addEventListener('load', function(evt) {
+    ping();
     statusDisplay = document.getElementById('status-display');
     document.getElementById('update').addEventListener('submit', estimate);
     chrome.runtime.getBackgroundPage(function(eventPage) {

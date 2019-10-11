@@ -42,6 +42,8 @@ def petrus(request):
         target_jira_key = request.args.get('target_jira_key', None)
         unite = Unite.Unite(jira_key, method, target_jira_key)
         items, success = unite.run()
+    elif function == 'Ping':
+        success = True
     response = {'success': success, 'items': items}
     json_response = json.dumps(response)
     return Response(json_response, mimetype='application/json', headers={'Access-Control-Allow-Origin': '*'})
