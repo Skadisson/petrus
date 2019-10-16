@@ -56,10 +56,10 @@ class SciKitLearn:
                 if key is not 'Date' and key not in y_attributes:
                     y_attributes.append(key)
 
-        self.generate_pyplot(title, x_attributes, y_attributes, data_sets, all_colors, graph_path)
+        self.generate_pyplot(title, x_attributes, y_attributes, data_sets, all_colors, graph_path, 0)
 
     @staticmethod
-    def generate_pyplot(title, x_attributes, y_attributes, data_sets, short_colors, plot_path, y_lim=0):
+    def generate_pyplot(title, x_attributes, y_attributes, data_sets, short_colors, plot_path, y_lim=0, do_plot=False):
 
         shape = numpy.pi * 3
         pyplot.figure(num=None, figsize=(12, 8), dpi=96)
@@ -77,7 +77,10 @@ class SciKitLearn:
             x_label += "{} ".format(x_attribute)
             for y_attribute in y_attributes:
                 color = short_colors.pop()
-                pyplot.scatter(x[x_attribute], y[y_attribute], label="{}".format(y_attribute[:8]), s=shape, c=color, alpha=0.5)
+                if do_plot is True:
+                    pyplot.plot(x[x_attribute], y[y_attribute], label="{}".format(y_attribute[:8]), c=color, alpha=0.5)
+                else:
+                    pyplot.scatter(x[x_attribute], y[y_attribute], label="{}".format(y_attribute[:8]), s=shape, c=color, alpha=0.5)
 
         x_label += " [KW]"
 
