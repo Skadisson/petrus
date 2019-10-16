@@ -68,7 +68,6 @@ class SciKitLearn:
         pyplot.title(title)
 
         x_label = ""
-        y_label = ""
 
         df_data_sets = DataFrame(data_sets)
         x = df_data_sets[x_attributes]
@@ -78,14 +77,12 @@ class SciKitLearn:
             x_label += "{} ".format(x_attribute)
             for y_attribute in y_attributes:
                 color = short_colors.pop()
-                pyplot.scatter(x[x_attribute], y[y_attribute], s=shape, c=color, alpha=0.5)
-                y_label += "{} ({}) | ".format(y_attribute, color)
+                pyplot.scatter(x[x_attribute], y[y_attribute], label="{}".format(y_attribute[:8]), s=shape, c=color, alpha=0.5)
 
         x_label += " [KW]"
-        y_label += " [h]"
 
         pyplot.xlabel(x_label)
-        pyplot.ylabel(y_label)
+        pyplot.legend()
         pyplot.savefig(fname=plot_path)
         pyplot.close()
 
