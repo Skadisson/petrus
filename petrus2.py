@@ -5,7 +5,6 @@ from bin.module import Search
 from bin.module import Trend
 from bin.module import Update
 from bin.module import Backup
-from bin.module import Unite
 import json
 
 
@@ -36,12 +35,6 @@ def petrus(request):
     elif function == 'Backup':
         backup = Backup.Backup()
         items, success = backup.run()
-    elif function == 'Unite':
-        jira_key = request.args.get('jira_key', None)
-        method = request.args.get('method', None)
-        target_jira_key = request.args.get('target_jira_key', None)
-        unite = Unite.Unite(jira_key, method, target_jira_key)
-        items, success = unite.run()
     elif function == 'Ping':
         success = True
     response = {'success': success, 'items': items}
