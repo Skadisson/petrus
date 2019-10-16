@@ -25,4 +25,5 @@ class Search:
     def format_keywords(self):
         formatted_keyword_string = self.keywords.replace(" ", ",")
         formatted_keywords = formatted_keyword_string.split(",")
+        formatted_keywords = list(filter(None, formatted_keywords))
         return formatted_keywords
