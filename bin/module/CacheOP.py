@@ -16,5 +16,8 @@ class CacheOP:
         if jira_id is not None:
             tickets = cache.load_cached_tickets()
             ticket = tickets[jira_id]
-            items.append(ticket)
+            items.append({
+                'count': len(tickets),
+                'ticket': ticket
+            })
         return items, success
