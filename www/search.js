@@ -17,7 +17,7 @@ PS = (function(window, document, $) {
 
     function search() {
         $('body').css('cursor', 'wait');
-        $('#link-list').html('<p><a href="">lädt ...</a></p>');
+        $('#link-list').html('<p><a href="">lädt ...</a></p>').fadeIn();
         $('#search').css({'top': '50%', 'margin-top': '-200px'});
         var keywords = $('#keywords').val();
         var getUrl = 'http://192.168.6.152:55888/?function=Search&keywords=' + encodeURIComponent(keywords);
@@ -34,7 +34,7 @@ PS = (function(window, document, $) {
                     if(typeof result.items[0].relevancy != 'undefined') {
                         if(result.items[0].relevancy.length == 0) {
                             $('#search').css({'top': '50%', 'margin-top': '-200px'});
-                            $('#link-list').append('<p><a href="">Nothing was found</a></p>');
+                            $('#link-list').append('<p><a href="">Nothing was found</a></p>').fadeIn();
                         } else {
                             $('#search').css({'top': '0%', 'margin-top': '0px'});
                         }
@@ -42,7 +42,7 @@ PS = (function(window, document, $) {
                             var item = result.items[0].relevancy[index];
                             if(index > 19)
                                 break;
-                            $('#link-list').append('<p><a href="' + item.link + '" target="_blank">' + item.title + ' (' + Math.round(item.percentage) + ' %)</a></p>');
+                            $('#link-list').append('<p><a href="' + item.link + '" target="_blank">' + item.title + ' (' + Math.round(item.percentage) + ' %)</a></p>').fadeIn();
                         }
                     } else {
                         $('#search').css({'top': '50%', 'margin-top': '-200px'});
