@@ -16,6 +16,7 @@ PS = (function(window, document, $) {
     }
 
     function search() {
+        $('body').css('cursor', 'wait');
         var keywords = $('#keywords').val();
         var getUrl = 'http://192.168.6.152:55888/?function=Search&keywords=' + encodeURIComponent(keywords);
         var formContentType = 'application/x-www-form-urlencoded';
@@ -25,13 +26,16 @@ PS = (function(window, document, $) {
             xhr.setRequestHeader('Content-type', formContentType);
             xhr.onreadystatechange = function() {
                 if(xhr.responseText) {
+                    $('body').css('cursor', 'auto');
                     $('#link-list').html('');
                     var result = JSON.parse(xhr.responseText);
                     if(typeof result.items[0].relevancy != 'undefined') {
-                        if(result.items[0].relevancy.length == 0)
+                        if(result.items[0].relevancy.length == 0) {
                             $('#search').css({'top': '50%', 'margin-top': '-200px'});
-                        else
+                            $('#link-list').append('<p><a href="">Nothing was found</a></p>');
+                        } else {
                             $('#search').css({'top': '0%', 'margin-top': '0px'});
+                        }
                         for(var index in result.items[0].relevancy) {
                             var item = result.items[0].relevancy[index];
                             if(index > 19)
