@@ -1,5 +1,6 @@
 from bin.service import Cache
 from bin.service import Context
+from bin.module import Estimate
 
 
 class Search:
@@ -13,12 +14,16 @@ class Search:
     def run(self):
         tickets = self.cache.load_cached_tickets()
         formatted_keywords = self.format_keywords()
-        relevancy = self.context.calculate_relevancy_for_tickets(tickets, {'Keywords': formatted_keywords, 'Related': []})
+        if len(formatted_keywords) == 1:
+            mod_estimate = Estimate.Estimate(formatted_keywords[0])
+            items, success = mod_estimate.run()
+        else:
+            relevancy = self.context.calculate_relevancy_for_tickets(tickets, {'Keywords': formatted_keywords, 'Related': []})
+            items = [{
+                'relevancy': relevancy,
+                'keywords': formatted_keywords
+            }]
 
-        items = [{
-            'relevancy': relevancy,
-            'keywords': formatted_keywords
-        }]
         success = True
         return items, success
 

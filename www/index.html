@@ -5,17 +5,20 @@
 <title>Petrus</title>
         <script src="jquery-3.4.1.min.js" type="text/javascript"></script>
         <script src="search.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="petrus.css">
+    <link rel="stylesheet" href="fontawesome-free-5.11.2-web/css/all.css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<h1>Petrus</h1>
-<form id="search" action="http://192.168.6.152:8080/search.html" method="GET" autocomplete="off">
-    <label for="keywords">Enter at least two keywords (comma separated): </label>
-    <input type="hidden" name="function" value="Search" />
-    <input type="text" name="keywords" id="keywords" placeholder="keywords" value="" />
-    <button type="submit">Search</button>
+<form id="search" action="" method="GET" autocomplete="off" onsubmit="petrusSearch.search();return false;">
+    <h1>Petrus</h1>
+    <input type="text" name="keywords" id="keywords" placeholder="one jira id or at least two keywords" value="" />
+    <button type="submit" class="fa fa-search"></button>
     <span id="link-list"></span>
 </form>
+
+<div id="image-copyright">"Austria Dawn" &copy; by Simon Matzinger @ <a href="https://www.pexels.com/photo/silhouette-of-mountains-1323550/" target="_blank">Pexels.com</a></div>
 
 </body>
 </html>

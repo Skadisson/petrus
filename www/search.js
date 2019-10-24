@@ -6,26 +6,16 @@ PS = (function(window, document, $) {
 
     var self;
 
-    var $body;
-
     var construct = function() {
         self = this;
         self.init();
     };
 
     function init() {
-        var urlParams = new URLSearchParams(window.location.search);
-        var keywords = urlParams.get('keywords');
-        $body = $('body');
-        $('#keywords', $body).val(keywords);
-        $body.on('#search', 'submit', self.search);
+        $('input[type=text]').focus();
     }
 
-    function search(event) {
-        console.log('search');
-
-        event.preventDefault();
-
+    function search() {
         var keywords = $('#keywords').val();
         var getUrl = 'http://192.168.6.152:55888/?function=Search&keywords=' + encodeURIComponent(keywords);
         var formContentType = 'application/x-www-form-urlencoded';
@@ -36,9 +26,21 @@ PS = (function(window, document, $) {
             xhr.onreadystatechange = function() {
                 if(xhr.responseText) {
                     $('#link-list').html('');
-                    result = JSON.parse(xhr.responseText).items[0].relevancy;
-                    for(index in result) {
-                        $('#link-list').append('<p><a href="' + result[index].link + '" target="_blank">' + result[index].title + ' (' + result[index].percentage + '%)</a></p>');
+                    var result = JSON.parse(xhr.responseText);
+                    if(typeof result.items[0].relevancy != 'undefined') {
+                        if(result.items[0].relevancy.length == 0)
+                            $('#search').css({'top': '50%', 'margin-top': '-200px'});
+                        else
+                            $('#search').css({'top': '0%', 'margin-top': '0px'});
+                        for(var index in result.items[0].relevancy) {
+                            var item = result.items[0].relevancy[index];
+                            if(index > 19)
+                                break;
+                            $('#link-list').append('<p><a href="' + item.link + '" target="_blank">' + item.title + ' (' + Math.round(item.percentage) + ' %)</a></p>');
+                        }
+                    } else {
+                        $('#search').css({'top': '50%', 'margin-top': '-200px'});
+                        $('#link-list').append('<p><a href="https://jira.konmedia.com/rest/api/2/issue/' + result.items[0].ticket.ID + '" target="_blank">Ticket "' + result.items[0].ticket.Title + '" estimate is ' + (result.items[0].estimation/60/60) + ' h</a></p>');
                     }
                 }
             };
