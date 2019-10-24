@@ -17,6 +17,7 @@ PS = (function(window, document, $) {
 
     function search() {
         $('body').css('cursor', 'wait');
+        $('#link-list').html('<p><a href="">lädt ...</a></p>');
         var keywords = $('#keywords').val();
         var getUrl = 'http://192.168.6.152:55888/?function=Search&keywords=' + encodeURIComponent(keywords);
         var formContentType = 'application/x-www-form-urlencoded';
