@@ -80,4 +80,5 @@ input[type=text] {
     color:#635C3B;
     font-weight:bold;
     width: 100%;
+    display:inline-block;
 }
