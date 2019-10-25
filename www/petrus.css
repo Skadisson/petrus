@@ -82,3 +82,10 @@ input[type=text] {
     width: 100%;
     display:inline-block;
 }
+p.tickets {
+    text-align:left;
+    margin-left:40px;
+    font-size: 12px;
+    line-height: 13px;
+    color:#635C3B;
+}

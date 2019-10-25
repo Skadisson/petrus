@@ -13,7 +13,30 @@ PS = (function(window, document, $) {
 
     function init() {
         $('input[type=text]').focus();
-    }
+        self.info();
+    };
+
+    function info() {
+        var getUrl = 'http://192.168.6.152:55888/?function=Info';
+        var formContentType = 'application/x-www-form-urlencoded';
+        try {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', getUrl, true);
+            xhr.setRequestHeader('Content-type', formContentType);
+            xhr.onreadystatechange = function() {
+                if(xhr.responseText) {
+                    $('#ticket-count').html('');
+                    var result = JSON.parse(xhr.responseText);
+                    if(typeof result.items[0].ticket_count != 'undefined') {
+                        $('#ticket-count').html(result.items[0].ticket_count);
+                    }
+                }
+            };
+            xhr.send();
+        } catch(e) {
+            console.log(e.message);
+        }
+    };
 
     function search() {
         $('body').css('cursor', 'wait');
@@ -37,7 +60,9 @@ PS = (function(window, document, $) {
                             if(keywords != '') {
                                 $('#link-list').append('<p>Nothing was found</p>').fadeIn();
                             }
+                            self.info();
                         } else {
+                            $('#ticket-count').html(result.items[0].relevancy.length);
                             $('#search').css({'top': '0%', 'margin-top': '0px'});
                         }
                         for(var index in result.items[0].relevancy) {
@@ -54,11 +79,12 @@ PS = (function(window, document, $) {
         } catch(e) {
             console.log(e.message);
         }
-    }
+    };
 
     construct.prototype = {
         init: init,
-        search: search
+        search: search,
+        info: info
     };
 
     return construct;

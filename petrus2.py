@@ -6,6 +6,7 @@ from bin.module import Trend
 from bin.module import Update
 from bin.module import Backup
 from bin.module import CacheOP
+from bin.module import Info
 import json
 
 
@@ -43,6 +44,9 @@ def petrus(request):
         cache = CacheOP.CacheOP(jira_key)
         if jira_key is not None:
             items, success = cache.run()
+    elif function == 'Info':
+        info = Info.Info()
+        items, success = info.run()
     response = {'success': success, 'items': items}
     json_response = json.dumps(response)
     return Response(json_response, mimetype='application/json', headers={'Access-Control-Allow-Origin': '*'})
