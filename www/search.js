@@ -40,8 +40,6 @@ PS = (function(window, document, $) {
                         }
                         for(var index in result.items[0].relevancy) {
                             var item = result.items[0].relevancy[index];
-                            if(index > 19)
-                                break;
                             $('#link-list').append('<p><a href="' + item.link + '" target="_blank">' + item.title + ' (' + Math.round(item.percentage) + ' %)</a></p>').fadeIn();
                         }
                     } else {
