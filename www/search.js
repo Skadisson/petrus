@@ -17,7 +17,7 @@ PS = (function(window, document, $) {
 
     function search() {
         $('body').css('cursor', 'wait');
-        $('#link-list').html('<p><a href="">loading ...</a></p>').fadeIn();
+        $('#link-list').html('<p>loading ...</p>').fadeIn();
         $('#search').css({'top': '50%', 'margin-top': '-200px'});
         var keywords = $('#keywords').val();
         var getUrl = 'http://192.168.6.152:55888/?function=Search&keywords=' + encodeURIComponent(keywords);
@@ -34,7 +34,7 @@ PS = (function(window, document, $) {
                     if(typeof result.items[0].relevancy != 'undefined') {
                         if(result.items[0].relevancy.length == 0) {
                             $('#search').css({'top': '50%', 'margin-top': '-200px'});
-                            $('#link-list').append('<p><a href="">Nothing was found</a></p>').fadeIn();
+                            $('#link-list').append('<p>Nothing was found</p>').fadeIn();
                         } else {
                             $('#search').css({'top': '0%', 'margin-top': '0px'});
                         }
@@ -46,7 +46,7 @@ PS = (function(window, document, $) {
                         }
                     } else {
                         $('#search').css({'top': '50%', 'margin-top': '-200px'});
-                        $('#link-list').append('<p><a href="https://jira.konmedia.com/rest/api/2/issue/' + result.items[0].ticket.ID + '" target="_blank">Ticket "' + result.items[0].ticket.Title + '" estimate is ' + (result.items[0].estimation/60/60) + ' h</a></p>');
+                        $('#link-list').append('<p>Ticket "' + result.items[0].ticket.Title + '" estimate is ' + (result.items[0].estimation/60/60) + ' h</p>');
                     }
                 }
             };
