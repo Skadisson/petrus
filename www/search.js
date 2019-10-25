@@ -34,7 +34,9 @@ PS = (function(window, document, $) {
                     if(typeof result.items[0].relevancy != 'undefined') {
                         if(result.items[0].relevancy.length == 0) {
                             $('#search').css({'top': '50%', 'margin-top': '-200px'});
-                            $('#link-list').append('<p>Nothing was found</p>').fadeIn();
+                            if(keywords != '') {
+                                $('#link-list').append('<p>Nothing was found</p>').fadeIn();
+                            }
                         } else {
                             $('#search').css({'top': '0%', 'margin-top': '0px'});
                         }
