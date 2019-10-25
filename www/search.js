@@ -28,7 +28,7 @@ PS = (function(window, document, $) {
                     $('#ticket-count').html('');
                     var result = JSON.parse(xhr.responseText);
                     if(typeof result.items[0].ticket_count != 'undefined') {
-                        $('#ticket-count').html(result.items[0].ticket_count);
+                        $('#ticket-count').html(result.items[0].ticket_count + " Tickets");
                     }
                 }
             };
@@ -60,8 +60,9 @@ PS = (function(window, document, $) {
                             if(keywords != '') {
                                 $('#link-list').append('<p>Nothing was found</p>').fadeIn();
                             }
+                            self.info();
                         } else {
-                            $('#ticket-count').html(result.items[0].relevancy.length);
+                            $('#ticket-count').html(result.items[0].relevancy.length + " Results");
                             $('#search').css({'top': '0%', 'margin-top': '0px'});
                         }
                         for(var index in result.items[0].relevancy) {
@@ -71,8 +72,8 @@ PS = (function(window, document, $) {
                     } else {
                         $('#search').css({'top': '50%', 'margin-top': '-200px'});
                         $('#link-list').append('<p>Ticket "' + result.items[0].ticket.Title + '" estimate is ' + (result.items[0].estimation/60/60) + ' h</p>');
+                        self.info();
                     }
-                    self.info();
                 }
             };
             xhr.send();
