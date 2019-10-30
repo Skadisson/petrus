@@ -17,6 +17,7 @@ h1 {
     font-size:36px;
     line-height:36px;
     color:#635C3B;
+    text-shadow: 0 0 15px white;
 }
 form {
     width:800px;
@@ -66,6 +67,7 @@ input[type=text] {
     text-align:left;
 }
 #link-list {
+    padding-bottom: 20px;
 }
 #link-list p {
     display:block;
@@ -76,6 +78,10 @@ input[type=text] {
     padding:5px 10px;
     color:#635C3B;
     font-weight:bold;
+    box-shadow: 1px 1px 3px grey;
+}
+#link-list p:hover {
+    background: white;
 }
 #link-list p a, #link-list p a:link, #link-list p a:visited, #link-list p a:hover, #link-list p a:active {
     color:#635C3B;
@@ -95,10 +101,11 @@ p.tickets {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     margin-bottom: -8px;
+    box-shadow: 1px 1px 3px grey;
 }
 #link-list #single {
     margin-top: -10px;
-    padding-top: 15px;
+    padding-top: 20px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
