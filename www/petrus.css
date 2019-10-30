@@ -69,14 +69,14 @@ input[type=text] {
     padding-bottom: 20px;
 }
 #link-list p {
-    display:block;
-    width: 685px;
+    display: block;
+    width: 675px;
     margin-left: 45px;
-    background:#FCF7E0;
-    border-radius:10px;
-    padding:5px 10px;
-    color:#635C3B;
-    font-weight:bold;
+    background: #FCF7E0;
+    border-radius: 10px;
+    padding: 5px 20px 5px 10px;
+    color: #635C3B;
+    font-weight: bold;
     box-shadow: 1px 1px 3px grey;
 }
 #link-list p:hover {
