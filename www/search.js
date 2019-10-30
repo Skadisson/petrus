@@ -40,7 +40,7 @@ PS = (function(window, document, $) {
 
     function search() {
         $('body').css('cursor', 'wait');
-        $('#link-list').html('<p>loading ...</p>').fadeIn();
+        $('#link-list').html('<p id="single">loading ...</p>').fadeIn();
         $('#search').css({'top': '50%', 'margin-top': '-200px'});
         var keywords = $('#keywords').val();
         var getUrl = 'http://192.168.6.152:55888/?function=Search&keywords=' + encodeURIComponent(keywords);
@@ -58,7 +58,7 @@ PS = (function(window, document, $) {
                         if(result.items[0].relevancy.length == 0) {
                             $('#search').css({'top': '50%', 'margin-top': '-200px'});
                             if(keywords != '') {
-                                $('#link-list').append('<p>Nothing was found</p>').fadeIn();
+                                $('#link-list').append('<p id="single">Nothing was found</p>').fadeIn();
                             }
                             self.info();
                         } else {
@@ -71,7 +71,7 @@ PS = (function(window, document, $) {
                         }
                     } else {
                         $('#search').css({'top': '50%', 'margin-top': '-200px'});
-                        $('#link-list').append('<p>Ticket "' + result.items[0].ticket.Title + '" estimate is ' + (result.items[0].estimation/60/60) + ' h</p>');
+                        $('#link-list').append('<p id="single">Ticket "' + result.items[0].ticket.Title + '" estimate is ' + (result.items[0].estimation/60/60) + ' h</p>');
                         self.info();
                     }
                 }

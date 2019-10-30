@@ -68,8 +68,8 @@ input[type=text] {
 }
 #link-list p {
     display:block;
-    width: 700px;
-    margin-left: 40px;
+    width: 705px;
+    margin-left: 35px;
     background:#FCF7E0;
     border-radius:10px;
     padding:5px 10px;
@@ -83,9 +83,21 @@ input[type=text] {
     display:inline-block;
 }
 p.tickets {
-    text-align:left;
-    margin-left:40px;
+    margin-left: 35px;
     font-size: 12px;
     line-height: 13px;
-    color:#635C3B;
+    color: #635C3B;
+    background: #FCF7E0;
+    width: 150px;
+    text-align: center;
+    padding: 10px 10px 20px 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    margin-bottom: -8px;
+}
+#link-list #single {
+    margin-top: -10px;
+    padding-top: 15px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
