@@ -70,8 +70,8 @@ input[type=text] {
 }
 #link-list p {
     display:block;
-    width: 705px;
-    margin-left: 35px;
+    width: 685px;
+    margin-left: 45px;
     background:#FCF7E0;
     border-radius:10px;
     padding:5px 10px;
@@ -92,7 +92,7 @@ input[type=text] {
     display:inline-block;
 }
 p.tickets {
-    margin-left: 35px;
+    margin-left: 45px;
     font-size: 12px;
     line-height: 13px;
     color: #635C3B;
@@ -113,7 +113,7 @@ p.tickets {
 }
 .corner {
     position: absolute;
-    right: 50px;
+    right: 60px;
     bottom: 20px;
     width: 8px;
     height: 8px;
