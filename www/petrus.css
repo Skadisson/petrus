@@ -83,6 +83,9 @@ input[type=text] {
 #link-list p:hover {
     background: white;
 }
+#link-list #single:hover {
+    background:#FCF7E0;
+}
 #link-list p a, #link-list p a:link, #link-list p a:visited, #link-list p a:hover, #link-list p a:active {
     color:#635C3B;
     font-weight:bold;
