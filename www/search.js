@@ -41,7 +41,7 @@ PS = (function(window, document, $) {
     function search() {
         $('body').css('cursor', 'wait');
         $('#link-list').html('<p id="single">loading ...</p>').fadeIn();
-        $('#search').css({'top': '50%', 'margin-top': '-200px'});
+        $('#search').css({'top': '50%', 'margin-top': '-100px'});
         var keywords = $('#keywords').val();
         var getUrl = 'http://192.168.6.152:55888/?function=Search&keywords=' + encodeURIComponent(keywords);
         var formContentType = 'application/x-www-form-urlencoded';
@@ -56,7 +56,7 @@ PS = (function(window, document, $) {
                     var result = JSON.parse(xhr.responseText);
                     if(typeof result.items[0].relevancy != 'undefined') {
                         if(result.items[0].relevancy.length == 0) {
-                            $('#search').css({'top': '50%', 'margin-top': '-200px'});
+                            $('#search').css({'top': '50%', 'margin-top': '-100px'});
                             if(keywords != '') {
                                 $('#link-list').append('<p id="single">Nothing was found</p>').fadeIn();
                             }
@@ -70,7 +70,7 @@ PS = (function(window, document, $) {
                             $('#link-list').append('<p><a href="' + item.link + '" target="_blank">' + item.title + ' (' + Math.round(item.percentage) + ' %)</a></p>').fadeIn();
                         }
                     } else {
-                        $('#search').css({'top': '50%', 'margin-top': '-200px'});
+                        $('#search').css({'top': '50%', 'margin-top': '-100px'});
                         $('#link-list').append('<p id="single">Ticket "' + result.items[0].ticket.Title + '" estimate is ' + (result.items[0].estimation/60/60) + ' h</p>');
                         self.info();
                     }
