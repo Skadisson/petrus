@@ -71,7 +71,9 @@ PS = (function(window, document, $) {
                         }
                     } else {
                         $('#search').css({'top': '50%', 'margin-top': '-100px'});
-                        $('#link-list').append('<p id="single">Ticket "' + result.items[0].ticket.Title + '" estimate is ' + (result.items[0].estimation/60/60) + ' h</p>');
+                        var hours = result.items[0].estimation/60/60;
+                        var cssClass = hours <= 2 ? 'green' : (hours <= 4 ? 'yellow' : 'red');
+                        $('#link-list').append('<p id="single">Ticket "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h <span class="corner ' + cssClass + '">&nbsp;</span></p>');
                         self.info();
                     }
                 }

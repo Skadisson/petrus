@@ -112,3 +112,23 @@ p.tickets {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
+.corner {
+    position: absolute;
+    right: 50px;
+    bottom: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+}
+.corner.green {
+    background: lime;
+    box-shadow: 0 0 10px lime;
+}
+.corner.yellow {
+    background: yellow;
+    box-shadow: 0 0 10px yellow;
+}
+.corner.red {
+    background: red;
+    box-shadow: 0 0 10px red;
+}
