@@ -25,10 +25,10 @@ PS = (function(window, document, $) {
             xhr.setRequestHeader('Content-type', formContentType);
             xhr.onreadystatechange = function() {
                 if(xhr.responseText) {
-                    $('#ticket-count').html('');
+                    $('#keywords').attr('placeholder', '');
                     var result = JSON.parse(xhr.responseText);
                     if(typeof result.items[0].ticket_count != 'undefined') {
-                        $('#ticket-count').html(result.items[0].ticket_count + " Tickets");
+                        $('#keywords').attr('placeholder', result.items[0].ticket_count + " Tickets");
                     }
                 }
             };
@@ -62,7 +62,7 @@ PS = (function(window, document, $) {
                             }
                             self.info();
                         } else {
-                            $('#ticket-count').html(result.items[0].relevancy.length + " Results");
+                            $('#keywords').attr('placeholder', result.items[0].relevancy.length + " Results");
                             $('#search').css({'top': '0%', 'margin-top': '0px'});
                         }
                         for(var index in result.items[0].relevancy) {
