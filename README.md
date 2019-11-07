@@ -47,6 +47,8 @@ wheel           0.33.6
 wincertstore    0.2
 </pre>
 
+Use "pip list --outdated --format=columns" to check for outdated versions.
+
 Inspect Code:
 SciKitLearn.py
 Expected type 'int', got 'DataFrame' instead
