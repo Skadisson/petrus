@@ -71,8 +71,9 @@ class Context:
             rel_percentage = rel_item['percentage']
             if rel_jira_id != jira_id and rel_jira_id in cached_tickets:
                 similar_ticket = cached_tickets[rel_jira_id]
-                normalized_similar_ticket = self.mapper.normalize_ticket(similar_ticket, rel_percentage)
-                similar_tickets.append(normalized_similar_ticket)
+                if similar_ticket['Time_Spent'] > 0:
+                    normalized_similar_ticket = self.mapper.normalize_ticket(similar_ticket, rel_percentage)
+                    similar_tickets.append(normalized_similar_ticket)
         hits = len(similar_tickets)
 
         return similar_tickets, hits
