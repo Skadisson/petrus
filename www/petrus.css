@@ -107,6 +107,10 @@ input[type=text] {
     color: #635C3B;
     box-shadow: 1px 1px 3px grey;
 }
+body.dark #link-list p {
+    background: #635C3B;
+    color: #FCF7E0;
+}
 #link-list p:hover {
     background: white;
 }
@@ -117,6 +121,9 @@ input[type=text] {
     color:#635C3B;
     width: 100%;
     display:inline-block;
+}
+body.dark #link-list p a, body.dark #link-list p a:link, body.dark #link-list p a:visited, body.dark #link-list p a:hover, body.dark #link-list p a:active {
+    color: #FCF7E0;
 }
 #link-list #single {
     margin-top: -10px;
