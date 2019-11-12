@@ -29,7 +29,6 @@ html, body {
 }
 a, a:active, a:link, a:visited, a:hover {
     color:#FCF7E0;
-    font-weight:bold;
     text-decoration:none;
 }
 h1 {
@@ -97,7 +96,6 @@ input[type=text] {
     border-radius: 10px;
     padding: 5px 20px 5px 10px;
     color: #635C3B;
-    font-weight: bold;
     box-shadow: 1px 1px 3px grey;
 }
 #link-list p:hover {
@@ -108,7 +106,6 @@ input[type=text] {
 }
 #link-list p a, #link-list p a:link, #link-list p a:visited, #link-list p a:hover, #link-list p a:active {
     color:#635C3B;
-    font-weight:bold;
     width: 100%;
     display:inline-block;
 }
