@@ -129,9 +129,9 @@ input[type=text] {
     box-shadow: 1px 1px 3px grey;
 }
 body.dark #link-list p {
-    background: #635C3B;
+    background: #271959;
     color: #FCF7E0;
-    box-shadow: 1px 1px 3px black;
+    box-shadow: 1px 1px 3px #E94792;
 }
 #link-list p:hover {
     background: white;
