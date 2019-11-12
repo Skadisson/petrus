@@ -84,10 +84,15 @@ PS = (function(window, document, $) {
         }
     };
 
+    function darkmode() {
+        $('body').toggleClass('dark');
+    };
+
     construct.prototype = {
         init: init,
         search: search,
-        info: info
+        info: info,
+        darkmode: darkmode
     };
 
     return construct;
