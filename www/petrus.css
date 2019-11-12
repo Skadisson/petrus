@@ -19,6 +19,27 @@
 .Petrus-4-hsla { color: hsla(249, 26, 9, 1); }
 .Petrus-5-hsla { color: hsla(49, 82, 93, 1); }
 
+/* Color Theme Swatches in Hex */
+.Petrus-Dark-1-hex { color: #F1ECDF; }
+.Petrus-Dark-2-hex { color: #652A8C; }
+.Petrus-Dark-3-hex { color: #271959; }
+.Petrus-Dark-4-hex { color: #070E26; }
+.Petrus-Dark-5-hex { color: #E94792; }
+
+/* Color Theme Swatches in RGBA */
+.Petrus-Dark-1-rgba { color: rgba(241, 236, 223, 1); }
+.Petrus-Dark-2-rgba { color: rgba(101, 42, 140, 1); }
+.Petrus-Dark-3-rgba { color: rgba(39, 25, 89, 1); }
+.Petrus-Dark-4-rgba { color: rgba(7, 14, 38, 1); }
+.Petrus-Dark-5-rgba { color: rgba(233, 71, 146, 1); }
+
+/* Color Theme Swatches in HSLA */
+.Petrus-Dark-1-hsla { color: hsla(43, 39, 90, 1); }
+.Petrus-Dark-2-hsla { color: hsla(276, 53, 35, 1); }
+.Petrus-Dark-3-hsla { color: hsla(253, 56, 22, 1); }
+.Petrus-Dark-4-hsla { color: hsla(226, 68, 8, 1); }
+.Petrus-Dark-5-hsla { color: hsla(332, 78, 59, 1); }
+
 html, body {
     font-family: 'Montserrat', sans-serif;
     color:#FCF7E0;
