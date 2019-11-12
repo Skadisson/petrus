@@ -110,9 +110,13 @@ input[type=text] {
 body.dark #link-list p {
     background: #635C3B;
     color: #FCF7E0;
+    box-shadow: 1px 1px 3px black;
 }
 #link-list p:hover {
     background: white;
+}
+body.dark #link-list p:hover {
+    background: black;
 }
 #link-list #single:hover {
     background:#FCF7E0;
