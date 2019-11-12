@@ -1,3 +1,24 @@
+/* Color Theme Swatches in Hex */
+.Petrus-1-hex { color: #5DC4DC; }
+.Petrus-2-hex { color: #635C3B; }
+.Petrus-3-hex { color: #F1B94A; }
+.Petrus-4-hex { color: #14121F; }
+.Petrus-5-hex { color: #FCF7E0; }
+
+/* Color Theme Swatches in RGBA */
+.Petrus-1-rgba { color: rgba(93, 196, 220, 1); }
+.Petrus-2-rgba { color: rgba(99, 92, 59, 1); }
+.Petrus-3-rgba { color: rgba(241, 185, 74, 1); }
+.Petrus-4-rgba { color: rgba(20, 18, 31, 1); }
+.Petrus-5-rgba { color: rgba(252, 247, 224, 1); }
+
+/* Color Theme Swatches in HSLA */
+.Petrus-1-hsla { color: hsla(191, 64, 61, 1); }
+.Petrus-2-hsla { color: hsla(49, 25, 30, 1); }
+.Petrus-3-hsla { color: hsla(39, 85, 61, 1); }
+.Petrus-4-hsla { color: hsla(249, 26, 9, 1); }
+.Petrus-5-hsla { color: hsla(49, 82, 93, 1); }
+
 html, body {
     background-color:white;
     background-image:url(image/austria-dawn-desktop-backgrounds-1323550.jpg);
