@@ -67,6 +67,12 @@ h1 {
 body.dark h1 {
     color:#FCF7E0;
 }
+h3 {
+    color:beige;
+}
+body.dark h3 {
+    color:magenta;
+}
 form {
     width:800px;
     height:200px;
