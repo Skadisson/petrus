@@ -2,6 +2,7 @@ from bin.service import Cache
 from bin.service import SciKitLearn
 from bin.service import Context
 from bin.service import Map
+from bin.service import Environment
 import time
 import datetime
 from collections import Counter
@@ -18,6 +19,7 @@ class Analyze:
         self.sci_kit = SciKitLearn.SciKitLearn()
         self.context = Context.Context()
         self.mapper = Map.Map()
+        self.environment = Environment.Environment()
 
     def ticket_count(self, for_days=0, year="", week_numbers=""):
         ticket_count = 0
@@ -132,9 +134,7 @@ class Analyze:
                         time_spent = ticket['Time_Spent']
                         hours_spent = int(self.seconds_to_hours(time_spent))
                         organization = ticket['Project']
-                        time_updated = self.timestamp_from_ticket_time(ticket['Updated'])
-                        date_uploaded = datetime.datetime.fromtimestamp(time_updated)
-                        calendar_week = date_uploaded.strftime("%V")
+                        calendar_week = self.get_calendar_week(ticket['Updated'])
                         if calendar_week not in total:
                             total[calendar_week] = 0
                         if calendar_week not in organizations:
@@ -266,3 +266,43 @@ class Analyze:
                         word_relations[keyword].append(related_keyword)
         word_count = Counter(words)
         return word_count, word_relations
+
+    def get_calendar_week(self, time):
+        time_updated = self.timestamp_from_ticket_time(time)
+        date_uploaded = datetime.datetime.fromtimestamp(time_updated)
+        calendar_week = date_uploaded.strftime("%V")
+        return calendar_week
+
+    def get_calendar_year(self, time):
+        time_updated = self.timestamp_from_ticket_time(time)
+        date_uploaded = datetime.datetime.fromtimestamp(time_updated)
+        calendar_year = date_uploaded.strftime("%Y")
+        return calendar_year
+
+    def ticket_type_calendar(self, tickets):
+        ticket_type_calendar = {}
+        labels = []
+        categories = self.environment.get_map_categories()
+        for ticket_id in tickets:
+            ticket = tickets[ticket_id]
+            calendar_week = self.get_calendar_week(ticket['Created'])
+            year = self.get_calendar_year(ticket['Created'])
+            ticket_type = ticket['Type']
+            for category in categories:
+                if ticket_type in categories[category]:
+                    ticket_type = category
+                    break
+            if year and calendar_week and ticket_type:
+                label = year + 'KW' + calendar_week
+                if label not in labels:
+                    labels.append(label)
+                if label not in ticket_type_calendar:
+                    ticket_type_calendar[label] = {}
+                if ticket_type not in ticket_type_calendar[label]:
+                    ticket_type_calendar[label][ticket_type] = 0
+                ticket_type_calendar[label][ticket_type] += 1
+        ordered_labels = sorted(labels)
+        ordered_type_calendar = {}
+        for label in ordered_labels:
+            ordered_type_calendar[label] = ticket_type_calendar[label]
+        return ordered_type_calendar

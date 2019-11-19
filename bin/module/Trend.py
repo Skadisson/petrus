@@ -62,14 +62,15 @@ class Trend:
     def output_trend_json(self, ticket_count, hours_total, hours_per_project, hours_per_type, hours_per_version, projects_per_version, problematic_tickets):
 
         trend_file = self.environment.get_path_trend()
+        categories = self.environment.get_map_categories()
         tickets_per_hour = ticket_count / hours_total
         payed_hours = 0.0
         un_payed_hours = 0.0
 
         for ticket_type in hours_per_type:
-            if ticket_type[0] in ['Fehler', 'Maintenance']:
+            if ticket_type[0] in categories['Bug']:
                 un_payed_hours += ticket_type[1]
-            elif ticket_type[0] in ['Serviceanfrage', 'Aufgabe', 'Media Service']:
+            elif ticket_type[0] in categories['Support']:
                 payed_hours += ticket_type[1]
 
         trend_content = {
