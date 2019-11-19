@@ -209,11 +209,12 @@ PS = (function(window, document, $) {
                 support = ticket_type_calendar[calendar_week]['Support'];
             }
         }
-        $('#stats h3').text(Math.ceil((support / (bugs + support) * 100)) + '% Support');
+        var support_percentage = Math.ceil((support / (bugs + support) * 100));
+        $('#stats h3').html(calendar_week + '<br />' + support_percentage + '% Support');
 
         // set the dimensions and margins of the graph
         var width = 200,
-            height = 233,
+            height = 220,
             margin = 20;
 
         // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
