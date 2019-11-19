@@ -183,3 +183,6 @@ body.dark #image-copyright-dark {
 body.dark #image-copyright {
     display:none;
 }
+#diagram {
+    opacity:0.5;
+}
