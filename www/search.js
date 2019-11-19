@@ -32,6 +32,7 @@ PS = (function(window, document, $) {
                     }
                     if(typeof result.items[0].ticket_type_calendar != 'undefined') {
                         self.renderTypeGraph(result.items[0].ticket_type_calendar);
+                        self.renderPieChart(result.items[0].ticket_type_calendar);
                     }
                 }
             };
@@ -192,12 +193,76 @@ PS = (function(window, document, $) {
 
     };
 
+    function renderPieChart(ticket_type_calendar) {
+        $('#stats_graph').html('');
+
+        var is_dark = $('body').hasClass('dark');
+        var main_color = is_dark ? 'magenta' : 'beige';
+        var support_color = is_dark ? 'purple' : 'lightblue';
+        var bugs = 0;
+        var support = 0;
+        for(var calendar_week in ticket_type_calendar) {
+            if(typeof ticket_type_calendar[calendar_week]['Bug'] != 'undefined') {
+                bugs = ticket_type_calendar[calendar_week]['Bug'];
+            }
+            if(typeof ticket_type_calendar[calendar_week]['Support'] != 'undefined') {
+                support = ticket_type_calendar[calendar_week]['Support'];
+            }
+        }
+        $('#stats h3').text(Math.ceil((support / (bugs + support) * 100)) + '% Support');
+
+        // set the dimensions and margins of the graph
+        var width = 200,
+            height = 233,
+            margin = 20;
+
+        // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+        var radius = Math.min(width, height) / 2 - margin;
+
+        // append the svg object to the div called 'my_dataviz'
+        var svg = d3.select("#stats_graph")
+          .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+          .append("g")
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        // Create dummy data
+        var data = {a: support, b: bugs}
+
+        // set the color scale
+        var color = d3.scaleOrdinal()
+          .domain(data)
+          .range([support_color, "#00000000"])
+
+        // Compute the position of each group on the pie:
+        var pie = d3.pie()
+          .value(function(d) {return d.value; })
+        var data_ready = pie(d3.entries(data))
+
+        // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+        svg
+          .selectAll('whatever')
+          .data(data_ready)
+          .enter()
+          .append('path')
+          .attr('d', d3.arc()
+            .innerRadius(0)
+            .outerRadius(radius)
+          )
+          .attr('fill', function(d){ return(color(d.data.key)) })
+          .attr("stroke", main_color)
+          .style("stroke-width", "2px")
+          .style("opacity", 1)
+    };
+
     construct.prototype = {
         init: init,
         search: search,
         info: info,
         darkmode: darkmode,
-        renderTypeGraph: renderTypeGraph
+        renderTypeGraph: renderTypeGraph,
+        renderPieChart: renderPieChart
     };
 
     return construct;

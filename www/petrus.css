@@ -183,6 +183,19 @@ body.dark #image-copyright-dark {
 body.dark #image-copyright {
     display:none;
 }
-#diagram {
+#graph {
     opacity:0.5;
+    position:relative;
+    width:800px;
+    overflow:hidden;
+}
+#diagram {
+    position:relative;
+    width:600px;
+    float:left;
+}
+#stats {
+    position:relative;
+    width:200px;
+    float:right;
 }
