@@ -30,6 +30,9 @@ PS = (function(window, document, $) {
                     if(typeof result.items[0].ticket_count != 'undefined') {
                         $('#keywords').attr('placeholder', result.items[0].ticket_count + " Tickets");
                     }
+                    if(typeof result.items[0].ticket_type_calendar != 'undefined') {
+                        self.renderTypeGraph(result.items[0].ticket_type_calendar);
+                    }
                 }
             };
             xhr.send();
@@ -86,13 +89,115 @@ PS = (function(window, document, $) {
 
     function darkmode() {
         $('body').toggleClass('dark');
+        self.info();
+    };
+
+    function renderTypeGraph(ticket_type_calendar) {
+        $('#diagram').html('');
+        var is_dark = $('body').hasClass('dark');
+        var color = is_dark ? 'magenta' : 'beige';
+        var support_color = is_dark ? 'purple' : 'lightblue';
+        var max_weeks = 20;
+        var week_count = Object.keys(ticket_type_calendar).length;
+        var start_week = week_count - max_weeks;
+        var data = [];
+        var x_cur = 0;
+        var x_start = 0;
+        var x_end = 0;
+        var y_max = 0;
+        for(var calendar_week in ticket_type_calendar) {
+            x_cur += 1;
+            if(x_cur >= start_week) {
+                if(x_start == 0) {
+                    x_start = calendar_week;
+                }
+                var y_cur = 0;
+                var ci_right = 0;
+                var ci_left = 0;
+                for(var ticket_type in ticket_type_calendar[calendar_week]) {
+                    y_cur += ticket_type_calendar[calendar_week][ticket_type];
+                }
+                if(typeof ticket_type_calendar[calendar_week]['Bug'] != 'undefined') {
+                    ci_left = ticket_type_calendar[calendar_week]['Bug'];
+                }
+                if(typeof ticket_type_calendar[calendar_week]['Support'] != 'undefined') {
+                    ci_right = ticket_type_calendar[calendar_week]['Support'] + ci_left;
+                }
+                if(y_cur > y_max) {
+                    y_max = y_cur;
+                }
+                data.push({
+                    'x': calendar_week,
+                    'y': y_cur,
+                    'CI_left': ci_left,
+                    'CI_right': ci_right
+                });
+            }
+        }
+        x_end = calendar_week;
+
+        // set the dimensions and margins of the graph
+        var margin = {top: 10, right: 30, bottom: 30, left: 60},
+            width = 600 - margin.left - margin.right,
+            height = 280 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        var svg = d3.select("#diagram")
+          .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform",
+                  "translate(" + margin.left + "," + margin.top + ")");
+
+        // Add X axis --> it is a date format
+        var x = d3.scaleLinear()
+          .domain([x_start,x_end])
+          .range([ 0, width ]);
+        svg.append("g")
+            .style('stroke', color)
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x));
+
+        // Add Y axis
+        var y = d3.scaleLinear()
+          .domain([0, y_max])
+          .range([ height, 0 ]);
+        svg.append("g")
+            .style('stroke', color)
+          .call(d3.axisLeft(y));
+
+        // Show confidence interval
+        svg.append("path")
+          .datum(data)
+          .attr("fill", support_color)
+          .attr("stroke", "none")
+          .attr("d", d3.area()
+            .x(function(d) { return x(d.x) })
+            .y0(function(d) { return y(d.CI_right) })
+            .y1(function(d) { return y(d.CI_left) })
+            )
+
+        // Add the line
+        svg
+          .append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", color)
+          .attr("stroke-width", 4)
+          .attr("d", d3.line()
+            .x(function(d) { return x(d.x) })
+            .y(function(d) { return y(d.y) })
+            )
+
     };
 
     construct.prototype = {
         init: init,
         search: search,
         info: info,
-        darkmode: darkmode
+        darkmode: darkmode,
+        renderTypeGraph: renderTypeGraph
     };
 
     return construct;

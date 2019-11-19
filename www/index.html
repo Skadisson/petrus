@@ -3,6 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Petrus</title>
+        <script src="https://d3js.org/d3.v4.js" type="text/javascript"></script>
         <script src="jquery-3.4.1.min.js" type="text/javascript"></script>
         <script src="search.js" type="text/javascript"></script>
     <link rel="stylesheet" href="petrus.css">
@@ -16,6 +17,11 @@
     <input type="text" name="keywords" id="keywords" placeholder="one jira id or at least two keywords" value="" />
     <button type="submit" class="fa fa-search"></button>
     <div id="link-list"></div>
+
+    <div id="graph">
+        <div id="diagram"></div>
+        <div id="stats"></div>
+    </div>
 </form>
 
 <div id="petrus-info"><a href="https://confluence.konmedia.com/display/PE/Petrus" target="_blank" title="information"><span class="fa fa-info-circle">&nbsp;</span></a> <a href="https://confluence.konmedia.com/display/PE/Support+Report" target="_blank" title="read reports"><span class="fas fa-file-word">&nbsp;</span></a> <a href="https://github.com/Skadisson/petrus/issues" target="_blank" title="report a bug"><span class="fab fa-github">&nbsp;</span></a> <a href="javascript:return false;" target="_blank" title="toggle dark mode" onclick="petrusSearch.darkmode();return false;"><span class="fas fa-moon">&nbsp;</span></a></div>

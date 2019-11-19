@@ -293,7 +293,7 @@ class Analyze:
                     ticket_type = category
                     break
             if year and calendar_week and ticket_type:
-                label = year + 'KW' + calendar_week
+                label = year + '.' + calendar_week
                 if label not in labels:
                     labels.append(label)
                 if label not in ticket_type_calendar:
