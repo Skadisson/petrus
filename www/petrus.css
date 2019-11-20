@@ -194,6 +194,8 @@ body.dark #image-copyright {
     position:relative;
     width:800px;
     overflow:hidden;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
 }
 #diagram {
     position:relative;
