@@ -213,6 +213,10 @@ body.dark #image-copyright {
     top:10px;
     font-size:12px;
     line-height:13px;
+    color:beige;
+}
+.dark #graph-options {
+    color:magenta;
 }
 #graph-options .selected {
     font-weight:bold;
