@@ -207,3 +207,17 @@ body.dark #image-copyright {
     width:200px;
     float:right;
 }
+#graph-options {
+    position:absolute;
+    right:10px;
+    top:10px;
+    font-size:12px;
+    line-height:13px;
+}
+#graph-options .selected {
+    font-weight:bold;
+    cursor:auto;
+}
+#graph-options span {
+    cursor:pointer;
+}

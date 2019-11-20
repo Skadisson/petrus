@@ -4,15 +4,26 @@ PS = (function(window, document, $) {
 
     'use strict';
 
-    var self;
+    var self, weeks;
 
     var construct = function() {
         self = this;
+        weeks = {
+            'year': 53,
+            'quarter': 13,
+            'month': 4
+        };
         self.init();
     };
 
     function init() {
         $('input[type=text]').focus();
+        self.info();
+    };
+
+    function toggleWeekFunction(obj) {
+        $('#graph-options span.selected').removeClass('selected');
+        $(obj).toggleClass('selected');
         self.info();
     };
 
@@ -95,10 +106,14 @@ PS = (function(window, document, $) {
 
     function renderTypeGraph(ticket_type_calendar) {
         $('#diagram').html('');
+        var max_weeks = weeks['quarter'];
+        var week_function = $('#graph-options .selected').attr('data-function');
+        if(week_function in weeks) {
+            max_weeks = weeks[week_function];
+        }
         var is_dark = $('body').hasClass('dark');
         var color = is_dark ? 'magenta' : 'beige';
         var support_color = is_dark ? 'purple' : 'lightblue';
-        var max_weeks = 20;
         var week_count = Object.keys(ticket_type_calendar).length;
         var start_week = week_count - max_weeks;
         var data = [];
@@ -263,7 +278,8 @@ PS = (function(window, document, $) {
         info: info,
         darkmode: darkmode,
         renderTypeGraph: renderTypeGraph,
-        renderPieChart: renderPieChart
+        renderPieChart: renderPieChart,
+        toggleWeekFunction: toggleWeekFunction
     };
 
     return construct;
