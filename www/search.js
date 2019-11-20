@@ -117,16 +117,15 @@ PS = (function(window, document, $) {
         var week_count = Object.keys(ticket_type_calendar).length;
         var start_week = week_count - max_weeks;
         var data = [];
-        var x_cur = 0;
-        var x_start = 0;
+        var x_pos_cur = 0;
+        var x_neg_cur = week_count *(-1);
+        var x_start = week_count *(-1);
         var x_end = 0;
         var y_max = 0;
         for(var calendar_week in ticket_type_calendar) {
-            x_cur += 1;
-            if(x_cur >= start_week) {
-                if(x_start == 0) {
-                    x_start = calendar_week;
-                }
+            x_pos_cur += 1;
+            x_neg_cur += 1;
+            if(x_pos_cur >= start_week) {
                 var y_cur = 0;
                 var ci_right = 0;
                 var ci_left = 0;
@@ -143,14 +142,16 @@ PS = (function(window, document, $) {
                     y_max = y_cur;
                 }
                 data.push({
-                    'x': calendar_week,
+                    'x': x_neg_cur,
                     'y': y_cur,
                     'CI_left': ci_left,
                     'CI_right': ci_right
                 });
             }
+            if(x_pos_cur <= start_week) {
+                x_start += 1;
+            }
         }
-        x_end = calendar_week;
 
         // set the dimensions and margins of the graph
         var margin = {top: 10, right: 30, bottom: 30, left: 60},
