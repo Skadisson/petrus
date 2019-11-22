@@ -1,5 +1,6 @@
 from bin.service import Environment
 import json
+import re
 from collections import Counter
 
 
@@ -45,6 +46,7 @@ class Map:
     def normalize_ticket(self, ticket, relevancy_percentage=100.0):
         normalized_ticket = {}
         values = self.environment.get_map_values()
+        keys = self.environment.get_map_keys()
         for field_name in values:
             if field_name in ticket:
                 actual_value = ticket[field_name]
@@ -74,6 +76,12 @@ class Map:
             normalized_ticket['State_Changes'] = len(ticket['Status'])
         else:
             normalized_ticket['State_Changes'] = 0
+        normalized_ticket['Key'] = 0
+        if 'Key' in ticket and ticket['Key'] is not None:
+            normalized_ticket['Key'] = 0
+            for key in keys:
+                if re.match(key, ticket['Key']):
+                    normalized_ticket['Key'] = keys[key]
         return normalized_ticket
 
     @staticmethod

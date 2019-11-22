@@ -57,7 +57,7 @@ class Estimate:
                             normalized_ticket,
                             similar_tickets,
                             'Time_Spent',
-                            ['Relevancy', 'Priority', 'State_Changes', 'Type', 'Organization', 'Words']
+                            ['Relevancy', 'Key', 'Priority', 'State_Changes', 'Type', 'Organization', 'Words']
                         )
                     success = self.sd_api.update_ticket_times(jira_id, estimation, mapped_ticket)
         except Exception as e:

@@ -79,6 +79,10 @@ class Environment:
         service_yaml = self.load_yaml('map')
         return service_yaml['Values']
 
+    def get_map_keys(self):
+        service_yaml = self.load_yaml('map')
+        return service_yaml['Keys']
+
     def get_map_categories(self):
         service_yaml = self.load_yaml('map')
         return service_yaml['Categories']

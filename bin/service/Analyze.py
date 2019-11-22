@@ -126,7 +126,7 @@ class Analyze:
                             normalized_ticket,
                             similar_tickets,
                             'Time_Spent',
-                            ['Relevancy', 'Priority', 'State_Changes', 'Type', 'Organization', 'Words']
+                            ['Relevancy', 'Key', 'Priority', 'State_Changes', 'Type', 'Organization', 'Words']
                         )
                         accuracy = estimation / ticket['Time_Spent'] * 100
                         accuracies.append(accuracy)
