@@ -241,7 +241,11 @@ PS = (function(window, document, $) {
         if(bugs > 0 && support > 0) {
             support_percentage = Math.ceil((support / (bugs + support) * 100));
         }
-        $('#stats h3').html(calendar_label + '<br />' + support_percentage + '% Support');
+        var this_weeks_percentage = 'no tickets yet';
+        if(support_percentage > 0) {
+            this_weeks_percentage = support_percentage + '% Support';
+        }
+        $('#stats h3').html(calendar_label + '<br />' + this_weeks_percentage);
 
         // set the dimensions and margins of the graph
         var width = 200,
