@@ -249,7 +249,7 @@ PS = (function(window, document, $) {
 
         // set the dimensions and margins of the graph
         var width = 200,
-            height = 220,
+            height = 200,
             margin = 20;
 
         // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
