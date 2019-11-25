@@ -241,7 +241,7 @@ PS = (function(window, document, $) {
         if(bugs > 0 && support > 0) {
             support_percentage = Math.ceil((support / (bugs + support) * 100));
         }
-        var this_weeks_percentage = 'no tickets yet';
+        var this_weeks_percentage = 'no new tickets yet';
         if(support_percentage > 0) {
             this_weeks_percentage = support_percentage + '% Support';
         }
