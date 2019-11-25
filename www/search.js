@@ -1,3 +1,11 @@
+Date.prototype.getWeekNumber = function(){
+  var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
+  var dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
+};
+
 var petrusSearch;
 
 PS = (function(window, document, $) {
@@ -226,7 +234,9 @@ PS = (function(window, document, $) {
             }
         }
         var support_percentage = Math.ceil((support / (bugs + support) * 100));
-        $('#stats h3').html(calendar_week + '<br />' + support_percentage + '% Support');
+        var current_calendar_week = new Date().getWeekNumber();
+        var current_year = new Date().getFullYear();
+        $('#stats h3').html(current_year + '.' + current_calendar_week + '<br />' + support_percentage + '% Support');
 
         // set the dimensions and margins of the graph
         var width = 200,
