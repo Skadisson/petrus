@@ -225,18 +225,23 @@ PS = (function(window, document, $) {
         var support_color = is_dark ? 'purple' : 'lightblue';
         var bugs = 0;
         var support = 0;
-        for(var calendar_week in ticket_type_calendar) {
-            if(typeof ticket_type_calendar[calendar_week]['Bug'] != 'undefined') {
-                bugs = ticket_type_calendar[calendar_week]['Bug'];
+        var support_percentage = 0;
+
+        var calendar_week = new Date().getWeekNumber();
+        var calendar_year = new Date().getFullYear();
+        var calendar_label = calendar_year + '.' + calendar_week;
+        if(typeof ticket_type_calendar[calendar_label] != 'undefined') {
+            if(typeof ticket_type_calendar[calendar_label]['Bug'] != 'undefined') {
+                bugs = ticket_type_calendar[calendar_label]['Bug'];
             }
-            if(typeof ticket_type_calendar[calendar_week]['Support'] != 'undefined') {
-                support = ticket_type_calendar[calendar_week]['Support'];
+            if(typeof ticket_type_calendar[calendar_label]['Support'] != 'undefined') {
+                support = ticket_type_calendar[calendar_label]['Support'];
             }
         }
-        var support_percentage = Math.ceil((support / (bugs + support) * 100));
-        var current_calendar_week = new Date().getWeekNumber();
-        var current_year = new Date().getFullYear();
-        $('#stats h3').html(current_year + '.' + current_calendar_week + '<br />' + support_percentage + '% Support');
+        if(bugs > 0 && support > 0) {
+            support_percentage = Math.ceil((support / (bugs + support) * 100));
+        }
+        $('#stats h3').html(calendar_label + '<br />' + support_percentage + '% Support');
 
         // set the dimensions and margins of the graph
         var width = 200,
