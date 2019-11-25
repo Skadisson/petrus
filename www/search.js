@@ -238,7 +238,7 @@ PS = (function(window, document, $) {
                 support = ticket_type_calendar[calendar_label]['Support'];
             }
         }
-        if(bugs > 0 && support > 0) {
+        if(bugs > 0 || support > 0) {
             support_percentage = Math.ceil((support / (bugs + support) * 100));
         }
         var this_weeks_percentage = 'no new tickets yet';
