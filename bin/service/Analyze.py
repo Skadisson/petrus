@@ -250,6 +250,8 @@ class Analyze:
 
     @staticmethod
     def timestamp_from_ticket_time(ticket_time):
+        if ticket_time is None:
+            return 0
         return time.mktime(datetime.datetime.strptime(ticket_time, "%Y-%m-%dT%H:%M:%S.%f%z").timetuple())
 
     def word_count_and_relations(self):
@@ -279,14 +281,22 @@ class Analyze:
         calendar_year = date_uploaded.strftime("%Y")
         return calendar_year
 
-    def ticket_type_calendar(self, tickets):
-        ticket_type_calendar = {}
+    def ticket_opened_calendar(self, tickets):
+        return self.ticket_calendar(tickets, 'Created')
+
+    def ticket_closed_calendar(self, tickets):
+        return self.ticket_calendar(tickets, 'Closed')
+
+    def ticket_calendar(self, tickets, state='Created'):
+        ticket_opened_calendar = {}
         labels = []
         categories = self.environment.get_map_categories()
         for ticket_id in tickets:
             ticket = tickets[ticket_id]
-            calendar_week = self.get_calendar_week(ticket['Created'])
-            year = self.get_calendar_year(ticket['Created'])
+            if state not in ticket:
+                continue
+            calendar_week = self.get_calendar_week(ticket[state])
+            year = self.get_calendar_year(ticket[state])
             ticket_type = ticket['Type']
             for category in categories:
                 if ticket_type in categories[category]:
@@ -296,13 +306,13 @@ class Analyze:
                 label = year + '.' + calendar_week
                 if label not in labels:
                     labels.append(label)
-                if label not in ticket_type_calendar:
-                    ticket_type_calendar[label] = {}
-                if ticket_type not in ticket_type_calendar[label]:
-                    ticket_type_calendar[label][ticket_type] = 0
-                ticket_type_calendar[label][ticket_type] += 1
+                if label not in ticket_opened_calendar:
+                    ticket_opened_calendar[label] = {}
+                if ticket_type not in ticket_opened_calendar[label]:
+                    ticket_opened_calendar[label][ticket_type] = 0
+                ticket_opened_calendar[label][ticket_type] += 1
         ordered_labels = sorted(labels)
-        ordered_type_calendar = {}
+        ordered_opened_calendar = {}
         for label in ordered_labels:
-            ordered_type_calendar[label] = ticket_type_calendar[label]
-        return ordered_type_calendar
+            ordered_opened_calendar[label] = ticket_opened_calendar[label]
+        return ordered_opened_calendar

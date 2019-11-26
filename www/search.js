@@ -12,7 +12,7 @@ PS = (function(window, document, $) {
 
     'use strict';
 
-    var self, weeks;
+    var self, weeks, mode;
 
     var construct = function() {
         self = this;
@@ -21,6 +21,7 @@ PS = (function(window, document, $) {
             'quarter': 13,
             'month': 4
         };
+        mode = 'opened';
         self.init();
     };
 
@@ -31,6 +32,12 @@ PS = (function(window, document, $) {
 
     function toggleWeekFunction(obj) {
         $('#graph-options span.selected').removeClass('selected');
+        $(obj).toggleClass('selected');
+        self.info();
+    };
+
+    function toggleGraphMode(obj) {
+        $('#graph-modes span.selected').removeClass('selected');
         $(obj).toggleClass('selected');
         self.info();
     };
@@ -49,9 +56,19 @@ PS = (function(window, document, $) {
                     if(typeof result.items[0].ticket_count != 'undefined') {
                         $('#keywords').attr('placeholder', result.items[0].ticket_count + " Tickets");
                     }
-                    if(typeof result.items[0].ticket_type_calendar != 'undefined') {
-                        self.renderTypeGraph(result.items[0].ticket_type_calendar);
-                        self.renderPieChart(result.items[0].ticket_type_calendar);
+                    var graph_mode = $('#graph-modes .selected').attr('data-function');
+                    if(graph_mode == 'opened') {
+                        $('#graph h3 b').text('New Tickets per Week');
+                        if(typeof result.items[0].ticket_opened_calendar != 'undefined') {
+                            self.renderTypeGraph(result.items[0].ticket_opened_calendar);
+                            self.renderPieChart(result.items[0].ticket_opened_calendar);
+                        }
+                    } else {
+                        $('#graph h3 b').text('Closed Tickets per Week');
+                        if(typeof result.items[0].ticket_closed_calendar != 'undefined') {
+                            self.renderTypeGraph(result.items[0].ticket_closed_calendar);
+                            self.renderPieChart(result.items[0].ticket_closed_calendar);
+                        }
                     }
                 }
             };
@@ -112,7 +129,7 @@ PS = (function(window, document, $) {
         self.info();
     };
 
-    function renderTypeGraph(ticket_type_calendar) {
+    function renderTypeGraph(ticket_calendar) {
         $('#diagram').html('');
         var max_weeks = weeks['quarter'];
         var week_function = $('#graph-options .selected').attr('data-function');
@@ -122,7 +139,7 @@ PS = (function(window, document, $) {
         var is_dark = $('body').hasClass('dark');
         var color = is_dark ? 'magenta' : 'beige';
         var support_color = is_dark ? 'purple' : 'lightblue';
-        var week_count = Object.keys(ticket_type_calendar).length;
+        var week_count = Object.keys(ticket_calendar).length;
         var start_week = week_count - max_weeks;
         var data = [];
         var x_pos_cur = 0;
@@ -130,21 +147,21 @@ PS = (function(window, document, $) {
         var x_start = week_count *(-1);
         var x_end = 0;
         var y_max = 0;
-        for(var calendar_week in ticket_type_calendar) {
+        for(var calendar_week in ticket_calendar) {
             x_pos_cur += 1;
             x_neg_cur += 1;
             if(x_pos_cur >= start_week) {
                 var y_cur = 0;
                 var ci_right = 0;
                 var ci_left = 0;
-                for(var ticket_type in ticket_type_calendar[calendar_week]) {
-                    y_cur += ticket_type_calendar[calendar_week][ticket_type];
+                for(var ticket_type in ticket_calendar[calendar_week]) {
+                    y_cur += ticket_calendar[calendar_week][ticket_type];
                 }
-                if(typeof ticket_type_calendar[calendar_week]['Bug'] != 'undefined') {
-                    ci_left = ticket_type_calendar[calendar_week]['Bug'];
+                if(typeof ticket_calendar[calendar_week]['Bug'] != 'undefined') {
+                    ci_left = ticket_calendar[calendar_week]['Bug'];
                 }
-                if(typeof ticket_type_calendar[calendar_week]['Support'] != 'undefined') {
-                    ci_right = ticket_type_calendar[calendar_week]['Support'] + ci_left;
+                if(typeof ticket_calendar[calendar_week]['Support'] != 'undefined') {
+                    ci_right = ticket_calendar[calendar_week]['Support'] + ci_left;
                 }
                 if(y_cur > y_max) {
                     y_max = y_cur;
@@ -217,7 +234,7 @@ PS = (function(window, document, $) {
 
     };
 
-    function renderPieChart(ticket_type_calendar) {
+    function renderPieChart(ticket_calendar) {
         $('#stats_graph').html('');
 
         var is_dark = $('body').hasClass('dark');
@@ -230,12 +247,12 @@ PS = (function(window, document, $) {
         var calendar_week = new Date().getWeekNumber();
         var calendar_year = new Date().getFullYear();
         var calendar_label = calendar_year + '.' + calendar_week;
-        if(typeof ticket_type_calendar[calendar_label] != 'undefined') {
-            if(typeof ticket_type_calendar[calendar_label]['Bug'] != 'undefined') {
-                bugs = ticket_type_calendar[calendar_label]['Bug'];
+        if(typeof ticket_calendar[calendar_label] != 'undefined') {
+            if(typeof ticket_calendar[calendar_label]['Bug'] != 'undefined') {
+                bugs = ticket_calendar[calendar_label]['Bug'];
             }
-            if(typeof ticket_type_calendar[calendar_label]['Support'] != 'undefined') {
-                support = ticket_type_calendar[calendar_label]['Support'];
+            if(typeof ticket_calendar[calendar_label]['Support'] != 'undefined') {
+                support = ticket_calendar[calendar_label]['Support'];
             }
         }
         if(bugs > 0 || support > 0) {
@@ -299,7 +316,8 @@ PS = (function(window, document, $) {
         darkmode: darkmode,
         renderTypeGraph: renderTypeGraph,
         renderPieChart: renderPieChart,
-        toggleWeekFunction: toggleWeekFunction
+        toggleWeekFunction: toggleWeekFunction,
+        toggleGraphMode: toggleGraphMode
     };
 
     return construct;

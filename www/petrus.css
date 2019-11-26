@@ -210,7 +210,8 @@ body.dark #image-copyright {
     width:200px;
     float:right;
 }
-#graph-options {
+#graph-options,
+#graph-modes {
     position:absolute;
     right:10px;
     top:10px;
@@ -218,13 +219,20 @@ body.dark #image-copyright {
     line-height:13px;
     color:beige;
 }
-.dark #graph-options {
+#graph-modes {
+    right:auto;
+    left:10px;
+}
+.dark #graph-options,
+.dark #graph-modes {
     color:magenta;
 }
-#graph-options .selected {
+#graph-options .selected,
+#graph-modes .selected {
     font-weight:bold;
     cursor:auto;
 }
-#graph-options span {
+#graph-options span,
+#graph-modes span {
     cursor:pointer;
 }

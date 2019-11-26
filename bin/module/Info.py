@@ -11,10 +11,12 @@ class Info:
         cache = Cache.Cache()
         analyze = Analyze.Analyze()
         tickets = cache.load_cached_tickets()
-        ticket_type_calendar = analyze.ticket_type_calendar(tickets)
+        ticket_opened_calendar = analyze.ticket_opened_calendar(tickets)
+        ticket_closed_calendar = analyze.ticket_closed_calendar(tickets)
         items = [{
             'ticket_count': len(tickets),
-            'ticket_type_calendar': ticket_type_calendar
+            'ticket_opened_calendar': ticket_opened_calendar,
+            'ticket_closed_calendar': ticket_closed_calendar
         }]
 
         return items, success
