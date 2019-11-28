@@ -110,6 +110,17 @@ class ServiceDeskAPI:
         mapped_ticket['Status'] = json.loads(status_history_raw)
         return mapped_ticket
 
+    def request_ticket_worklog(self, mapped_ticket):
+        worklog_endpoint = self.environment.get_endpoint_worklog()
+        worklog_url = worklog_endpoint.format(mapped_ticket['ID'])
+        response, content = self.client.request(worklog_url, "GET")
+        if response['status'] != '200':
+            mapped_ticket['Worklog'] = None
+            return mapped_ticket
+        worklog_raw = content.decode("utf-8")
+        mapped_ticket['Worklog'] = json.loads(worklog_raw)
+        return mapped_ticket
+
     def request_info(self):
         info_endpoint = self.environment.get_endpoint_info()
         response, content = self.client.request(info_endpoint, "GET")

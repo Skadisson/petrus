@@ -287,6 +287,30 @@ class Analyze:
     def ticket_closed_calendar(self, tickets):
         return self.ticket_calendar(tickets, 'Closed')
 
+    def ticket_effort_calendar(self, tickets):
+        ticket_effort_calendar = {}
+        labels = []
+        for ticket_id in tickets:
+            ticket = tickets[ticket_id]
+            if 'Worklog' not in ticket or ticket['Worklog'] is None:
+                continue
+            for worklog in ticket['Worklog']:
+                calendar_week = self.get_calendar_week(worklog['updated'])
+                year = self.get_calendar_year(worklog['updated'])
+                if year and calendar_week:
+                    label = year + '.' + calendar_week
+                    if label not in labels:
+                        labels.append(label)
+                    if label not in ticket_effort_calendar:
+                        ticket_effort_calendar[label] = 0.0
+                    if worklog['timeSpentSeconds'] is not None:
+                        ticket_effort_calendar[label] += self.seconds_to_hours(int(worklog['timeSpentSeconds']))
+        ordered_labels = sorted(labels)
+        ordered_effort_calendar = {}
+        for label in ordered_labels:
+            ordered_effort_calendar[label] = ticket_effort_calendar[label]
+        return ordered_effort_calendar
+
     def ticket_calendar(self, tickets, state='Created'):
         ticket_opened_calendar = {}
         labels = []

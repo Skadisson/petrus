@@ -71,6 +71,10 @@ class Environment:
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['info']
 
+    def get_endpoint_worklog(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['worklog']
+
     def get_map_ticket(self):
         service_yaml = self.load_yaml('map')
         return service_yaml['Ticket']

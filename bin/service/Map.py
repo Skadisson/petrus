@@ -101,6 +101,20 @@ class Map:
             mapped_ticket['Status'] = []
         return mapped_ticket
 
+    @staticmethod
+    def format_worklog(mapped_ticket):
+        if mapped_ticket['Worklog'] is not None:
+            formatted_worklog = []
+            for worklog in mapped_ticket['Worklog']['worklogs']:
+                formatted_worklog.append({
+                    'updated': worklog['updated'],
+                    'timeSpentSeconds': worklog['timeSpentSeconds']
+                })
+            mapped_ticket['Worklog'] = formatted_worklog
+        else:
+            mapped_ticket['Worklog'] = []
+        return mapped_ticket
+
     def format_related_tickets(self, mapped_ticket):
         formatted_related_tickets = []
         allowed_relations = self.environment.get_map_relation()
