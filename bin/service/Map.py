@@ -105,12 +105,13 @@ class Map:
     def format_worklog(mapped_ticket):
         if mapped_ticket['Worklog'] is not None:
             formatted_worklog = []
-            for worklog in mapped_ticket['Worklog']['worklogs']:
-                formatted_worklog.append({
-                    'updated': worklog['updated'],
-                    'timeSpentSeconds': worklog['timeSpentSeconds']
-                })
-            mapped_ticket['Worklog'] = formatted_worklog
+            if 'worklogs' in mapped_ticket['Worklog']:
+                for worklog in mapped_ticket['Worklog']['worklogs']:
+                    formatted_worklog.append({
+                        'updated': worklog['updated'],
+                        'timeSpentSeconds': worklog['timeSpentSeconds']
+                    })
+                mapped_ticket['Worklog'] = formatted_worklog
         else:
             mapped_ticket['Worklog'] = []
         return mapped_ticket

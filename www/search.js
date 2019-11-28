@@ -63,11 +63,17 @@ PS = (function(window, document, $) {
                             self.renderTypeGraph(result.items[0].ticket_opened_calendar);
                             self.renderPieChart(result.items[0].ticket_opened_calendar);
                         }
-                    } else {
+                    } else if(graph_mode == 'closed') {
                         $('#graph h3 b').text('Closed Tickets per Week');
                         if(typeof result.items[0].ticket_closed_calendar != 'undefined') {
                             self.renderTypeGraph(result.items[0].ticket_closed_calendar);
                             self.renderPieChart(result.items[0].ticket_closed_calendar);
+                        }
+                    } else {
+                        $('#graph h3 b').text('Hours per Week');
+                        if(typeof result.items[0].ticket_effort_calendar != 'undefined') {
+                            self.renderTypeGraph(result.items[0].ticket_effort_calendar);
+                            self.renderPieChart(result.items[0].ticket_effort_calendar);
                         }
                     }
                 }

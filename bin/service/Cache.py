@@ -143,6 +143,11 @@ class Cache:
         try:
             raw_ticket_data = sd_api.request_ticket_data(jira_key)
             mapped_ticket = self.mapper.get_mapped_ticket(raw_ticket_data)
+            mapped_ticket = self.mapper.format_related_tickets(mapped_ticket)
+            mapped_ticket = self.sd_api.request_ticket_status(mapped_ticket)
+            mapped_ticket = self.mapper.format_status_history(mapped_ticket)
+            mapped_ticket = self.sd_api.request_ticket_worklog(mapped_ticket)
+            mapped_ticket = self.mapper.format_worklog(mapped_ticket)
         except Exception as e:
             self.add_log_entry(self.__class__.__name__, e)
             failed_jira_keys.append(jira_key)
