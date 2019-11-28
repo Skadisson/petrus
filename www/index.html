@@ -22,7 +22,7 @@
         <h3><b>New Tickets per Week</b></h3>
         <div id="graph-modes"><span data-function="opened" onclick="petrusSearch.toggleGraphMode(this);" class="selected">O</span> | <span data-function="closed" onclick="petrusSearch.toggleGraphMode(this);">C</span></div>
         <div id="graph-options"><span data-function="year" onclick="petrusSearch.toggleWeekFunction(this);">Y</span> | <span data-function="quarter" onclick="petrusSearch.toggleWeekFunction(this);" class="selected">Q</span> | <span data-function="month" onclick="petrusSearch.toggleWeekFunction(this);">M</span></div>
-        <div id="diagram"></div>
+        <div id="diagram" onclick="petrusSearch.downloadPNG();"></div>
         <div id="stats">
             <div id="stats_graph"></div>
             <h3>Support</h3>
