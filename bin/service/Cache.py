@@ -107,7 +107,11 @@ class Cache:
         failed_jira_keys = []
         clean_cache = {}
         jira_keys_and_ids = self.load_jira_keys_and_ids()
+        total_tickets = len(jira_keys_and_ids)
+        current_ticket = 0
+        self.post_progress(current_ticket, total_tickets)
         for jira_key in jira_keys_and_ids:
+            current_ticket += 1
             jira_id = jira_keys_and_ids[jira_key]
             success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
                 sd_api,
@@ -116,10 +120,23 @@ class Cache:
                 clean_cache,
                 jira_id
             )
+            self.post_progress(current_ticket, total_tickets)
         cache_file = self.environment.get_path_cache()
         file = open(cache_file, "wb")
         pickle.dump(clean_cache, file)
         return failed_jira_keys, success
+
+    def post_progress(self, current, total):
+        max_bars = 100
+        progress = current / total
+        percentage = int(round(progress * 100))
+        current_bars = int(round(progress * max_bars, 0))
+        diff_bars = max_bars - current_bars
+        bars = '=' * current_bars
+        diff = ' ' * diff_bars
+        os.system('cls' if os.name == 'nt' else 'clear')
+        os.system("echo [{}{}] {}%".format(bars, diff, percentage))
+        os.system("echo {} of {} ids processed".format(current, total))
 
     def add_to_clean_cache(self, sd_api, jira_key, failed_jira_keys, clean_cache, jira_id):
         success = True
