@@ -43,18 +43,23 @@ class Analyze:
 
     def hours_per_project(self, for_days=0, year="", week_numbers=""):
         projects = {}
+        ticket_count = {}
         for jira_id in self.tickets:
             ticket = self.tickets[jira_id]
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
             if is_in_range is True and 'Project' in ticket:
-                if ticket['Project'] is not None:
-                    if ticket['Project'] not in projects:
-                        projects[ticket['Project']] = []
+                project_name = ticket['Project']
+                if project_name is not None:
+                    if project_name not in projects:
+                        projects[project_name] = []
+                    if project_name not in ticket_count:
+                        ticket_count[project_name] = 0
                     if ticket['Time_Spent'] is not None:
-                        projects[ticket['Project']].append(ticket['Time_Spent'])
+                        projects[project_name].append(ticket['Time_Spent'])
+                        ticket_count[project_name] += 1
 
         projects = self.sort_tickets(projects)
-        return projects
+        return projects, ticket_count
 
     def hours_per_type(self, for_days=0, year="", week_numbers=""):
         types = {}

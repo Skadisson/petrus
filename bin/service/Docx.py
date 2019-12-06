@@ -57,14 +57,14 @@ class Docx:
 
         return days
 
-    def place_projects(self, hours_per_project, months):
+    def place_projects(self, hours_per_project, project_ticket_count, months):
         days = self.months_to_days(months)
         self.document.add_heading('Projekte', level=1)
         self.document.add_paragraph('Im folgenden getrackte Aufwände der letzten {} Tage pro Projekt.'.format(days))
         for project_hours in hours_per_project:
             paragraph = self.document.add_paragraph('')
             paragraph.add_run("{}".format(project_hours[0])).bold = True
-            paragraph.add_run(" - {} Stunden".format(round(project_hours[1], ndigits=2)))
+            paragraph.add_run(" - {} Stunden auf {} Tickets".format(round(project_hours[1], ndigits=2), project_ticket_count[project_hours[0]]))
 
     def place_type_weight(self, hours_per_version, projects_per_version, months):
         bb_versions = self.environment.get_bb_versions()
