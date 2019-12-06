@@ -3,6 +3,8 @@
 
 Self-sufficient Python 3 web service package using SciKit-Learn to estimate times to process and finish a ticket, calculate trends and communicates with the Jira Service Desk API.
 
+![Screenshot](src/screenshot.png "Petrus 2 Screenshot")
+
 This application is running on Conda environments, provided by the Anaconda Machine Learning Framework.
 
 https://docs.atlassian.com/jira-servicedesk/REST/3.6.2/
