@@ -321,7 +321,7 @@ class Analyze:
                                 ticket_effort_calendar[label] = {}
                             if ticket_type not in ticket_effort_calendar[label]:
                                 ticket_effort_calendar[label][ticket_type] = 0
-                            ticket_effort_calendar[label][ticket_type] += int(worklog['timeSpentSeconds'])
+                            ticket_effort_calendar[label][ticket_type] += self.seconds_to_hours(int(worklog['timeSpentSeconds']))
         ordered_labels = sorted(labels)
         ordered_effort_calendar = {}
         for label in ordered_labels:
