@@ -163,7 +163,7 @@ body.dark #link-list p a, body.dark #link-list p a:link, body.dark #link-list p 
 }
 .corner {
     position: absolute;
-    right: 25px;
+    right: 5px;
     width: 8px;
     height: 8px;
     border-radius: 4px;
