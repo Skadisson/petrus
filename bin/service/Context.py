@@ -1,6 +1,7 @@
 from bin.service import Environment
 from bin.service import Map
 from bin.service import Cache
+import time, datetime
 
 
 class Context:
@@ -45,18 +46,35 @@ class Context:
             jira_key = self.cache.load_jira_key_for_id(jira_id)
             ticket_link = self.environment.get_endpoint_ticket_link().format(jira_key)
             ticket_organization = str(ticket['Project'])
+            creation = self.timestamp_from_ticket_time(ticket['Created'])
+            if ticket['Time_Spent'] is not None:
+                time_spent = self.seconds_to_hours(int(ticket['Time_Spent']))
+            else:
+                time_spent = 0
             if percentage > 0:
                 relevancy = {
                     "jira_id": str(jira_id),
                     "percentage": percentage,
                     "hits": keyword_hits,
                     "link": ticket_link,
-                    "project": ticket_organization
+                    "project": ticket_organization,
+                    "creation": creation,
+                    "time_spent": time_spent
                 }
                 if 'Title' in ticket:
                     relevancy['title'] = ticket['Title']
 
         return relevancy
+
+    @staticmethod
+    def timestamp_from_ticket_time(ticket_time):
+        if ticket_time is None:
+            return 0
+        return time.mktime(datetime.datetime.strptime(ticket_time, "%Y-%m-%dT%H:%M:%S.%f%z").timetuple())
+
+    @staticmethod
+    def seconds_to_hours(seconds):
+        return seconds / 60 / 60
 
     @staticmethod
     def sort_relevancy(relevancy):

@@ -127,20 +127,58 @@ input[type=text] {
     display: flex;
     flex-wrap: wrap;
 }
-#link-list p {
-    flex-grow: 1;
-    width: 200px;
+#link-list > a {
+    max-width: 31%;
     display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
+    position:relative;
+    margin-right: 2%;
+}
+#link-list p {
+    display: block;
     background: #FCF7E0;
     border-radius: 10px;
-    padding: 5px 20px 5px 10px;
+    padding: 5px 10px;
     color: #635C3B;
     box-shadow: 1px 1px 3px grey;
-    margin-right: 20px;
-    justify-content: space-between;
+    overflow: hidden;
+    position:relative;
 }
 #link-list p#single {
     margin-right:0;
+    width: 100%;
+}
+#link-list p span {
+    display:inline-block;
+    width: 100%;
+}
+#link-list p span.date {
+    font-weight:bold;
+    font-size:10px;
+    line-height:10px;
+}
+#link-list p span.title {
+    font-weight:bold;
+    font-size:14px;
+    line-height:16px;
+    margin: 20px 0 10px;
+    min-height: 50px;
+}
+#link-list p span.id {
+    font-weight:bold;
+    font-size:10px;
+    line-height:10px;
+}
+#link-list p span.relevancy {
+    font-weight:bold;
+    font-size:14px;
+    line-height:15px;
+}
+#link-list p span.keywords {
+    font-weight:bold;
+    font-size:12px;
+    line-height:12px;
 }
 body.dark #link-list p {
     background: #271959;
@@ -161,7 +199,7 @@ body.dark #link-list p:hover {
 body.dark #link-list p a, body.dark #link-list p a:link, body.dark #link-list p a:visited, body.dark #link-list p a:hover, body.dark #link-list p a:active {
     color: #FCF7E0;
 }
-.corner {
+#link-list p span.corner {
     position: absolute;
     right: 5px;
     width: 8px;

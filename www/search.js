@@ -113,7 +113,17 @@ PS = (function(window, document, $) {
                         }
                         for(var index in result.items[0].relevancy) {
                             var item = result.items[0].relevancy[index];
-                            $('#link-list').append('<p><a href="' + item.link + '" target="_blank">' + item.title + ' (' + Math.round(item.percentage) + ' %)</a></p>').fadeIn();
+                            var date = new Date(item.creation * 1000);
+                            var $a = $('<a href="' + item.link + '" target="_blank">');
+                            var $p = $('<p data-jira-id="' + item.jira_id + '">');
+                            $p.append('<span class="date">' + date.getFullYear() + '/' + date.getMonth() + '/' + date.getUTCDay() + '</span>');
+                            $p.append('<span class="title">' + item.title + '</span>');
+                            $p.append('<span class="relevancy">' + Math.round(item.percentage) + '%</span>');
+                            $p.append('<span class="time_spent">' + item.time_spent + ' Stunden</span>');
+                            $p.append('<span class="keywords">' + item.hits.join(', ') + '</span>')
+                            $a.append($p);
+                            $('#link-list').append($a);
+                            $p.fadeIn();
                         }
                     } else {
                         $('#search').css({'top': '50%', 'margin-top': '-100px'});
