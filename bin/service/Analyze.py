@@ -295,6 +295,7 @@ class Analyze:
     def ticket_effort_calendar(self, tickets):
         ticket_effort_calendar = {}
         labels = []
+        categories = self.environment.get_map_categories()
         for ticket_id in tickets:
             ticket = tickets[ticket_id]
             if 'Worklog' not in ticket or ticket['Worklog'] is None:
@@ -306,10 +307,21 @@ class Analyze:
                     label = year + '.' + calendar_week
                     if label not in labels:
                         labels.append(label)
-                    if label not in ticket_effort_calendar:
-                        ticket_effort_calendar[label] = 0.0
                     if worklog['timeSpentSeconds'] is not None:
-                        ticket_effort_calendar[label] += self.seconds_to_hours(int(worklog['timeSpentSeconds']))
+                        ticket_type = ticket['Type']
+                        for category in categories:
+                            if ticket_type in categories[category]:
+                                ticket_type = category
+                                break
+                        if year and calendar_week and ticket_type:
+                            label = year + '.' + calendar_week
+                            if label not in labels:
+                                labels.append(label)
+                            if label not in ticket_effort_calendar:
+                                ticket_effort_calendar[label] = {}
+                            if ticket_type not in ticket_effort_calendar[label]:
+                                ticket_effort_calendar[label][ticket_type] = 0
+                            ticket_effort_calendar[label][ticket_type] += int(worklog['timeSpentSeconds'])
         ordered_labels = sorted(labels)
         ordered_effort_calendar = {}
         for label in ordered_labels:

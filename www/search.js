@@ -169,11 +169,6 @@ PS = (function(window, document, $) {
                 if(typeof ticket_calendar[calendar_week]['Support'] != 'undefined') {
                     ci_right = ticket_calendar[calendar_week]['Support'] + ci_left;
                 }
-                if(typeof ticket_calendar[calendar_week] == 'number') {
-                    ci_left = 0;
-                    ci_right = ticket_calendar[calendar_week];
-                    y_cur += ci_right;
-                }
                 if(y_cur > y_max) {
                     y_max = y_cur;
                 }
@@ -264,10 +259,6 @@ PS = (function(window, document, $) {
             }
             if(typeof ticket_calendar[calendar_label]['Support'] != 'undefined') {
                 support = ticket_calendar[calendar_label]['Support'];
-            }
-            if(typeof ticket_calendar[calendar_label] == 'number') {
-                bugs = 0;
-                support = ticket_calendar[calendar_label];
             }
         }
         if(bugs > 0 || support > 0) {
