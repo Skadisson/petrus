@@ -139,6 +139,9 @@ input[type=text] {
     margin-right: 20px;
     justify-content: space-between;
 }
+#link-list p#single {
+    margin-right:0;
+}
 body.dark #link-list p {
     background: #271959;
     color: #FCF7E0;
