@@ -123,16 +123,21 @@ input[type=text] {
 }
 #link-list {
     padding-bottom: 10px;
+    flex-direction: row;
+    display: flex;
+    flex-wrap: wrap;
 }
 #link-list p {
-    display: block;
-    width: 675px;
-    margin-left: 45px;
+    flex-grow: 1;
+    width: 200px;
+    display: flex;
     background: #FCF7E0;
     border-radius: 10px;
     padding: 5px 20px 5px 10px;
     color: #635C3B;
     box-shadow: 1px 1px 3px grey;
+    margin-right: 20px;
+    justify-content: space-between;
 }
 body.dark #link-list p {
     background: #271959;
@@ -153,16 +158,9 @@ body.dark #link-list p:hover {
 body.dark #link-list p a, body.dark #link-list p a:link, body.dark #link-list p a:visited, body.dark #link-list p a:hover, body.dark #link-list p a:active {
     color: #FCF7E0;
 }
-#link-list #single {
-    margin-top: -10px;
-    padding-top: 20px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-}
 .corner {
     position: absolute;
-    right: 60px;
-    bottom: 60px;
+    right: 25px;
     width: 8px;
     height: 8px;
     border-radius: 4px;
