@@ -164,6 +164,11 @@ input[type=text] {
     line-height:16px;
     margin: 20px 0 10px;
     min-height: 50px;
+    padding:5px 0;
+    background: white;
+}
+body.dark #link-list p span.title {
+    background: black;
 }
 #link-list p span.id {
     font-weight:bold;
