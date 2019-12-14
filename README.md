@@ -18,12 +18,12 @@ ___
 pip list -l
 <pre>
 Package         Version
---------------- -----------
-certifi         2019.9.11
+--------------- -------------------
+certifi         2019.11.28
 colorclass      2.2.0
 cycler          0.10.0
 httplib2        0.14.0
-joblib          0.14.0
+joblib          0.14.1
 kiwisolver      1.1.0
 lxml            4.4.2
 matplotlib      3.1.2
@@ -31,15 +31,15 @@ numpy           1.17.4
 oauth2          1.9.0.post1
 pandas          0.25.3
 pip             19.3.1
-pip-check       2.5.2
+pip-check       2.6
 pyparsing       2.4.5
 python-dateutil 2.8.1
 python-docx     0.8.10
 pytz            2019.3
-PyYAML          5.1.2
-scikit-learn    0.21.3
+PyYAML          5.2
+scikit-learn    0.22
 scipy           1.3.3
-setuptools      42.0.1
+setuptools      42.0.2.post20191203
 six             1.13.0
 sklearn         0.0
 terminaltables  3.1.0
