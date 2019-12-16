@@ -126,10 +126,11 @@ class ServiceDeskAPI:
         comment_url = comment_endpoint.format(mapped_ticket['ID'])
         response, content = self.client.request(comment_url, "GET")
         if response['status'] != '200':
-            mapped_ticket['Worklog'] = None
+            mapped_ticket['Comments'] = None
             return mapped_ticket
         comments_raw = content.decode("utf-8")
         mapped_ticket['Comments'] = json.loads(comments_raw)
+        return mapped_ticket
 
     def request_info(self):
         info_endpoint = self.environment.get_endpoint_info()
