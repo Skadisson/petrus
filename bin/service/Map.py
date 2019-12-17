@@ -111,6 +111,19 @@ class Map:
             mapped_ticket['Worklog'] = []
         return mapped_ticket
 
+    @staticmethod
+    def format_comments(mapped_ticket):
+        if mapped_ticket['Comments'] is not None:
+            formatted_comments = []
+            if 'values' in mapped_ticket['Comments']:
+                for comment in mapped_ticket['Comments']['values']:
+                    if comment['body'] is not None:
+                        formatted_comments.append(comment['body'])
+                mapped_ticket['Comments'] = formatted_comments
+        else:
+            mapped_ticket['Comments'] = []
+        return mapped_ticket
+
     def format_related_tickets(self, mapped_ticket):
         formatted_related_tickets = []
         allowed_relations = self.environment.get_map_relation()
