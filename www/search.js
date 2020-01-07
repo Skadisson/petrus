@@ -261,6 +261,8 @@ PS = (function(window, document, $) {
         var support_percentage = 0;
 
         var calendar_week = new Date().getWeekNumber();
+        if(calendar_week < 10)
+          calendar_week = '0' + calendar_week;
         var calendar_year = new Date().getFullYear();
         var calendar_label = calendar_year + '.' + calendar_week;
         if(typeof ticket_calendar[calendar_label] != 'undefined') {
