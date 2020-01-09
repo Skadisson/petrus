@@ -18,16 +18,17 @@ class Context:
         keywords = mapped_ticket['Keywords']
         relations = mapped_ticket['Related']
 
+        sorted_relevancy = []
         relevancy = []
         keyword_total = len(keywords)
         if keyword_total is not 0:
             for jira_id in tickets:
                 relevancy = self.add_to_relevancy(tickets, jira_id, keywords, relevancy, relations)
-        sorted_relevancy = self.sort_relevancy(relevancy)
-        if len(sorted_relevancy) == 0:
-            phoenix_suggestion = self.get_phoenix_suggestion(tickets, " ".join(keywords))
-            if phoenix_suggestion is not None:
-                sorted_relevancy.append(phoenix_suggestion)
+            sorted_relevancy = self.sort_relevancy(relevancy)
+            if len(sorted_relevancy) == 0:
+                phoenix_suggestion = self.get_phoenix_suggestion(tickets, " ".join(keywords))
+                if phoenix_suggestion is not None:
+                    sorted_relevancy.append(phoenix_suggestion)
         return sorted_relevancy
 
     def add_to_relevancy(self, tickets, jira_id, keywords, relevancy, relations):
