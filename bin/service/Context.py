@@ -1,6 +1,7 @@
 from bin.service import Environment
 from bin.service import Map
 from bin.service import Cache
+from bin.service import SciKitLearn
 import time, datetime
 
 
@@ -11,6 +12,7 @@ class Context:
         self.environment = Environment.Environment()
         self.mapper = Map.Map()
         self.cache = Cache.Cache()
+        self.scikit = SciKitLearn.SciKitLearn()
 
     def calculate_relevancy_for_tickets(self, tickets, mapped_ticket):
         keywords = mapped_ticket['Keywords']
@@ -22,6 +24,10 @@ class Context:
             for jira_id in tickets:
                 relevancy = self.add_to_relevancy(tickets, jira_id, keywords, relevancy, relations)
         sorted_relevancy = self.sort_relevancy(relevancy)
+        if len(sorted_relevancy) == 0:
+            phoenix_suggestion = self.get_phoenix_suggestion(tickets, " ".join(keywords))
+            if phoenix_suggestion is not None:
+                sorted_relevancy.append(phoenix_suggestion)
         return sorted_relevancy
 
     def add_to_relevancy(self, tickets, jira_id, keywords, relevancy, relations):
@@ -95,3 +101,51 @@ class Context:
         hits = len(similar_tickets)
 
         return similar_tickets, hits
+
+    def get_phoenix_suggestion(self, tickets, query):
+        texts = []
+        keys = []
+        suggested_ticket = None
+        for ticket_id in tickets:
+            ticket = tickets[ticket_id]
+            title = str(ticket['Title'])
+            description = str(ticket['Text'])
+            description += " || " + str(title)
+            comments = ticket['Comments']
+            if comments is not None:
+                description += " || " + (" || ".join(comments))
+            keywords = ticket['Keywords']
+            if keywords is not None:
+                description += " || " + (", ".join(keywords))
+            project = ticket['Project']
+            if project is not None:
+                description += " || " + project
+            key = ticket['Key']
+            if description is not None and key is not None:
+                keys.append(key)
+                texts.append(str(description))
+        suggested_key = self.scikit.get_phoenix_suggestion(texts, keys, query)
+        for ticket_id in tickets:
+            ticket = tickets[ticket_id]
+            key = ticket['Key']
+            creation = self.timestamp_from_ticket_time(ticket['Created'])
+            if ticket['Time_Spent'] is not None:
+                time_spent = self.seconds_to_hours(int(ticket['Time_Spent']))
+            else:
+                time_spent = 0
+            if 'Title' in ticket:
+                title = ticket['Title']
+            else:
+                title = ''
+            if suggested_key == key:
+                suggested_ticket = {
+                    'jira_id': ticket_id,
+                    'percentage': 100,
+                    'hits': [],
+                    'link': self.environment.get_endpoint_ticket_link().format(key),
+                    'project': ticket['Project'],
+                    'creation': creation,
+                    'time_spent': time_spent,
+                    'title': title
+                }
+        return suggested_ticket
