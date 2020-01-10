@@ -121,6 +121,10 @@ class Cache:
                 jira_id
             )
             self.post_progress(current_ticket, total_tickets)
+        old_cache = self.load_cached_tickets()
+        for jira_id in old_cache:
+            if jira_id not in clean_cache:
+                clean_cache[jira_id] = old_cache[jira_id]
         cache_file = self.environment.get_path_cache()
         file = open(cache_file, "wb")
         pickle.dump(clean_cache, file)
@@ -155,7 +159,7 @@ class Cache:
             failed_jira_keys.append(jira_key)
             success = False
             return success
-        time.sleep(1)
+        time.sleep(0.5)
         clean_cache[str(jira_id)] = mapped_ticket
         return success, clean_cache, failed_jira_keys
 
