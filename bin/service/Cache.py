@@ -113,13 +113,17 @@ class Cache:
         for jira_key in jira_keys_and_ids:
             current_ticket += 1
             jira_id = jira_keys_and_ids[jira_key]
-            success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
-                sd_api,
-                jira_key,
-                failed_jira_keys,
-                clean_cache,
-                jira_id
-            )
+            try:
+                success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
+                    sd_api,
+                    jira_key,
+                    failed_jira_keys,
+                    clean_cache,
+                    jira_id
+                )
+            except Exception as err:
+                print(err)
+                success = False
             self.post_progress(current_ticket, total_tickets)
         old_cache = self.load_cached_tickets()
         for jira_id in old_cache:
