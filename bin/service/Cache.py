@@ -109,7 +109,6 @@ class Cache:
         jira_keys_and_ids = self.load_jira_keys_and_ids()
         total_tickets = len(jira_keys_and_ids)
         current_ticket = 0
-        self.post_progress(current_ticket, total_tickets)
         for jira_key in jira_keys_and_ids:
             current_ticket += 1
             jira_id = jira_keys_and_ids[jira_key]
@@ -124,7 +123,6 @@ class Cache:
             except Exception as err:
                 print(err)
                 success = False
-            self.post_progress(current_ticket, total_tickets)
         old_cache = self.load_cached_tickets()
         for jira_id in old_cache:
             if jira_id not in clean_cache:
@@ -179,3 +177,29 @@ class Cache:
         file = open(log_file, "a")
         file.write(entry)
         file.close()
+
+    def update_all_commits(self, git_api):
+        commits = git_api.get_all_commits()
+        success = len(commits) > 0
+        if success:
+            self.strore_commits(commits)
+        return success
+
+    def load_all_commits(self):
+        cache_file = self.environment.get_path_git_cache()
+        file_exists = os.path.exists(cache_file)
+        if file_exists:
+            file = open(cache_file, "rb")
+            content = pickle.load(file)
+        else:
+            content = {}
+        return content
+
+    def strore_commits(self, commits):
+        cache_file = self.environment.get_path_git_cache()
+        file = open(cache_file, "wb")
+        pickle.dump(commits, file)
+
+    def update_all_documents(self, confluence_api):
+        """ TODO: TBI """
+        return True

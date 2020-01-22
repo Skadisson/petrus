@@ -79,6 +79,18 @@ class Environment:
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['comment']
 
+    def get_endpoint_git_projects(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['git_projects']
+
+    def get_endpoint_git_commits(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['git_commits']
+
+    def get_endpoint_git_private_token(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['git_private_token']
+
     def get_map_ticket(self):
         service_yaml = self.load_yaml('map')
         return service_yaml['Ticket']
@@ -106,6 +118,14 @@ class Environment:
     def get_path_cache(self):
         service_yaml = self.load_yaml('path')
         return service_yaml['cache']
+
+    def get_path_git_cache(self):
+        service_yaml = self.load_yaml('path')
+        return service_yaml['git_cache']
+
+    def get_path_confluence_cache(self):
+        service_yaml = self.load_yaml('path')
+        return service_yaml['confluence_cache']
 
     def get_endpoint_ticket_link(self):
         service_yaml = self.load_yaml('endpoint')
