@@ -16,41 +16,49 @@ class Update:
 
     def run(self):
         failed_jira_keys = []
+        success = True
+
+        start = float(time.time())
+
         try:
-
-            start = float(time.strftime('%S'))
-
             print('--- Updating Jira Cache [1/3] ---')
             failed_jira_keys, success = self.cache.update_all_tickets(self.sd_api)
             if success:
                 print('DONE')
             else:
                 print('FAILED')
+        except Exception as e:
+            self.cache.add_log_entry(self.__class__.__name__, e)
+            success = False
 
+        try:
             print('--- Updating Git Cache [2/3] ---')
             success = self.cache.update_all_commits(self.git_api)
             if success:
                 print('DONE')
             else:
                 print('FAILED')
+        except Exception as e:
+            self.cache.add_log_entry(self.__class__.__name__, e)
+            success = False
 
+        try:
             print('--- Updating Confluence Cache [3/3] ---')
             success = self.cache.update_all_documents(self.confluence_api)
             if success:
                 print('DONE')
             else:
                 print('FAILED')
-
-            stop = float(time.strftime('%S'))
-            minutes = (stop - start) / 60
-            if success:
-                state = 'successfully'
-            else:
-                state = 'unsuccessfully'
-            print('--- Update {} Completed after {} minutes ---'.format(state, minutes))
-
         except Exception as e:
             self.cache.add_log_entry(self.__class__.__name__, e)
             success = False
+
+        stop = float(time.time())
+        minutes = (stop - start) / 60
+        if success:
+            state = 'successfully'
+        else:
+            state = 'unsuccessfully'
+        print('--- Update {} Completed after {} minutes ---'.format(state, minutes))
 
         return failed_jira_keys, success

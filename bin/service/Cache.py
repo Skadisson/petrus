@@ -167,7 +167,9 @@ class Cache:
 
     def backup(self):
         cache_file = self.environment.get_path_cache()
+        git_file = self.environment.get_path_git_cache()
         copyfile(cache_file, "{}.backup".format(cache_file))
+        copyfile(git_file, "{}.backup".format(git_file))
 
     def add_log_entry(self, code_reference, message):
         log_file = self.environment.get_path_log()
@@ -185,7 +187,7 @@ class Cache:
             self.strore_commits(commits)
         return success
 
-    def load_all_commits(self):
+    def load_cached_commits(self):
         cache_file = self.environment.get_path_git_cache()
         file_exists = os.path.exists(cache_file)
         if file_exists:

@@ -27,7 +27,12 @@ class GitlabAPI:
                 for project in projects:
                     project_commits = self.get_project_commits(project['id'])
                     for project_commit in project_commits:
-                        commits[project_commit['id']] = project_commit['message']
+                        commits[project_commit['id']] = {
+                            'title': project_commit['title'],
+                            'text': project_commit['message'],
+                            'date': project_commit['authored_date'],
+                            'project': project['id']
+                        }
             else:
                 run = False
 

@@ -131,6 +131,10 @@ class Environment:
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['ticket_link']
 
+    def get_endpoint_git_link(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['git_link']
+
     def get_path_jira_key(self):
         service_yaml = self.load_yaml('path')
         return service_yaml['jira_key']

@@ -26,10 +26,16 @@ class Context:
                 relevancy = self.add_to_relevancy(tickets, jira_id, keywords, relevancy, relations)
             sorted_relevancy = self.sort_relevancy(relevancy)
             if len(sorted_relevancy) == 0:
-                phoenix_suggestion = self.get_phoenix_suggestion(tickets, " ".join(keywords))
+                phoenix_suggestion = self.get_phoenix_ticket_suggestion(tickets, " ".join(keywords))
                 if phoenix_suggestion is not None:
                     sorted_relevancy.append(phoenix_suggestion)
         return sorted_relevancy
+
+    def add_relevancy_for_commits(self, commits, keywords, relevancy):
+        phoenix_suggestion = self.get_phoenix_commit_suggestion(commits, " ".join(keywords))
+        if phoenix_suggestion is not None:
+            relevancy.append(phoenix_suggestion)
+        return relevancy
 
     def add_to_relevancy(self, tickets, jira_id, keywords, relevancy, relations):
         ticket_data = tickets[str(jira_id)]
@@ -103,7 +109,7 @@ class Context:
 
         return similar_tickets, hits
 
-    def get_phoenix_suggestion(self, tickets, query):
+    def get_phoenix_ticket_suggestion(self, tickets, query):
         texts = []
         keys = []
         suggested_ticket = None
@@ -150,3 +156,29 @@ class Context:
                     'title': title
                 }
         return suggested_ticket
+
+    def get_phoenix_commit_suggestion(self, commits, query):
+        private_token = self.environment.get_endpoint_git_private_token()
+        texts = []
+        keys = []
+        suggested_commit = None
+        for git_hash in commits:
+            commit = commits[git_hash]
+            text = commit['title'] + ' ' + commit['text']
+            texts.append(text)
+            keys.append(git_hash)
+        suggested_key = self.scikit.get_phoenix_suggestion(texts, keys, query)
+        if suggested_key in commits:
+            commit = commits[suggested_key]
+            suggested_commit = {
+                'jira_id': suggested_key,
+                'percentage': 100,
+                'hits': [],
+                'link': self.environment.get_endpoint_git_link().format(commit['project'], suggested_key, private_token),
+                'project': None,
+                'creation': None,
+                'time_spent': None,
+                'title': commit['title']
+            }
+
+        return suggested_commit
