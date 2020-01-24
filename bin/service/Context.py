@@ -2,7 +2,7 @@ from bin.service import Environment
 from bin.service import Map
 from bin.service import Cache
 from bin.service import SciKitLearn
-import time, datetime
+import time, datetime, sys
 
 
 class Context:
@@ -170,9 +170,13 @@ class Context:
         suggested_commit = None
         for git_hash in commits:
             commit = commits[git_hash]
-            text = commit['title'] + ' ' + commit['text']
-            texts.append(text)
-            keys.append(git_hash)
+            if commit['title'] != '' and commit['text'] != '':
+                text = commit['title'] + ' ' + commit['text']
+                texts.append(text)
+                keys.append(git_hash)
+                gigs_used = sys.getsizeof(texts)/1024/1024
+                if gigs_used >= 0.2:
+                    break
         suggested_key = self.scikit.get_phoenix_suggestion(texts, keys, query)
         if suggested_key in commits:
             commit = commits[suggested_key]
