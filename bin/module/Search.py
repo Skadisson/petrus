@@ -31,7 +31,10 @@ class Search:
                 'keywords': formatted_keywords
             }]
         else:
-            items = []
+            items = [{
+                'relevancy': [],
+                'keywords': formatted_keywords
+            }]
 
         success = True
         return items, success
