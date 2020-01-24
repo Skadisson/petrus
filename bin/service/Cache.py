@@ -107,7 +107,6 @@ class Cache:
         failed_jira_keys = []
         clean_cache = {}
         jira_keys_and_ids = self.load_jira_keys_and_ids()
-        total_tickets = len(jira_keys_and_ids)
         current_ticket = 0
         for jira_key in jira_keys_and_ids:
             current_ticket += 1
@@ -183,10 +182,9 @@ class Cache:
         file.close()
 
     def update_all_commits(self, git_api):
-        commits = git_api.get_all_commits()
+        commits = git_api.request_all_commits(self)
         success = len(commits) > 0
-        if success:
-            self.strore_commits(commits)
+
         return success
 
     def load_cached_commits(self):
@@ -199,7 +197,7 @@ class Cache:
             content = {}
         return content
 
-    def strore_commits(self, commits):
+    def store_commits(self, commits):
         cache_file = self.environment.get_path_git_cache()
         file = open(cache_file, "wb")
         pickle.dump(commits, file)
@@ -210,10 +208,8 @@ class Cache:
         pickle.dump(documents, file)
 
     def update_all_documents(self, confluence_api):
-        documents = confluence_api.get_all_documents()
+        documents = confluence_api.request_all_documents(self)
         success = len(documents) > 0
-        if success:
-            self.store_documents(documents)
 
         return success
 

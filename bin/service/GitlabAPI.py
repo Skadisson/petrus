@@ -10,7 +10,7 @@ class GitlabAPI:
     def __init__(self):
         self.environment = Environment.Environment()
 
-    def get_all_commits(self):
+    def request_all_commits(self, cache):
 
         private_token = self.environment.get_endpoint_git_private_token()
         url = self.environment.get_endpoint_git_projects()
@@ -27,12 +27,14 @@ class GitlabAPI:
                 for project in projects:
                     project_commits = self.get_project_commits(project['id'])
                     for project_commit in project_commits:
-                        commits[project_commit['id']] = {
+                        commit = {
                             'title': project_commit['title'],
                             'text': project_commit['message'],
                             'date': project_commit['authored_date'],
                             'project': project['id']
                         }
+                        self.cache_commit(cache, project_commit['id'], commit)
+                        commits[project_commit['id']] = commit
             else:
                 run = False
 
@@ -62,3 +64,9 @@ class GitlabAPI:
         f = urllib.request.urlopen(url)
         json_raw = f.read().decode('utf-8')
         return json.loads(json_raw)
+
+    @staticmethod
+    def cache_commit(cache, identifier, commit):
+        cached_commits = cache.load_cached_commits()
+        cached_commits[identifier] = commit
+        cache.store_commits(cached_commits)
