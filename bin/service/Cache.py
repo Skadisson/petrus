@@ -168,8 +168,10 @@ class Cache:
     def backup(self):
         cache_file = self.environment.get_path_cache()
         git_file = self.environment.get_path_git_cache()
+        confluence_file = self.environment.get_path_confluence_cache()
         copyfile(cache_file, "{}.backup".format(cache_file))
         copyfile(git_file, "{}.backup".format(git_file))
+        copyfile(confluence_file, "{}.backup".format(confluence_file))
 
     def add_log_entry(self, code_reference, message):
         log_file = self.environment.get_path_log()
@@ -202,6 +204,25 @@ class Cache:
         file = open(cache_file, "wb")
         pickle.dump(commits, file)
 
+    def store_documents(self, documents):
+        cache_file = self.environment.get_path_confluence_cache()
+        file = open(cache_file, "wb")
+        pickle.dump(documents, file)
+
     def update_all_documents(self, confluence_api):
-        """ TODO: TBI """
-        return True
+        documents = confluence_api.get_all_documents()
+        success = len(documents) > 0
+        if success:
+            self.store_documents(documents)
+
+        return success
+
+    def load_cached_documents(self):
+        cache_file = self.environment.get_path_confluence_cache()
+        file_exists = os.path.exists(cache_file)
+        if file_exists:
+            file = open(cache_file, "rb")
+            content = pickle.load(file)
+        else:
+            content = {}
+        return content

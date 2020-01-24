@@ -91,6 +91,18 @@ class Environment:
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['git_private_token']
 
+    def get_endpoint_confluence_list(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['confluence_list']
+
+    def get_endpoint_confluence_detail(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['confluence_detail']
+
+    def get_endpoint_confluence_link(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['confluence_link']
+
     def get_map_ticket(self):
         service_yaml = self.load_yaml('map')
         return service_yaml['Ticket']

@@ -36,6 +36,12 @@ class Context:
         if phoenix_suggestion is not None:
             relevancy.append(phoenix_suggestion)
         return relevancy
+    
+    def add_relevancy_for_documents(self, documents, keywords, relevancy):
+        phoenix_suggestion = self.get_phoenix_document_suggestion(documents, " ".join(keywords))
+        if phoenix_suggestion is not None:
+            relevancy.append(phoenix_suggestion)
+        return relevancy
 
     def add_to_relevancy(self, tickets, jira_id, keywords, relevancy, relations):
         ticket_data = tickets[str(jira_id)]
@@ -182,3 +188,28 @@ class Context:
             }
 
         return suggested_commit
+
+    def get_phoenix_document_suggestion(self, documents, query):
+        texts = []
+        keys = []
+        suggested_document = None
+        for confluence_id in documents:
+            document = documents[confluence_id]
+            text = document['title'] + ' ' + document['text']
+            texts.append(text)
+            keys.append(confluence_id)
+        suggested_id = self.scikit.get_phoenix_suggestion(texts, keys, query)
+        if suggested_id in documents:
+            document = documents[suggested_id]
+            suggested_document = {
+                'jira_id': suggested_id,
+                'percentage': 100,
+                'hits': [],
+                'link': document['link'],
+                'project': document['project'],
+                'creation': None,
+                'time_spent': None,
+                'title': document['title']
+            }
+
+        return suggested_document
