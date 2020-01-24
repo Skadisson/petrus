@@ -21,8 +21,8 @@ class Search:
             items, success = mod_estimate.run()
         else:
             relevancy = self.context.calculate_relevancy_for_tickets(tickets, {'Keywords': formatted_keywords, 'Related': []})
-            relevancy = self.context.add_relevancy_for_commits(commits, formatted_keywords, relevancy)
-            relevancy = self.context.add_relevancy_for_documents(documents, formatted_keywords, relevancy)
+            """relevancy = self.context.add_relevancy_for_commits(commits, formatted_keywords, relevancy)
+            relevancy = self.context.add_relevancy_for_documents(documents, formatted_keywords, relevancy)"""
             items = [{
                 'relevancy': relevancy,
                 'keywords': formatted_keywords
