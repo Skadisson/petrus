@@ -31,7 +31,7 @@ class Update:
             self.cache.add_log_entry(self.__class__.__name__, e)
             success = False
 
-        try:
+        """try:
             print('--- Updating Git Cache [2/3] ---')
             success = self.cache.update_all_commits(self.git_api)
             if success:
@@ -40,7 +40,7 @@ class Update:
                 print('FAILED')
         except Exception as e:
             self.cache.add_log_entry(self.__class__.__name__, e)
-            success = False
+            success = False"""
 
         try:
             print('--- Updating Confluence Cache [3/3] ---')
