@@ -120,7 +120,7 @@ class Cache:
                     jira_id
                 )
             except Exception as err:
-                print(err)
+                print(str(err) + "; with Ticket " + jira_key)
                 success = False
         old_cache = self.load_cached_tickets()
         for jira_id in old_cache:
