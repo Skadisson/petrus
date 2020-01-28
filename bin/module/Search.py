@@ -21,11 +21,11 @@ class Search:
             items, success = mod_estimate.run()
         elif len(formatted_keywords) > 1:
             relevancy = self.context.calculate_relevancy_for_tickets(tickets, {'Keywords': formatted_keywords, 'Related': []})
-            try:
-                """relevancy = self.context.add_relevancy_for_commits(commits, formatted_keywords, relevancy)"""
-                relevancy = self.context.add_relevancy_for_documents(documents, formatted_keywords, relevancy)
+            relevancy = self.context.add_relevancy_for_documents(documents, formatted_keywords, relevancy)
+            """try:
+                relevancy = self.context.add_relevancy_for_commits(commits, formatted_keywords, relevancy)
             except Exception as e:
-                print(e)
+                print(e)"""
             items = [{
                 'relevancy': relevancy,
                 'keywords': formatted_keywords
