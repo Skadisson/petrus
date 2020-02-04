@@ -31,19 +31,8 @@ class Update:
             self.cache.add_log_entry(self.__class__.__name__, e)
             success = False
 
-        """try:
-            print('--- Updating Git Cache [2/3] ---')
-            success = self.cache.update_all_commits(self.git_api)
-            if success:
-                print('DONE')
-            else:
-                print('FAILED')
-        except Exception as e:
-            self.cache.add_log_entry(self.__class__.__name__, e)
-            success = False"""
-
         try:
-            print('--- Updating Confluence Cache [3/3] ---')
+            print('--- Updating Confluence Cache [2/3] ---')
             success = self.cache.update_all_documents(self.confluence_api)
             if success:
                 print('DONE')
@@ -52,6 +41,17 @@ class Update:
         except Exception as e:
             self.cache.add_log_entry(self.__class__.__name__, e)
             success = False
+
+        """try:
+            print('--- Updating Git Cache [3/3] ---')
+            success = self.cache.update_all_commits(self.git_api)
+            if success:
+                print('DONE')
+            else:
+                print('FAILED')
+        except Exception as e:
+            self.cache.add_log_entry(self.__class__.__name__, e)
+            success = False"""
 
         stop = float(time.time())
         minutes = (stop - start) / 60
