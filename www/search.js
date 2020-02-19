@@ -50,7 +50,7 @@ PS = (function(window, document, $) {
             xhr.open('GET', getUrl, true);
             xhr.setRequestHeader('Content-type', formContentType);
             xhr.onreadystatechange = function() {
-                if(xhr.responseText) {
+                if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200 && xhr.responseText) {
                     $('#keywords').attr('placeholder', '');
                     var result = JSON.parse(xhr.responseText);
                     if(typeof result.items[0].ticket_count != 'undefined') {
@@ -96,7 +96,7 @@ PS = (function(window, document, $) {
             xhr.open('GET', getUrl, true);
             xhr.setRequestHeader('Content-type', formContentType);
             xhr.onreadystatechange = function() {
-                if(xhr.responseText) {
+                if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200 && xhr.responseText) {
                     $('body').css('cursor', 'auto');
                     $('#link-list').html('');
                     var result = JSON.parse(xhr.responseText);
