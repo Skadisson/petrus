@@ -24,6 +24,8 @@ class Estimate:
         mapped_ticket = self.mapper.format_status_history(mapped_ticket)
         mapped_ticket = self.sd_api.request_ticket_worklog(mapped_ticket)
         mapped_ticket = self.mapper.format_worklog(mapped_ticket)
+        mapped_ticket = self.sd_api.request_ticket_comments(mapped_ticket)
+        mapped_ticket = self.mapper.format_comments(mapped_ticket)
         return mapped_ticket
 
     def format_tickets(self, mapped_ticket):
@@ -59,7 +61,7 @@ class Estimate:
                             normalized_ticket,
                             similar_tickets,
                             'Time_Spent',
-                            ['Relevancy', 'Key', 'Priority', 'State_Changes', 'Type', 'Organization', 'Words']
+                            ['Relevancy', 'Key', 'Priority', 'State_Changes', 'Type', 'Organization']
                         )
                     success = self.sd_api.update_ticket_times(jira_id, estimation, mapped_ticket)
         except Exception as e:

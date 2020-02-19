@@ -17,7 +17,6 @@ class Map:
         for map_to_label in mapping:
             map_from_key = mapping[map_to_label]
             converted_data[map_to_label] = self.get_converted_value(map_from_key, ticket_data)
-        converted_data['Comments'] = Counter(self.parse_comments(converted_data['Comments']))
         return converted_data
 
     @staticmethod
@@ -68,10 +67,6 @@ class Map:
             normalized_ticket['Organization'] = int(ticket['Organization'])
         else:
             normalized_ticket['Organization'] = -1
-        if 'Comments' in ticket and ticket['Comments'] is not None:
-            normalized_ticket['Words'] = sum(ticket['Comments'].values())
-        else:
-            normalized_ticket['Words'] = 0
         if 'Status' in ticket and ticket['Status'] is not None:
             normalized_ticket['State_Changes'] = len(ticket['Status'])
         else:
@@ -114,6 +109,19 @@ class Map:
                 mapped_ticket['Worklog'] = formatted_worklog
         else:
             mapped_ticket['Worklog'] = []
+        return mapped_ticket
+
+    @staticmethod
+    def format_comments(mapped_ticket):
+        if mapped_ticket['Comments'] is not None:
+            formatted_comments = []
+            if 'values' in mapped_ticket['Comments']:
+                for comment in mapped_ticket['Comments']['values']:
+                    if comment['body'] is not None:
+                        formatted_comments.append(comment['body'])
+                mapped_ticket['Comments'] = formatted_comments
+        else:
+            mapped_ticket['Comments'] = []
         return mapped_ticket
 
     def format_related_tickets(self, mapped_ticket):

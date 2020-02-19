@@ -107,20 +107,25 @@ class Cache:
         failed_jira_keys = []
         clean_cache = {}
         jira_keys_and_ids = self.load_jira_keys_and_ids()
-        total_tickets = len(jira_keys_and_ids)
         current_ticket = 0
-        self.post_progress(current_ticket, total_tickets)
         for jira_key in jira_keys_and_ids:
             current_ticket += 1
             jira_id = jira_keys_and_ids[jira_key]
-            success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
-                sd_api,
-                jira_key,
-                failed_jira_keys,
-                clean_cache,
-                jira_id
-            )
-            self.post_progress(current_ticket, total_tickets)
+            try:
+                success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
+                    sd_api,
+                    jira_key,
+                    failed_jira_keys,
+                    clean_cache,
+                    jira_id
+                )
+            except Exception as err:
+                print(str(err) + "; with Ticket " + jira_key)
+                success = False
+        old_cache = self.load_cached_tickets()
+        for jira_id in old_cache:
+            if jira_id not in clean_cache:
+                clean_cache[jira_id] = old_cache[jira_id]
         cache_file = self.environment.get_path_cache()
         file = open(cache_file, "wb")
         pickle.dump(clean_cache, file)
@@ -148,18 +153,24 @@ class Cache:
             mapped_ticket = self.mapper.format_status_history(mapped_ticket)
             mapped_ticket = sd_api.request_ticket_worklog(mapped_ticket)
             mapped_ticket = self.mapper.format_worklog(mapped_ticket)
+            mapped_ticket = sd_api.request_ticket_comments(mapped_ticket)
+            mapped_ticket = self.mapper.format_comments(mapped_ticket)
         except Exception as e:
             self.add_log_entry(self.__class__.__name__, e)
             failed_jira_keys.append(jira_key)
             success = False
             return success
-        time.sleep(1)
+        time.sleep(0.5)
         clean_cache[str(jira_id)] = mapped_ticket
         return success, clean_cache, failed_jira_keys
 
     def backup(self):
         cache_file = self.environment.get_path_cache()
+        git_file = self.environment.get_path_git_cache()
+        confluence_file = self.environment.get_path_confluence_cache()
         copyfile(cache_file, "{}.backup".format(cache_file))
+        copyfile(git_file, "{}.backup".format(git_file))
+        copyfile(confluence_file, "{}.backup".format(confluence_file))
 
     def add_log_entry(self, code_reference, message):
         log_file = self.environment.get_path_log()
@@ -169,3 +180,45 @@ class Cache:
         file = open(log_file, "a")
         file.write(entry)
         file.close()
+
+    def update_all_commits(self, git_api):
+        commits = git_api.request_all_commits(self)
+        success = len(commits) > 0
+
+        return success
+
+    def load_cached_commits(self):
+        cache_file = self.environment.get_path_git_cache()
+        file_exists = os.path.exists(cache_file)
+        if file_exists:
+            file = open(cache_file, "rb")
+            content = pickle.load(file)
+        else:
+            content = {}
+        return content
+
+    def store_commits(self, commits):
+        cache_file = self.environment.get_path_git_cache()
+        file = open(cache_file, "wb")
+        pickle.dump(commits, file)
+
+    def store_documents(self, documents):
+        cache_file = self.environment.get_path_confluence_cache()
+        file = open(cache_file, "wb")
+        pickle.dump(documents, file)
+
+    def update_all_documents(self, confluence_api):
+        documents = confluence_api.request_all_documents(self)
+        success = len(documents) > 0
+
+        return success
+
+    def load_cached_documents(self):
+        cache_file = self.environment.get_path_confluence_cache()
+        file_exists = os.path.exists(cache_file)
+        if file_exists:
+            file = open(cache_file, "rb")
+            content = pickle.load(file)
+        else:
+            content = {}
+        return content
