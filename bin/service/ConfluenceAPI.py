@@ -24,7 +24,7 @@ class ConfluenceAPI:
                 parsed_url = url.format(offset)
                 confluence_items = self.confluence_request(parsed_url)
                 if 'results' in confluence_items:
-                    found_item_count = len(confluence_items['results'])
+                    found_item_count = confluence_items['size']
                     offset += found_item_count
                     if found_item_count > 0:
                         for confluence_item in confluence_items['results']:
