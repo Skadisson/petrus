@@ -15,26 +15,31 @@ class ConfluenceAPI:
         url = self.environment.get_endpoint_confluence_list()
 
         documents = {}
-        page = 0
+        offset = 0
+        found_item_count = 0
         run = True
         while run:
             time.sleep(0.25)
             try:
-                page += 1
-                parsed_url = url.format(page)
+                parsed_url = url.format(offset)
                 confluence_items = self.confluence_request(parsed_url)
-                if 'results' in confluence_items and len(confluence_items['results']) > 0:
-                    for confluence_item in confluence_items['results']:
-                        time.sleep(0.05)
-                        document = self.get_confluence_detail(confluence_item['id'])
-                        self.cache_document(cache, confluence_item['id'], document)
-                        documents[confluence_item['id']] = document
+                if 'results' in confluence_items:
+                    found_item_count = len(confluence_items['results'])
+                    offset += found_item_count
+                    if found_item_count > 0:
+                        for confluence_item in confluence_items['results']:
+                            time.sleep(0.05)
+                            document = self.get_confluence_detail(confluence_item['id'])
+                            self.cache_document(cache, confluence_item['id'], document)
+                            documents[confluence_item['id']] = document
+                    else:
+                        run = False
                 else:
                     run = False
             except Exception as e:
                 cache.add_log_entry(self.__class__.__name__, e)
                 time.sleep(1)
-                page -= 1
+                offset -= found_item_count
 
         return documents
 
