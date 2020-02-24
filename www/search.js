@@ -273,13 +273,11 @@ PS = (function(window, document, $) {
                 support = ticket_calendar[calendar_label]['Support'];
             }
         }
+        support_percentage = 0
         if(bugs > 0 || support > 0) {
-            support_percentage = Math.ceil((support / (bugs + support) * 100));
+            support_percentage = bugs == 0 ? 100 : (support == 0 ? 0 : (Math.ceil((support / (bugs + support) * 100))));
         }
-        var this_weeks_percentage = 'no new tickets yet';
-        if(support_percentage > 0) {
-            this_weeks_percentage = support_percentage + '% Support';
-        }
+        var this_weeks_percentage = support_percentage + '% Support';
         $('#stats h3').html(calendar_label + '<br />' + this_weeks_percentage);
 
         // set the dimensions and margins of the graph
