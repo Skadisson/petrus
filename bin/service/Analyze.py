@@ -61,6 +61,33 @@ class Analyze:
         projects = self.sort_tickets(projects)
         return projects, ticket_count
 
+    def hours_per_system(self, for_days=0, year="", week_numbers=""):
+
+        domain_regex = r'^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)'
+
+        domains = {}
+        ticket_count = {}
+        for jira_id in self.tickets:
+            ticket = self.tickets[jira_id]
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            if is_in_range is True and 'System' in ticket:
+                system_url = ticket['System']
+                if system_url is not None and system_url != '':
+                    domain_reg = re.compile(domain_regex)
+                    domain_matches = domain_reg.search(system_url)
+                    domain = domain_matches[1]
+                    if domain is not None:
+                        if domain not in domains:
+                            domains[domain] = []
+                        if domain not in ticket_count:
+                            ticket_count[domain] = 0
+                        if ticket['Time_Spent'] is not None:
+                            domains[domain].append(ticket['Time_Spent'])
+                            ticket_count[domain] += 1
+
+        systems = self.sort_tickets(domains)
+        return systems, ticket_count
+
     def hours_per_type(self, for_days=0, year="", week_numbers=""):
         types = {}
         for jira_id in self.tickets:
