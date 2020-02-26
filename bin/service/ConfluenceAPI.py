@@ -51,6 +51,7 @@ class ConfluenceAPI:
             'title': confluence_detail['title'],
             'text': confluence_detail['body']['storage']['value'],
             'project': confluence_detail['container']['key'],
+            'created': confluence_detail['version']['when'],
             'link': self.environment.get_endpoint_confluence_link().format(confluence_detail['_links']['webui'])
         }
         return formatted_detail
