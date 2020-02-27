@@ -241,6 +241,28 @@ class Analyze:
 
         return problematic_tickets
 
+    def rank_projects_and_versions(self, hours_per_project, project_ticket_count, hours_per_version, projects_per_version):
+
+        score_projects = {}
+        for project_hours in hours_per_project:
+            project_name = project_hours[0]
+            score_projects[project_name] = {
+                'hours': project_hours[1],
+                'tickets': project_ticket_count[project_name]
+            }
+
+        score_versions = {}
+        for version_hours in hours_per_version:
+            version_name = version_hours[0]
+            score_versions[version_name] = {
+                'hours': version_hours[1],
+                'projects': projects_per_version[version_name]
+            }
+        rank_versions = {}
+        for version_name in score_versions:
+            rank_versions[version_name] = self.calculate_rank()
+
+
     @staticmethod
     def sort_tickets(seconds_spent_per_attribute):
         accumulated_hours_spent = {}
