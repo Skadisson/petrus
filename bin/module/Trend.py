@@ -26,7 +26,7 @@ class Trend:
         ticket_count = analyze.ticket_count(days, self.year, self.week_numbers)
         hours_per_ticket = analyze.hours_per_ticket(days, self.year, self.week_numbers)
         problematic_tickets = analyze.problematic_tickets(days, self.year, self.week_numbers)
-        project_ranks, version_ranks = analyze.rank_projects_and_versions(hours_per_project, project_ticket_count, hours_per_version, projects_per_version)
+        """project_ranks, version_ranks = analyze.rank_projects_and_versions(hours_per_project, project_ticket_count, hours_per_version, projects_per_version)"""
         self.output_trend_json(ticket_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_per_type, hours_per_version, projects_per_version, problematic_tickets)
         return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket
 
