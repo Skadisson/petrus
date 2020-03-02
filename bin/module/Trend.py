@@ -43,6 +43,8 @@ class Trend:
         hours_per_ticket = None
         docx_path = None
         projects_per_version = None
+        project_ranks = None
+        version_ranks = None
 
         try:
             hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, project_ranks, version_ranks = \
