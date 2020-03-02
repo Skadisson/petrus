@@ -22,12 +22,12 @@ class Trend:
         hours_per_system, system_ticket_count = analyze.hours_per_system(days, self.year, self.week_numbers)
         hours_per_type = analyze.hours_per_type(days, self.year, self.week_numbers)
         hours_per_version, projects_per_version = analyze.hours_per_version(days, self.year, self.week_numbers)
+        project_ranks, version_ranks = analyze.rank_projects_and_versions(hours_per_project, project_ticket_count, hours_per_version, projects_per_version)
         hours_total = analyze.hours_total(days, self.year, self.week_numbers)
         ticket_count = analyze.ticket_count(days, self.year, self.week_numbers)
         hours_per_ticket = analyze.hours_per_ticket(days, self.year, self.week_numbers)
         problematic_tickets = analyze.problematic_tickets(days, self.year, self.week_numbers)
-        """project_ranks, version_ranks = analyze.rank_projects_and_versions(hours_per_project, project_ticket_count, hours_per_version, projects_per_version)"""
-        self.output_trend_json(ticket_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_per_type, hours_per_version, projects_per_version, problematic_tickets)
+        self.output_trend_json(ticket_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, project_ranks, version_ranks)
         return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket
 
     def run(self):
@@ -67,7 +67,7 @@ class Trend:
         }]
         return items, success
 
-    def output_trend_json(self, ticket_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_per_type, hours_per_version, projects_per_version, problematic_tickets):
+    def output_trend_json(self, ticket_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, project_ranks, version_ranks):
 
         trend_file = self.environment.get_path_trend()
         categories = self.environment.get_map_categories()
@@ -93,7 +93,9 @@ class Trend:
             "tickets-per-hour": tickets_per_hour,
             "hours-per-version": hours_per_version,
             "projects-per-version": projects_per_version,
-            "problematic-tickets": problematic_tickets
+            "problematic-tickets": problematic_tickets,
+            "project-ranks": project_ranks,
+            "version-ranks": version_ranks
         }
 
         file = open(trend_file, "w+")

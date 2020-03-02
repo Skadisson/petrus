@@ -248,20 +248,73 @@ class Analyze:
             project_name = project_hours[0]
             score_projects[project_name] = {
                 'hours': project_hours[1],
-                'tickets': project_ticket_count[project_name]
+                'count': project_ticket_count[project_name]
             }
+
+        rank_projects = {}
+        for project_name in score_projects:
+            rank = self.calculate_rank(project_name, score_projects)
+            if rank is not None:
+                rank_projects[project_name] = rank
 
         score_versions = {}
         for version_hours in hours_per_version:
             version_name = version_hours[0]
             score_versions[version_name] = {
                 'hours': version_hours[1],
-                'projects': projects_per_version[version_name]
+                'count': len(projects_per_version[version_name])
             }
+
         rank_versions = {}
         for version_name in score_versions:
-            rank_versions[version_name] = self.calculate_rank()
+            rank = self.calculate_rank(version_name, score_versions)
+            if rank is not None:
+                rank_versions[version_name] = rank
 
+        return rank_projects, rank_versions
+
+    def calculate_rank(self, target, all_scores):
+
+        ranking_percentage = {
+            'A+': 5,
+            'A': 10,
+            'B': 20,
+            'C': 50,
+            'D': 70,
+            'E': 80,
+            'F': 90
+        }
+
+        rank = None
+        if target in all_scores:
+            target_score = all_scores[target]
+
+            all_hours = list(all_scores[name]['hours'] for name in all_scores)
+            all_counts = list(all_scores[name]['count'] for name in all_scores)
+            max_hours = float(max(all_hours))
+            max_counts = float(max(all_counts))
+
+            percentage_hours = target_score['hours'] / max_hours * 100
+            percentage_count = target_score['count'] / max_counts * 100
+            rank_hours = 'F'
+            rank_count = 'F'
+            for rank_mark in ranking_percentage:
+                ranking_percent = ranking_percentage[rank_mark]
+                if ranking_percent > percentage_hours:
+                    rank_hours = rank_mark
+                    break
+            for rank_mark in ranking_percentage:
+                ranking_percent = ranking_percentage[rank_mark]
+                if ranking_percent > percentage_count:
+                    rank_count = rank_mark
+                    break
+
+            rank = {
+                'target': target,
+                'rank': [rank_hours, rank_count]
+            }
+
+        return rank
 
     @staticmethod
     def sort_tickets(seconds_spent_per_attribute):
