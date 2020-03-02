@@ -28,7 +28,7 @@ class Trend:
         hours_per_ticket = analyze.hours_per_ticket(days, self.year, self.week_numbers)
         problematic_tickets = analyze.problematic_tickets(days, self.year, self.week_numbers)
         self.output_trend_json(ticket_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, project_ranks, version_ranks)
-        return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket
+        return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, project_ranks, version_ranks
 
     def run(self):
         success = True
@@ -45,7 +45,7 @@ class Trend:
         projects_per_version = None
 
         try:
-            hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket = \
+            hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, project_ranks, version_ranks = \
                 self.analyze_trend()
             docx_path = self.output_docx(hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket)
         except Exception as e:
@@ -63,6 +63,8 @@ class Trend:
             'hours_per_version': hours_per_version,
             'projects_per_version': projects_per_version,
             'hours_per_ticket': hours_per_ticket,
+            'project_ranks': project_ranks,
+            'version_ranks': version_ranks,
             'docx_path': docx_path
         }]
         return items, success
