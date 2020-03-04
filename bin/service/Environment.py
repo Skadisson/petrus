@@ -151,6 +151,10 @@ class Environment:
         service_yaml = self.load_yaml('path')
         return service_yaml['jira_key']
 
+    def get_path_lost_jira_key(self):
+        service_yaml = self.load_yaml('path')
+        return service_yaml['lost_jira_key']
+
     def get_path_mirror(self):
         service_yaml = self.load_yaml('path')
         return service_yaml['mirror']

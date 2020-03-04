@@ -102,6 +102,32 @@ class Cache:
             content = {}
         return content
 
+    def add_lost_jira_key(self, jira_key):
+        cache_file = self.environment.get_path_lost_jira_key()
+        file_exists = os.path.exists(cache_file)
+        if file_exists:
+            file = open(cache_file, "rb")
+            content = pickle.load(file)
+        else:
+            content = {'jira_keys': []}
+        if jira_key not in content['jira_keys']:
+            content['jira_keys'].append(jira_key)
+        file = open(cache_file, "wb")
+        pickle.dump(content, file)
+
+    def remove_jira_key(self, jira_key):
+        cache_file = self.environment.get_path_jira_key()
+        file_exists = os.path.exists(cache_file)
+        if file_exists:
+            file = open(cache_file, "rb")
+            content = pickle.load(file)
+        else:
+            content = {}
+        if jira_key in content:
+            del(content[jira_key])
+        file = open(cache_file, "wb")
+        pickle.dump(content, file)
+
     def update_all_tickets(self, sd_api):
         success = True
         failed_jira_keys = []
@@ -121,6 +147,8 @@ class Cache:
                 )
             except Exception as err:
                 print(str(err) + "; with Ticket " + jira_key)
+                self.add_lost_jira_key(jira_key)
+                self.remove_jira_key(jira_key)
                 success = False
         old_cache = self.load_cached_tickets()
         for jira_id in old_cache:
