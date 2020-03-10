@@ -7,7 +7,6 @@ import time
 import datetime
 from collections import Counter
 import re
-import numpy
 
 
 class Analyze:
@@ -140,65 +139,6 @@ class Analyze:
 
         tickets = self.sort_tickets(tickets)
         return tickets
-
-    def accuracy(self, for_days=0, year="", week_numbers=""):
-        accuracies = []
-        times = []
-        total = {}
-        organizations = {}
-        for jira_id in self.tickets:
-            ticket = self.tickets[jira_id]
-            jira_key = self.cache.load_jira_key_for_id(jira_id)
-            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
-            if jira_key is not None and is_in_range is True:
-                if ticket['Time_Spent'] is not None and ticket['Time_Spent'] > 0.0:
-                    normalized_ticket, similar_tickets, hits = self.format_tickets(ticket)
-                    if len(similar_tickets) > 0:
-                        estimation = self.sci_kit.estimate(
-                            normalized_ticket,
-                            similar_tickets,
-                            'Time_Spent',
-                            ['Relevancy', 'Key', 'Priority', 'State_Changes', 'Type', 'Organization']
-                        )
-                        accuracy = estimation / ticket['Time_Spent'] * 100
-                        accuracies.append(accuracy)
-
-                        time_spent = ticket['Time_Spent']
-                        hours_spent = int(self.seconds_to_hours(time_spent))
-                        organization = ticket['Project']
-                        calendar_week = self.get_calendar_week(ticket['Updated'])
-                        if calendar_week not in total:
-                            total[calendar_week] = 0
-                        if calendar_week not in organizations:
-                            organizations[calendar_week] = {}
-                        if organization is not None and organization not in organizations[calendar_week]:
-                            organizations[calendar_week][organization] = 0
-                        total[calendar_week] += hours_spent
-                        if organization is not None:
-                            organizations[calendar_week][organization] += hours_spent
-
-                        times.append({
-                            'Date': calendar_week,
-                            'Time_Spent': self.seconds_to_hours(time_spent),
-                            'Estimation': self.seconds_to_hours(estimation),
-                            'Total': total[calendar_week]
-                        })
-
-        times_sorted = sorted(times, key=lambda k: k['Date'])
-        self.sci_kit.generate_plot("Plot für {} Tage".format(for_days), ['Date'], ['Estimation', 'Time_Spent', 'Total'], times_sorted)
-
-        orga_times = []
-        for calendar_week in organizations:
-            for organization in organizations[calendar_week]:
-                orga_time = {'Date': calendar_week}
-                orga_time[str(organization)] = organizations[calendar_week][organization]
-                orga_times.append(orga_time)
-
-        orgas_sorted = sorted(orga_times, key=lambda k: k['Date'])
-        self.sci_kit.generate_graph("Plot für {} Tage".format(for_days), ['Date'], orgas_sorted)
-
-        average_accuracy = numpy.average(accuracies)
-        return average_accuracy
 
     @staticmethod
     def seconds_to_hours(seconds):

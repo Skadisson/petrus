@@ -31,7 +31,7 @@ class ServiceDeskAPI:
         while self.token is None and tries > 0:
             self.retrieve_token()
             tries -= 1
-        if self.token is None or tries is 0:
+        if self.token is None or tries == 0:
             raise Exception("Unable to retrieve sd api token, shutting down.")
         self.client = oauth.Client(self.consumer, self.token)
         self.client.set_signature_method(JiraSignature.JiraSignature())

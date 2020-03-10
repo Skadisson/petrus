@@ -21,7 +21,7 @@ class Context:
         sorted_relevancy = []
         relevancy = []
         keyword_total = len(keywords)
-        if keyword_total is not 0:
+        if keyword_total != 0:
             for jira_id in tickets:
                 relevancy = self.add_to_relevancy(tickets, jira_id, keywords, relevancy, relations)
             sorted_relevancy = self.sort_relevancy(relevancy)
