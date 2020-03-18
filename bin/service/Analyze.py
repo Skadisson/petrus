@@ -22,13 +22,20 @@ class Analyze:
 
     def ticket_count(self, for_days=0, year="", week_numbers=""):
         ticket_count = 0
+        external_count = 0
+        internal_count = 0
         for jira_id in self.tickets:
             ticket = self.tickets[jira_id]
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
             if is_in_range is True:
                 ticket_count += 1
+                if 'Reporter' in ticket:
+                    if ticket['Reporter'] == 'internal':
+                        internal_count += 1
+                    else:
+                        external_count += 1
 
-        return ticket_count
+        return ticket_count, internal_count, external_count
 
     def hours_total(self, for_days=0, year="", week_numbers=""):
         total = 0.0

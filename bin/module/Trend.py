@@ -24,11 +24,11 @@ class Trend:
         hours_per_version, projects_per_version = analyze.hours_per_version(days, self.year, self.week_numbers)
         project_ranks, version_ranks = analyze.rank_projects_and_versions(hours_per_project, project_ticket_count, hours_per_version, projects_per_version)
         hours_total = analyze.hours_total(days, self.year, self.week_numbers)
-        ticket_count = analyze.ticket_count(days, self.year, self.week_numbers)
+        ticket_count, internal_count, external_count = analyze.ticket_count(days, self.year, self.week_numbers)
         hours_per_ticket = analyze.hours_per_ticket(days, self.year, self.week_numbers)
         problematic_tickets = analyze.problematic_tickets(days, self.year, self.week_numbers)
-        self.output_trend_json(ticket_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, project_ranks, version_ranks)
-        return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, project_ranks, version_ranks
+        self.output_trend_json(ticket_count, internal_count, external_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, project_ranks, version_ranks)
+        return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, project_ranks, version_ranks
 
     def run(self):
         success = True
@@ -47,15 +47,17 @@ class Trend:
         version_ranks = None
 
         try:
-            hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, project_ranks, version_ranks = \
+            hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, project_ranks, version_ranks = \
                 self.analyze_trend()
-            docx_path = self.output_docx(hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket)
+            docx_path = self.output_docx(hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket)
         except Exception as e:
             self.cache.add_log_entry(self.__class__.__name__, e)
             success = False
 
         items = [{
             'ticket_count': ticket_count,
+            'internal_tickets': internal_count,
+            'external_tickets': external_count,
             'hours_total': hours_total,
             'hours_per_project': hours_per_project,
             "project_ticket_count": project_ticket_count,
@@ -71,7 +73,7 @@ class Trend:
         }]
         return items, success
 
-    def output_trend_json(self, ticket_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, project_ranks, version_ranks):
+    def output_trend_json(self, ticket_count, internal_count, external_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, project_ranks, version_ranks):
 
         trend_file = self.environment.get_path_trend()
         categories = self.environment.get_map_categories()
@@ -87,6 +89,8 @@ class Trend:
 
         trend_content = {
             "tickets-tracked": ticket_count,
+            "internal-tickets": internal_count,
+            "external-tickets": external_count,
             "hours-total": hours_total,
             "hot-projects": hours_per_project,
             "project_ticket_count": project_ticket_count,
@@ -120,10 +124,10 @@ class Trend:
         json.dump(obj=word_cloud_output, fp=file)
         file.close()
 
-    def output_docx(self, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket):
+    def output_docx(self, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket):
         docx_generator = Docx.Docx()
         docx_generator.place_headline()
-        docx_generator.place_stats(ticket_count, hours_total, hours_per_type, self.months)
+        docx_generator.place_stats(ticket_count, internal_count, external_count, hours_total, hours_per_type, self.months)
         docx_generator.place_type_weight(hours_per_version, projects_per_version, self.months)
         docx_generator.place_versions(hours_per_version, self.months)
         docx_generator.place_projects(hours_per_project, project_ticket_count, self.months)

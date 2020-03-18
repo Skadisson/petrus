@@ -1,7 +1,6 @@
 from bin.service import Environment
 import json
 import re
-from collections import Counter
 
 
 class Map:
@@ -122,6 +121,17 @@ class Map:
                 mapped_ticket['Comments'] = formatted_comments
         else:
             mapped_ticket['Comments'] = []
+        return mapped_ticket
+
+    @staticmethod
+    def format_reporter(mapped_ticket):
+        regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
+        if mapped_ticket['Reporter'] is not None and mapped_ticket['Reporter'] not in ['internal', 'external']:
+            is_email = re.search(regex, mapped_ticket['Reporter'])
+            if is_email:
+                mapped_ticket['Reporter'] = 'external'
+            else:
+                mapped_ticket['Reporter'] = 'internal'
         return mapped_ticket
 
     def format_related_tickets(self, mapped_ticket):

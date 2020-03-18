@@ -16,7 +16,7 @@ class Docx:
         date = datetime.strftime(now, "%Y/%m/%d")
         self.document.add_heading("Support Report {}".format(date), 0)
 
-    def place_stats(self, ticket_count, hours_total, hours_per_type, months):
+    def place_stats(self, ticket_count, internal_count, external_count, hours_total, hours_per_type, months):
 
         self.document.add_paragraph("").add_run("Durch Petrus automatisiert erstellt.").italic = True
 
@@ -40,7 +40,11 @@ class Docx:
         paragraph.add_run("{} Tagen".format(days)).bold = True
         paragraph.add_run(" wurden ")
         paragraph.add_run("{} Tickets".format(ticket_count)).bold = True
-        paragraph.add_run(" getrackt. Insgesamter getrackter Aufwand war ")
+        paragraph.add_run(" getrackt. Davon waren ")
+        paragraph.add_run("{} Tickets von Mitarbeitern".format(internal_count)).bold = True
+        paragraph.add_run(" und ")
+        paragraph.add_run("{} Tickets von Kunden".format(external_count)).bold = True
+        paragraph.add_run(". Insgesamter getrackter Aufwand war ")
         paragraph.add_run("{} Stunden".format(hours_total)).bold = True
         paragraph.add_run(". Fehler-Support-Verhältnis war ")
         paragraph.add_run("{}:{}".format(bugfix_relation, support_relation)).bold = True
