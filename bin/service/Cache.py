@@ -183,6 +183,7 @@ class Cache:
             mapped_ticket = self.mapper.format_worklog(mapped_ticket)
             mapped_ticket = sd_api.request_ticket_comments(mapped_ticket)
             mapped_ticket = self.mapper.format_comments(mapped_ticket)
+            mapped_ticket = self.mapper.format_reporter(mapped_ticket)
         except Exception as e:
             self.add_log_entry(self.__class__.__name__, e)
             failed_jira_keys.append(jira_key)
