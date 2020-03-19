@@ -421,6 +421,18 @@ class Analyze:
         return tickets
 
     def normalize_ticket_for_ranks(self, ticket):
-        normalized_ticket = {}
+        closed_count = 0
+        for state in ticket['Status']:
+            if state['type'] in ['Fertig', 'Final abgeschlossen', 'Schliessen', 'Schließen', 'Closed', 'Gelöst', 'Done']:
+                closed_count += 1
+        normalized_ticket = {
+            'comments': len(ticket['Comments']),
+            'breached': int(ticket['SLA']['breached'] is True),
+            'persons': int(ticket['Persons']),
+            'relations': len(ticket['Related']),
+            'closed': closed_count,
+            'support': int(ticket['Type'] in ['Hilfe / Support', 'Neue Funktion', 'Anfrage', 'Änderung', 'Story', 'Epic', 'Serviceanfrage', 'Aufgabe', 'Media Service', 'Information'])
+        }
+        print(normalized_ticket)
         """TODO: TBI"""
         return normalized_ticket
