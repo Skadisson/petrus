@@ -102,10 +102,13 @@ class Map:
 
     @staticmethod
     def format_worklog(mapped_ticket):
+        persons = []
         if mapped_ticket['Worklog'] is not None:
             formatted_worklog = []
             if 'worklogs' in mapped_ticket['Worklog']:
                 for worklog in mapped_ticket['Worklog']['worklogs']:
+                    if worklog['author']['name'] not in persons:
+                        persons.append(worklog['author']['name'])
                     formatted_worklog.append({
                         'updated': worklog['updated'],
                         'timeSpentSeconds': worklog['timeSpentSeconds']
@@ -113,7 +116,7 @@ class Map:
                 mapped_ticket['Worklog'] = formatted_worklog
         else:
             mapped_ticket['Worklog'] = []
-        return mapped_ticket
+        return mapped_ticket, persons
 
     @staticmethod
     def format_sla(mapped_ticket):
@@ -130,16 +133,19 @@ class Map:
 
     @staticmethod
     def format_comments(mapped_ticket):
+        persons = []
         if mapped_ticket['Comments'] is not None:
             formatted_comments = []
             if 'values' in mapped_ticket['Comments']:
                 for comment in mapped_ticket['Comments']['values']:
                     if comment['body'] is not None:
                         formatted_comments.append(comment['body'])
+                    if comment['author']['name'] not in persons:
+                        persons.append(comment['author']['name'])
                 mapped_ticket['Comments'] = formatted_comments
         else:
             mapped_ticket['Comments'] = []
-        return mapped_ticket
+        return mapped_ticket, persons
 
     @staticmethod
     def format_reporter(mapped_ticket):
@@ -163,4 +169,10 @@ class Map:
                 if ticket_relation['type']['outward'] in allowed_relations:
                     formatted_related_tickets.append(str(ticket_relation['outwardIssue']['id']))
         mapped_ticket['Related'] = formatted_related_tickets
+        return mapped_ticket
+
+    @staticmethod
+    def add_persons(mapped_ticket, persons):
+        unique_persons = list(dict.fromkeys(persons))
+        mapped_ticket['Persons'] = len(unique_persons)
         return mapped_ticket
