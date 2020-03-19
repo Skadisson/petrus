@@ -281,14 +281,14 @@ class Analyze:
 
     def ticket_is_in_range(self, ticket, for_days=0, year="", week_numbers=""):
         is_in_range = False
-        if 'LastProcessed' not in ticket:
-            time_updated = self.timestamp_from_ticket_time(ticket['Updated'])
-        else:
-            time_updated = int(ticket['LastProcessed']) / 1000
+        time_updated = self.timestamp_from_ticket_time(ticket['Created'])
         current_time_stamp = datetime.datetime.now().timestamp()
         if for_days > 0:
             max_gap = for_days * 24 * 60 * 60
             is_in_range = time_updated >= (current_time_stamp - max_gap)
+            if is_in_range and year != "":
+                ticket_year = str(datetime.datetime.fromtimestamp(time_updated).strftime("%Y"))
+                is_in_range = ticket_year == year
         elif week_numbers != "":
             weeks = week_numbers.split(',')
             ticket_week_number = str(int(datetime.datetime.fromtimestamp(time_updated).strftime("%W")) + 1)
@@ -300,6 +300,7 @@ class Analyze:
         elif year != "":
             ticket_year = datetime.datetime.fromtimestamp(time_updated).strftime("%Y")
             is_in_range = year == ticket_year
+
         return is_in_range
 
     @staticmethod
