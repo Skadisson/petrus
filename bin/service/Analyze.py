@@ -428,7 +428,7 @@ class Analyze:
                 closed_count += 1
         breached = False
         if 'SLA' in ticket and ticket['SLA'] is not None and 'breached' in ticket['SLA'] and ticket['SLA']['breached'] is not None:
-            breached = True
+            breached = ticket['SLA']['breached']
         support = False
         if ticket['Type'] is not None and ticket['Type'] in ['Hilfe / Support', 'Neue Funktion', 'Anfrage', 'Änderung', 'Story', 'Epic', 'Serviceanfrage', 'Aufgabe', 'Media Service', 'Information']:
             support = True
