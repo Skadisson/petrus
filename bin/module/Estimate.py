@@ -24,6 +24,8 @@ class Estimate:
         mapped_ticket = self.mapper.format_status_history(mapped_ticket)
         mapped_ticket = self.sd_api.request_ticket_worklog(mapped_ticket)
         mapped_ticket = self.mapper.format_worklog(mapped_ticket)
+        mapped_ticket = self.sd_api.request_ticket_sla(mapped_ticket)
+        mapped_ticket = self.mapper.format_sla(mapped_ticket)
         mapped_ticket = self.sd_api.request_ticket_comments(mapped_ticket)
         mapped_ticket = self.mapper.format_comments(mapped_ticket)
         mapped_ticket = self.mapper.format_reporter(mapped_ticket)

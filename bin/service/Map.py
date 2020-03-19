@@ -41,6 +41,11 @@ class Map:
                     return self.get_converted_value(key[map_from_key], data)
         return None
 
+    def normalize_tickets(self, tickets):
+        for ticket_id in tickets:
+            tickets[ticket_id] = self.normalize_ticket(tickets[ticket_id])
+        return tickets
+
     def normalize_ticket(self, ticket, relevancy_percentage=100.0):
         normalized_ticket = {}
         values = self.environment.get_map_values()
@@ -108,6 +113,19 @@ class Map:
                 mapped_ticket['Worklog'] = formatted_worklog
         else:
             mapped_ticket['Worklog'] = []
+        return mapped_ticket
+
+    @staticmethod
+    def format_sla(mapped_ticket):
+        formatted_sla = {}
+        if mapped_ticket['SLA'] is not None:
+            if 'ongoingCycle' in mapped_ticket['SLA']:
+                formatted_sla = {
+                    'start': mapped_ticket['SLA']['ongoingCycle']['startTime']['iso8601'],
+                    'end': mapped_ticket['SLA']['ongoingCycle']['breachTime']['iso8601'],
+                    'breached': mapped_ticket['SLA']['ongoingCycle']['breached']
+                }
+        mapped_ticket['SLA'] = formatted_sla
         return mapped_ticket
 
     @staticmethod

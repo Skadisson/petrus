@@ -121,6 +121,17 @@ class ServiceDeskAPI:
         mapped_ticket['Worklog'] = json.loads(worklog_raw)
         return mapped_ticket
 
+    def request_ticket_sla(self, mapped_ticket):
+        sla_endpoint = self.environment.get_endpoint_sla()
+        sla_url = sla_endpoint.format(mapped_ticket['ID'])
+        response, content = self.client.request(sla_url, "GET")
+        if response['status'] != '200':
+            mapped_ticket['SLA'] = None
+            return mapped_ticket
+        sla_raw = content.decode("utf-8")
+        mapped_ticket['SLA'] = json.loads(sla_raw)
+        return mapped_ticket
+
     def request_ticket_comments(self, mapped_ticket):
         comment_endpoint = self.environment.get_endpoint_comment()
         comment_url = comment_endpoint.format(mapped_ticket['ID'])

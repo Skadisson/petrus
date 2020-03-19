@@ -75,6 +75,10 @@ class Environment:
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['worklog']
 
+    def get_endpoint_sla(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['sla']
+
     def get_endpoint_comment(self):
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['comment']

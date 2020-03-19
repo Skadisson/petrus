@@ -407,3 +407,20 @@ class Analyze:
         for label in ordered_labels:
             ordered_opened_calendar[label] = ticket_opened_calendar[label]
         return ordered_opened_calendar
+
+    def rank_ticket(self, ticket, tickets):
+        normalized_ticket = self.normalize_ticket_for_ranks(ticket)
+        normalized_tickets = self.normalize_tickets_for_ranks(tickets)
+
+        """TODO: TBI"""
+        return 'A+'
+
+    def normalize_tickets_for_ranks(self, tickets):
+        for ticket_id in tickets:
+            tickets[ticket_id] = self.normalize_ticket_for_ranks(tickets[ticket_id])
+        return tickets
+
+    def normalize_ticket_for_ranks(self, ticket):
+        normalized_ticket = {}
+        """TODO: TBI"""
+        return normalized_ticket

@@ -6,6 +6,7 @@ from bin.module import Trend
 from bin.module import Backup
 from bin.module import CacheOP
 from bin.module import Info
+from bin.module import Rank
 import json
 
 
@@ -43,6 +44,10 @@ def petrus(request):
     elif function == 'Info':
         info = Info.Info()
         items, success = info.run()
+    elif function == 'Rank':
+        jira_key = request.args.get('jira_key', None)
+        rank = Rank.Rank(jira_key)
+        items, success = rank.run()
     response = {'success': success, 'items': items}
     json_response = json.dumps(response)
     return Response(json_response, mimetype='application/json', headers={'Access-Control-Allow-Origin': '*'})
