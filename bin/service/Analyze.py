@@ -411,6 +411,7 @@ class Analyze:
     def rank_ticket(self, ticket, tickets):
         normalized_ticket = self.normalize_ticket_for_ranks(ticket)
         normalized_tickets = self.normalize_tickets_for_ranks(tickets)
+        print(normalized_ticket)
 
         """TODO: TBI"""
         return 'A+'
@@ -425,14 +426,21 @@ class Analyze:
         for state in ticket['Status']:
             if state['type'] in ['Fertig', 'Final abgeschlossen', 'Schliessen', 'Schließen', 'Closed', 'Gelöst', 'Done']:
                 closed_count += 1
+        breached = False
+        if 'SLA' in ticket and ticket['SLA'] is not None and 'breached' in ticket['SLA'] and ticket['SLA']['breached'] is not None:
+            breached = True
+        support = False
+        if ticket['Type'] is not None and ticket['Type'] in ['Hilfe / Support', 'Neue Funktion', 'Anfrage', 'Änderung', 'Story', 'Epic', 'Serviceanfrage', 'Aufgabe', 'Media Service', 'Information']:
+            support = True
+        persons = 0
+        if 'Persons' in ticket and ticket['Persons'] is not None:
+            persons = int(ticket['Persons'])
         normalized_ticket = {
             'comments': len(ticket['Comments']),
-            'breached': int(ticket['SLA']['breached'] is True),
-            'persons': int(ticket['Persons']),
+            'breached': int(breached),
+            'persons': persons,
             'relations': len(ticket['Related']),
             'closed': closed_count,
-            'support': int(ticket['Type'] in ['Hilfe / Support', 'Neue Funktion', 'Anfrage', 'Änderung', 'Story', 'Epic', 'Serviceanfrage', 'Aufgabe', 'Media Service', 'Information'])
+            'support': int(support)
         }
-        print(normalized_ticket)
-        """TODO: TBI"""
         return normalized_ticket
