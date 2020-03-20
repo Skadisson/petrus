@@ -281,25 +281,29 @@ body.dark #image-copyright {
     cursor:pointer;
 }
 #scored {
+    background-image:url(image/coin.gif);
+    background-size:32px;
+    background-repeat:no-repeat;
+    background-color:white;
+    background-position:0 -1px;
     font-weight:bold;
     display:block;
     position:fixed;
     top:43px;
     right:150px;
-    background:white;
     font-family:Courier New;
     border-radius:5px;
     font-size:20px;
     line-height:22px;
     color:black;
-    padding:5px 10px;
+    padding:5px 10px 5px 30px;
     opacity:0;
 }
 #scored.positive {
-    background:lime;
+    color:black;
 }
 #scored.negative {
-    background:red;
+    color:darkred;
 }
 #high-score {
     display:block;
