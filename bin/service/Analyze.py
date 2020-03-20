@@ -403,7 +403,7 @@ class Analyze:
     def normalize_ticket_for_ranks(self, ticket):
         closed_count = 0
         for state in ticket['Status']:
-            if state['type'] in ['Final abgeschlossen', 'Schliessen', 'Schließen', 'Closed', 'Gelöst']:
+            if state['type'] in ['Final abgeschlossen', 'Fertig', 'Done', 'Schliessen', 'Schließen', 'Closed', 'Gelöst']:
                 closed_count += 1
         breached = False
         if 'SLA' in ticket and ticket['SLA'] is not None and 'breached' in ticket['SLA'] and ticket['SLA']['breached'] is not None:
