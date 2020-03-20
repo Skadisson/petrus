@@ -316,6 +316,7 @@ body.dark #image-copyright {
 #score {
     display:block;
     position:fixed;
+    font-weight:bold;
     top:43px;
     right:10px;
     background:black;
