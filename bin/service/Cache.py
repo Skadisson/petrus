@@ -271,3 +271,21 @@ class Cache:
         file = open(cache_file, "wb")
         pickle.dump(content, file)
         return numpy.sum(numpy.array(list(content[today].values())).astype(int))
+
+    def get_high_score(self):
+        cache_file = self.environment.get_path_score()
+        file_exists = os.path.exists(cache_file)
+        if file_exists:
+            file = open(cache_file, "rb")
+            content = pickle.load(file)
+        else:
+            content = {}
+        highest_score = 0
+        highest_day = ''
+        for day in content:
+            if isinstance(content[day], dict):
+                day_sum = numpy.sum(numpy.array(list(content[day].values())).astype(int))
+                if day_sum > highest_score:
+                    highest_score = day_sum
+                    highest_day = day
+        return highest_day, highest_score

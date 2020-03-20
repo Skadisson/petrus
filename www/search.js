@@ -130,6 +130,8 @@ PS = (function(window, document, $) {
                         var hours = result.items[0].estimation/60/60;
                         var new_score = result.items[0].score.today;
                         var diff = parseInt(new_score) - parseInt($('#score').text());
+                        var high_score = result.items[0].score.highest_score;
+                        var highest_day = result.items[0].score.highest_day;
                         var is_positive = diff > 0;
                         $('#scored').text((is_positive ? "+" : "") + ("" + diff + "").padStart(4, '0'));
                         if(diff != 0) {
@@ -143,6 +145,7 @@ PS = (function(window, document, $) {
                             $('#scored').css({'opacity': 1}).animate({'opacity': 0}, 3000);
                         }
                         $('#score').text(new_score.padStart(10, '0'));
+                        $('#high-score').text(highest_day + ':' + high_score.padStart(10, '0'));
                         var cssClass = hours <= 2 ? 'green' : (hours <= 4 ? 'yellow' : 'red');
                         $('#link-list').append('<p id="single">Ticket "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h <span class="corner ' + cssClass + '">&nbsp;</span></p>');
                         self.info();

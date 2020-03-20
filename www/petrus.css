@@ -283,7 +283,7 @@ body.dark #image-copyright {
 #scored {
     display:block;
     position:fixed;
-    top:10px;
+    top:43px;
     right:150px;
     background:white;
     font-family:Courier New;
@@ -300,10 +300,23 @@ body.dark #image-copyright {
 #scored.negative {
     background:red;
 }
-#score {
+#high-score {
     display:block;
     position:fixed;
     top:10px;
+    right:10px;
+    background:black;
+    font-family:Courier New;
+    border-radius:5px;
+    font-size:20px;
+    line-height:22px;
+    color:beige;
+    padding:5px 10px;
+}
+#score {
+    display:block;
+    position:fixed;
+    top:43px;
     right:10px;
     background:black;
     font-family:Courier New;
