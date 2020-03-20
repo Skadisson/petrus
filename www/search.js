@@ -140,7 +140,7 @@ PS = (function(window, document, $) {
                                 $('#scored').addClass('negative');
                                 $('#scored').removeClass('positive');
                             }
-                            $('#scored').css({'opacity': 1}).animate({'opacity': 0}, 1500);
+                            $('#scored').css({'opacity': 1}).animate({'opacity': 0}, 3000);
                         }
                         $('#score').text(new_score.padStart(10, '0'));
                         var cssClass = hours <= 2 ? 'green' : (hours <= 4 ? 'yellow' : 'red');
