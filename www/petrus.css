@@ -280,3 +280,16 @@ body.dark #image-copyright {
 #graph-modes span {
     cursor:pointer;
 }
+#score {
+    display:block;
+    position:fixed;
+    top:10px;
+    right:10px;
+    background:black;
+    font-family:Courier New;
+    border-radius:5px;
+    font-size:20px;
+    line-height:22px;
+    color:beige;
+    padding:5px 10px;
+}

@@ -13,7 +13,6 @@ class Search:
 
     def run(self):
         tickets = self.cache.load_cached_tickets()
-        """commits = self.cache.load_cached_commits()"""
         documents = self.cache.load_cached_documents()
         formatted_keywords = self.format_keywords()
         if len(formatted_keywords) == 1:
@@ -22,10 +21,6 @@ class Search:
         elif len(formatted_keywords) > 1:
             relevancy = self.context.calculate_relevancy_for_tickets(tickets, {'Keywords': formatted_keywords, 'Related': []})
             relevancy = self.context.add_relevancy_for_documents(documents, formatted_keywords, relevancy)
-            """try:
-                relevancy = self.context.add_relevancy_for_commits(commits, formatted_keywords, relevancy)
-            except Exception as e:
-                print(e)"""
             items = [{
                 'relevancy': relevancy,
                 'keywords': formatted_keywords

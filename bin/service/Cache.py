@@ -5,6 +5,7 @@ import pickle
 import os
 import time
 import datetime
+import numpy
 
 
 class Cache:
@@ -254,3 +255,19 @@ class Cache:
         else:
             content = {}
         return content
+
+    def add_to_todays_score(self, jira_key, ticket_score):
+        cache_file = self.environment.get_path_score()
+        file_exists = os.path.exists(cache_file)
+        if file_exists:
+            file = open(cache_file, "rb")
+            content = pickle.load(file)
+        else:
+            content = {}
+        today = datetime.date.today().strftime("%Y%m%d")
+        if today not in content:
+            content[today] = {}
+        content[today][jira_key] = ticket_score
+        file = open(cache_file, "wb")
+        pickle.dump(content, file)
+        return numpy.sum(numpy.array(list(content[today].values())).astype(int))

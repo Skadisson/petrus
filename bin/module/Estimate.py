@@ -3,6 +3,7 @@ from bin.service import Map
 from bin.service import Cache
 from bin.service import Context
 from bin.service import SciKitLearn
+from bin.service import Analyze
 
 
 class Estimate:
@@ -15,6 +16,7 @@ class Estimate:
         self.cache = Cache.Cache()
         self.context = Context.Context()
         self.sci_kit = SciKitLearn.SciKitLearn()
+        self.analyze = Analyze.Analyze()
 
     def retrieve_ticket(self):
         ticket_data = self.sd_api.request_ticket_data(self.jira_key)
@@ -49,6 +51,7 @@ class Estimate:
         estimation = None
         hits = None
         normalized_ticket = None
+        jira_id = None
 
         try:
             if self.jira_key is not None:
@@ -73,10 +76,17 @@ class Estimate:
 
         if estimation is not None:
             estimation = float(estimation)
+        ticket_score = self.analyze.rank_ticket(mapped_ticket)
+        todays_score = self.cache.add_to_todays_score(self.jira_key, ticket_score)
+        score = {
+            'ticket': str(ticket_score),
+            'today': str(todays_score)
+        }
         items = [{
             'ticket': mapped_ticket,
             'estimation': estimation,
             'hits': hits,
-            'normal_ticket': normalized_ticket
+            'normal_ticket': normalized_ticket,
+            'score': score
         }]
         return items, success
