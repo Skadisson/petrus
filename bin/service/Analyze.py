@@ -7,6 +7,7 @@ import time
 import datetime
 from collections import Counter
 import re
+import numpy
 
 
 class Analyze:
@@ -50,6 +51,7 @@ class Analyze:
     def hours_per_project(self, for_days=0, year="", week_numbers=""):
         projects = {}
         ticket_count = {}
+        project_tickets = {}
         for jira_id in self.tickets:
             ticket = self.tickets[jira_id]
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
@@ -60,12 +62,15 @@ class Analyze:
                         projects[project_name] = []
                     if project_name not in ticket_count:
                         ticket_count[project_name] = 0
+                    if project_name not in project_tickets:
+                        project_tickets[project_name] = {}
                     if ticket['Time_Spent'] is not None:
                         projects[project_name].append(ticket['Time_Spent'])
                         ticket_count[project_name] += 1
+                    project_tickets[project_name][jira_id] = ticket
 
         projects = self.sort_tickets(projects)
-        return projects, ticket_count
+        return projects, ticket_count, project_tickets
 
     def hours_per_system(self, for_days=0, year="", week_numbers=""):
 
@@ -73,6 +78,7 @@ class Analyze:
 
         domains = {}
         ticket_count = {}
+        system_tickets = {}
         for jira_id in self.tickets:
             ticket = self.tickets[jira_id]
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
@@ -87,12 +93,15 @@ class Analyze:
                             domains[domain] = []
                         if domain not in ticket_count:
                             ticket_count[domain] = 0
+                        if domain not in system_tickets:
+                            system_tickets[domain] = {}
                         if ticket['Time_Spent'] is not None:
                             domains[domain].append(ticket['Time_Spent'])
                             ticket_count[domain] += 1
+                        system_tickets[domain][jira_id] = ticket
 
         systems = self.sort_tickets(domains)
-        return systems, ticket_count
+        return systems, ticket_count, system_tickets
 
     def hours_per_type(self, for_days=0, year="", week_numbers=""):
         types = {}
@@ -187,81 +196,6 @@ class Analyze:
             problematic_tickets[jira_key].append(ticket['Time_Spent'])
 
         return problematic_tickets
-
-    def rank_projects_and_versions(self, hours_per_project, project_ticket_count, hours_per_version, projects_per_version):
-
-        score_projects = {}
-        for project_hours in hours_per_project:
-            project_name = project_hours[0]
-            score_projects[project_name] = {
-                'hours': project_hours[1],
-                'count': project_ticket_count[project_name]
-            }
-
-        rank_projects = {}
-        for project_name in score_projects:
-            rank = self.calculate_rank(project_name, score_projects)
-            if rank is not None:
-                rank_projects[project_name] = rank
-
-        score_versions = {}
-        for version_hours in hours_per_version:
-            version_name = version_hours[0]
-            score_versions[version_name] = {
-                'hours': version_hours[1],
-                'count': len(projects_per_version[version_name])
-            }
-
-        rank_versions = {}
-        for version_name in score_versions:
-            rank = self.calculate_rank(version_name, score_versions)
-            if rank is not None:
-                rank_versions[version_name] = rank
-
-        return rank_projects, rank_versions
-
-    def calculate_rank(self, target, all_scores):
-
-        ranking_percentage = {
-            'A+': 5,
-            'A': 10,
-            'B': 20,
-            'C': 50,
-            'D': 70,
-            'E': 80,
-            'F': 90
-        }
-
-        rank = None
-        if target in all_scores:
-            target_score = all_scores[target]
-
-            all_hours = list(all_scores[name]['hours'] for name in all_scores)
-            all_counts = list(all_scores[name]['count'] for name in all_scores)
-            max_hours = float(max(all_hours))
-            max_counts = float(max(all_counts))
-
-            percentage_hours = target_score['hours'] / max_hours * 100
-            percentage_count = target_score['count'] / max_counts * 100
-            rank_hours = 'F'
-            rank_count = 'F'
-            for rank_mark in ranking_percentage:
-                ranking_percent = ranking_percentage[rank_mark]
-                if ranking_percent > percentage_hours:
-                    rank_hours = rank_mark
-                    break
-            for rank_mark in ranking_percentage:
-                ranking_percent = ranking_percentage[rank_mark]
-                if ranking_percent > percentage_count:
-                    rank_count = rank_mark
-                    break
-
-            rank = {
-                'target': target,
-                'rank': [rank_hours, rank_count]
-            }
-
-        return rank
 
     @staticmethod
     def sort_tickets(seconds_spent_per_attribute):
@@ -408,13 +342,58 @@ class Analyze:
             ordered_opened_calendar[label] = ticket_opened_calendar[label]
         return ordered_opened_calendar
 
-    def rank_ticket(self, ticket, tickets):
-        normalized_ticket = self.normalize_ticket_for_ranks(ticket)
-        normalized_tickets = self.normalize_tickets_for_ranks(tickets)
-        print(normalized_ticket)
+    def score_labeled_tickets(self, labeled_tickets):
+        scores = {}
+        for label in labeled_tickets:
+            ranked_tickets = self.rank_tickets(labeled_tickets[label])
+            scores[label] = numpy.average(numpy.array(list(ranked_tickets.values())).astype(int))
+        top_scores = [
+            (k, scores[k]) for k in sorted(scores, key=scores.get, reverse=True)
+        ]
+        return top_scores
 
-        """TODO: TBI"""
-        return 'A+'
+    def rank_tickets(self, tickets):
+        ticket_ranks = {}
+        for ticket_id in tickets:
+            ticket_ranks[ticket_id] = self.rank_ticket(tickets[ticket_id])
+        return ticket_ranks
+
+    def rank_ticket(self, ticket):
+        normalized_ticket = self.normalize_ticket_for_ranks(ticket)
+        ticket_score = self.score_ticket(normalized_ticket)
+
+        return ticket_score
+
+    def score_tickets(self, normalized_tickets):
+        for ticket_id in normalized_tickets:
+            normalized_tickets[ticket_id] = self.score_ticket(normalized_tickets[ticket_id])
+        return normalized_tickets
+
+    @staticmethod
+    def score_ticket(normalized_ticket):
+        scoring = {
+            'comments': 200,
+            'breached': 200,
+            'persons': 125,
+            'relations': 125,
+            'closed': 300,
+            'support': 50
+        }
+        ticket_score = 0
+        if normalized_ticket['comments'] < 10:
+            ticket_score += scoring['comments']
+        if normalized_ticket['breached'] == 0:
+            ticket_score += scoring['breached']
+        if normalized_ticket['persons'] < 3:
+            ticket_score += scoring['persons']
+        if normalized_ticket['relations'] < 2:
+            ticket_score += scoring['relations']
+        if normalized_ticket['closed'] == 1:
+            ticket_score += scoring['closed']
+        if normalized_ticket['support'] == 1:
+            ticket_score += scoring['support']
+
+        return ticket_score
 
     def normalize_tickets_for_ranks(self, tickets):
         for ticket_id in tickets:

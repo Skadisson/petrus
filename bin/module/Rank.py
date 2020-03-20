@@ -18,9 +18,9 @@ class Rank:
             success = True
             tickets = self.cache.load_cached_tickets()
             ticket = tickets[jira_id]
-            rank = self.analyze.rank_ticket(ticket, tickets)
+            score = self.analyze.rank_ticket(ticket)
             items.append({
-                'rank': rank,
+                'score': score,
                 'ticket': ticket
             })
         return items, success
