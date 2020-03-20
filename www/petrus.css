@@ -281,6 +281,7 @@ body.dark #image-copyright {
     cursor:pointer;
 }
 #scored {
+    font-weight:bold;
     display:block;
     position:fixed;
     top:43px;
