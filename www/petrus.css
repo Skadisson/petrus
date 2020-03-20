@@ -305,12 +305,12 @@ body.dark #image-copyright {
     position:fixed;
     top:10px;
     right:10px;
-    background:black;
+    background:beige;
     font-family:Courier New;
     border-radius:5px;
     font-size:20px;
     line-height:22px;
-    color:beige;
+    color:black;
     padding:5px 10px;
 }
 #score {
