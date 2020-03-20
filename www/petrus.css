@@ -280,6 +280,26 @@ body.dark #image-copyright {
 #graph-modes span {
     cursor:pointer;
 }
+#scored {
+    display:block;
+    position:fixed;
+    top:10px;
+    right:150px;
+    background:white;
+    font-family:Courier New;
+    border-radius:5px;
+    font-size:20px;
+    line-height:22px;
+    color:black;
+    padding:5px 10px;
+    opacity:0;
+}
+#scored.positive {
+    background:lime;
+}
+#scored.negative {
+    background:red;
+}
 #score {
     display:block;
     position:fixed;

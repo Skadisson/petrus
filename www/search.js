@@ -128,8 +128,19 @@ PS = (function(window, document, $) {
                     } else {
                         $('#search').css({'top': '50%', 'margin-top': '-100px'});
                         var hours = result.items[0].estimation/60/60;
-                        var new_score = result.items[0].score.today.padStart(10, '0');
-                        $('#score').text(new_score);
+                        var new_score = result.items[0].score.today;
+                        var diff = parseInt(new_score) - parseInt($('#score').text());
+                        var is_positive = diff > 0;
+                        $('#scored').text((is_positive ? "+" : "") + ("" + diff + "").padStart(4, '0'));
+                        if(is_positive) {
+                            $('#scored').removeClass('negative');
+                            $('#scored').addClass('positive');
+                        } else {
+                            $('#scored').addClass('negative');
+                            $('#scored').removeClass('positive');
+                        }
+                        $('#scored').css({'opacity': 1}).animate({'opacity': 0}, 1500);
+                        $('#score').text(new_score.padStart(10, '0'));
                         var cssClass = hours <= 2 ? 'green' : (hours <= 4 ? 'yellow' : 'red');
                         $('#link-list').append('<p id="single">Ticket "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h <span class="corner ' + cssClass + '">&nbsp;</span></p>');
                         self.info();
