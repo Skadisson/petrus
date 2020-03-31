@@ -186,6 +186,7 @@ class Cache:
             mapped_ticket = self.mapper.format_sla(mapped_ticket)
             mapped_ticket = sd_api.request_ticket_comments(mapped_ticket)
             mapped_ticket, comment_persons = self.mapper.format_comments(mapped_ticket)
+            mapped_ticket = self.mapper.format_text(mapped_ticket)
             mapped_ticket = self.mapper.format_reporter(mapped_ticket)
             mapped_ticket = self.mapper.add_persons(mapped_ticket, (worklog_persons + comment_persons))
         except Exception as e:

@@ -1,4 +1,5 @@
 from bin.service import Environment
+from bin.service import RegEx
 import json
 import re
 
@@ -8,6 +9,7 @@ class Map:
 
     def __init__(self):
         self.environment = Environment.Environment()
+        self.regex = RegEx.RegEx()
 
     def get_mapped_ticket(self, ticket_data_json):
         converted_data = {}
@@ -131,21 +133,26 @@ class Map:
         mapped_ticket['SLA'] = formatted_sla
         return mapped_ticket
 
-    @staticmethod
-    def format_comments(mapped_ticket):
+    def format_comments(self, mapped_ticket):
         persons = []
         if mapped_ticket['Comments'] is not None:
             formatted_comments = []
             if 'values' in mapped_ticket['Comments']:
                 for comment in mapped_ticket['Comments']['values']:
                     if comment['body'] is not None:
-                        formatted_comments.append(comment['body'])
+                        comment_text = self.regex.mask_text(comment['body'])
+                        formatted_comments.append(comment_text)
                     if comment['author']['name'] not in persons:
                         persons.append(comment['author']['name'])
                 mapped_ticket['Comments'] = formatted_comments
         else:
             mapped_ticket['Comments'] = []
         return mapped_ticket, persons
+
+    def format_text(self, mapped_ticket):
+        if 'Text' in mapped_ticket and mapped_ticket['Text'] is not None:
+            mapped_ticket['Text'] = self.regex.mask_text(mapped_ticket['Text'])
+        return mapped_ticket
 
     @staticmethod
     def format_reporter(mapped_ticket):
