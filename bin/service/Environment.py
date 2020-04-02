@@ -63,6 +63,10 @@ class Environment:
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['ticket']
 
+    def get_endpoint_tickets(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['tickets']
+
     def get_endpoint_status(self):
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['status']

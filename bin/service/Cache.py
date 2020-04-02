@@ -129,12 +129,57 @@ class Cache:
         file = open(cache_file, "wb")
         pickle.dump(content, file)
 
+    def sync(self, sd_api):
+        failed_jira_keys = []
+        clean_cache = {}
+        success = True
+
+        offset = 0
+        max_results = 100
+
+        jira_keys = sd_api.request_service_jira_keys(offset, max_results)
+        while len(jira_keys) > 0:
+            for jira_id in jira_keys:
+                jira_key = jira_keys[jira_id]
+                try:
+                    success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
+                        sd_api,
+                        jira_key,
+                        failed_jira_keys,
+                        clean_cache,
+                        jira_id
+                    )
+                    if success:
+                        self.store_jira_key_and_id(jira_key, jira_id)
+                except Exception as err:
+                    print(str(err) + "; with Ticket " + jira_key)
+                    self.add_lost_jira_key(jira_key)
+                    self.remove_jira_key(jira_key)
+                    success = False
+
+            offset += max_results
+            jira_keys = sd_api.request_service_jira_keys(offset, max_results)
+
+        self.update_cache_diff(clean_cache)
+
+        return failed_jira_keys, success
+
+    def update_cache_diff(self, clean_cache):
+        old_cache = self.load_cached_tickets()
+        for jira_id in old_cache:
+            if jira_id not in clean_cache:
+                clean_cache[jira_id] = old_cache[jira_id]
+        cache_file = self.environment.get_path_cache()
+        file = open(cache_file, "wb")
+        pickle.dump(clean_cache, file)
+
     def update_all_tickets(self, sd_api):
         success = True
         failed_jira_keys = []
         clean_cache = {}
         jira_keys_and_ids = self.load_jira_keys_and_ids()
         current_ticket = 0
+
         for jira_key in jira_keys_and_ids:
             current_ticket += 1
             jira_id = jira_keys_and_ids[jira_key]
@@ -151,13 +196,9 @@ class Cache:
                 self.add_lost_jira_key(jira_key)
                 self.remove_jira_key(jira_key)
                 success = False
-        old_cache = self.load_cached_tickets()
-        for jira_id in old_cache:
-            if jira_id not in clean_cache:
-                clean_cache[jira_id] = old_cache[jira_id]
-        cache_file = self.environment.get_path_cache()
-        file = open(cache_file, "wb")
-        pickle.dump(clean_cache, file)
+
+        self.update_cache_diff(clean_cache)
+
         return failed_jira_keys, success
 
     def post_progress(self, current, total):
