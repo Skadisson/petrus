@@ -15,10 +15,15 @@ class SciKitLearn:
     def estimate(self, target_data, source_data, target_attribute, source_attributes):
 
         x, y = self.frame_data(source_data, target_attribute, source_attributes)
-        models = self.shotgun_models(x, y)
-        model = self.get_highest_scoring_model(models, x, y)
+        """models = self.shotgun_models(x, y)
+        model = self.get_highest_scoring_model(models, x, y)"""
         target_x, target_y = self.frame_data([target_data], target_attribute, source_attributes)
-        estimations = model.predict(target_x)
+        estimations = neural_network.MLPRegressor(
+                hidden_layer_sizes=(10,), activation='relu', solver='adam', alpha=0.001, batch_size='auto',
+                learning_rate='constant', learning_rate_init=0.01, power_t=0.5, max_iter=1000, shuffle=True,
+                random_state=9, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True,
+                early_stopping=False, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08
+            ).fit(x, y).predict(target_x)
         if estimations is not None and len(estimations) > 0:
             estimation = numpy.average(estimations)
         else:
