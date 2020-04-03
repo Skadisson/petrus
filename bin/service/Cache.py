@@ -93,6 +93,14 @@ class Cache:
             content = {}
         return content
 
+    def load_cached_ticket(self, jira_id):
+        ticket = None
+        tickets = self.load_cached_tickets()
+        if jira_id in tickets:
+            ticket = tickets[jira_id]
+
+        return ticket
+
     def load_jira_keys_and_ids(self):
         cache_file = self.environment.get_path_jira_key()
         file_exists = os.path.exists(cache_file)
@@ -216,8 +224,15 @@ class Cache:
     def add_to_clean_cache(self, sd_api, jira_key, failed_jira_keys, clean_cache, jira_id):
         success = True
         try:
+            last_updated = None
+            cached_ticket = self.load_cached_ticket(jira_id)
+            if cached_ticket is not None and 'Updated' in cached_ticket and cached_ticket['Updated'] is not None:
+                last_updated = cached_ticket['Updated']
             raw_ticket_data = sd_api.request_ticket_data(jira_key)
             mapped_ticket = self.mapper.get_mapped_ticket(raw_ticket_data)
+            if last_updated is not None and 'Updated' in mapped_ticket and mapped_ticket['Updated'] is not None:
+                if last_updated == mapped_ticket['Updated']:
+                    return True, clean_cache, failed_jira_keys
             mapped_ticket = self.mapper.format_related_tickets(mapped_ticket)
             mapped_ticket = sd_api.request_ticket_status(mapped_ticket)
             mapped_ticket = self.mapper.format_status_history(mapped_ticket)
