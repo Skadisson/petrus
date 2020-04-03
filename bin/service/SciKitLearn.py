@@ -23,6 +23,7 @@ class SciKitLearn:
             estimation = numpy.average(estimations)
         else:
             estimation = None
+        self.cache.add_log_entry(self.__class__.__name__, 'Estimation with model ' + model.__class__.__name__ + ' for ' + str(len(source_data)) + ' tickets is: ' + str(estimation))
 
         if estimation < 900:
             estimation = 900
