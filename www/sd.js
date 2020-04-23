@@ -62,7 +62,7 @@ SD = (function() {
 
     function requestTrend() {
 
-        $.get( "http://192.168.6.152:55888/", "function=Trend&months=1", function(response) {
+        $.get( "http://localhost:55888/", "function=Trend&months=1", function(response) {
           console.log(response);
         });
         $.get( "trend.json", function(trend) {

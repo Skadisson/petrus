@@ -9,7 +9,7 @@ function estimate() {
     event.preventDefault();
 
     var jira_key = document.getElementById('jira_key');
-    var getUrl = 'http://192.168.6.152:55888/?function=Estimate&jira_key=' + encodeURIComponent(jira_key.value);
+    var getUrl = 'http://localhost:55888/?function=Estimate&jira_key=' + encodeURIComponent(jira_key.value);
     var formContentType = 'application/x-www-form-urlencoded';
     try {
         var xhr = new XMLHttpRequest();
@@ -31,7 +31,7 @@ function search() {
 
     document.getElementById('link-list').innerHTML = '';
     var query = document.getElementById('query');
-    var getUrl = 'http://192.168.6.152:55888/?function=Search&keywords=' + encodeURIComponent(query.value);
+    var getUrl = 'http://localhost:55888/?function=Search&keywords=' + encodeURIComponent(query.value);
     var formContentType = 'application/x-www-form-urlencoded';
     try {
         var xhr = new XMLHttpRequest();
@@ -60,7 +60,7 @@ function search() {
 
 function ping() {
     document.getElementById('is-online').innerHTML = 'pending';
-    var getUrl = 'http://192.168.6.152:55888/?function=Ping';
+    var getUrl = 'http://localhost:55888/?function=Ping';
     var formContentType = 'application/x-www-form-urlencoded';
     try {
         var xhr = new XMLHttpRequest();

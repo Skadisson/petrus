@@ -43,7 +43,7 @@ PS = (function(window, document, $) {
     };
 
     function info() {
-        var getUrl = 'http://192.168.6.152:55888/?function=Info';
+        var getUrl = 'http://localhost:55888/?function=Info';
         var formContentType = 'application/x-www-form-urlencoded';
         try {
             var xhr = new XMLHttpRequest();
@@ -89,7 +89,7 @@ PS = (function(window, document, $) {
         $('#link-list').html('<p id="single">loading ...</p>').fadeIn();
         $('#search').css({'top': '50%', 'margin-top': '-100px'});
         var keywords = $('#keywords').val();
-        var getUrl = 'http://192.168.6.152:55888/?function=Search&keywords=' + encodeURIComponent(keywords);
+        var getUrl = 'http://localhost:55888/?function=Search&keywords=' + encodeURIComponent(keywords);
         var formContentType = 'application/x-www-form-urlencoded';
         try {
             var xhr = new XMLHttpRequest();
