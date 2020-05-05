@@ -229,29 +229,36 @@ class Cache:
             if cached_ticket is not None and 'Updated' in cached_ticket and cached_ticket['Updated'] is not None:
                 last_updated = cached_ticket['Updated']
             raw_ticket_data = sd_api.request_ticket_data(jira_key)
-            mapped_ticket = self.mapper.get_mapped_ticket(raw_ticket_data)
-            if last_updated is not None and 'Updated' in mapped_ticket and mapped_ticket['Updated'] is not None:
-                if last_updated == mapped_ticket['Updated']:
-                    return True, clean_cache, failed_jira_keys
-            mapped_ticket = self.mapper.format_related_tickets(mapped_ticket)
-            mapped_ticket = sd_api.request_ticket_status(mapped_ticket)
-            mapped_ticket = self.mapper.format_status_history(mapped_ticket)
-            mapped_ticket = sd_api.request_ticket_worklog(mapped_ticket)
-            mapped_ticket, worklog_persons = self.mapper.format_worklog(mapped_ticket)
-            mapped_ticket = sd_api.request_ticket_sla(mapped_ticket)
-            mapped_ticket = self.mapper.format_sla(mapped_ticket)
-            mapped_ticket = sd_api.request_ticket_comments(mapped_ticket)
-            mapped_ticket, comment_persons = self.mapper.format_comments(mapped_ticket)
-            mapped_ticket = self.mapper.format_text(mapped_ticket)
-            mapped_ticket = self.mapper.format_reporter(mapped_ticket)
-            mapped_ticket = self.mapper.add_persons(mapped_ticket, (worklog_persons + comment_persons))
+            if raw_ticket_data is False:
+                time.sleep(3)
+                raw_ticket_data = sd_api.request_ticket_data(jira_key)
+            if raw_ticket_data is not False:
+                mapped_ticket = self.mapper.get_mapped_ticket(raw_ticket_data)
+                if last_updated is not None and 'Updated' in mapped_ticket and mapped_ticket['Updated'] is not None:
+                    if last_updated == mapped_ticket['Updated']:
+                        return True, clean_cache, failed_jira_keys
+                mapped_ticket = self.mapper.format_related_tickets(mapped_ticket)
+                mapped_ticket = sd_api.request_ticket_status(mapped_ticket)
+                mapped_ticket = self.mapper.format_status_history(mapped_ticket)
+                mapped_ticket = sd_api.request_ticket_worklog(mapped_ticket)
+                mapped_ticket, worklog_persons = self.mapper.format_worklog(mapped_ticket)
+                mapped_ticket = sd_api.request_ticket_sla(mapped_ticket)
+                mapped_ticket = self.mapper.format_sla(mapped_ticket)
+                mapped_ticket = sd_api.request_ticket_comments(mapped_ticket)
+                mapped_ticket, comment_persons = self.mapper.format_comments(mapped_ticket)
+                mapped_ticket = self.mapper.format_text(mapped_ticket)
+                mapped_ticket = self.mapper.format_reporter(mapped_ticket)
+                mapped_ticket = self.mapper.add_persons(mapped_ticket, (worklog_persons + comment_persons))
+                time.sleep(0.5)
+                clean_cache[str(jira_id)] = mapped_ticket
+            else:
+                failed_jira_keys.append(jira_key)
+                success = False
         except Exception as e:
             self.add_log_entry(self.__class__.__name__, e)
             failed_jira_keys.append(jira_key)
             success = False
             return success
-        time.sleep(0.5)
-        clean_cache[str(jira_id)] = mapped_ticket
         return success, clean_cache, failed_jira_keys
 
     def backup(self):
