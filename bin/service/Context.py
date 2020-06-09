@@ -31,18 +31,6 @@ class Context:
                     sorted_relevancy.append(phoenix_suggestion)
         return sorted_relevancy
 
-    def add_relevancy_for_commits(self, commits, keywords, relevancy):
-        phoenix_suggestion = self.get_phoenix_commit_suggestion(commits, " ".join(keywords))
-        if phoenix_suggestion is not None:
-            relevancy.append(phoenix_suggestion)
-        return relevancy
-    
-    def add_relevancy_for_documents(self, documents, keywords, relevancy):
-        phoenix_suggestion = self.get_phoenix_document_suggestion(documents, " ".join(keywords))
-        if phoenix_suggestion is not None:
-            relevancy.append(phoenix_suggestion)
-        return relevancy
-
     def add_to_relevancy(self, tickets, jira_id, keywords, relevancy, relations):
         ticket_data = tickets[str(jira_id)]
         ticket_relevancy = self.calculate_ticket_relevancy(ticket_data, keywords, jira_id, relations)
@@ -162,58 +150,3 @@ class Context:
                     'title': title
                 }
         return suggested_ticket
-
-    def get_phoenix_commit_suggestion(self, commits, query):
-        private_token = self.environment.get_endpoint_git_private_token()
-        texts = []
-        keys = []
-        suggested_commit = None
-        for git_hash in commits:
-            commit = commits[git_hash]
-            if commit['title'] != '' and commit['text'] != '':
-                text = commit['title'] + ' ' + commit['text']
-                texts.append(text)
-                keys.append(git_hash)
-                gigs_used = sys.getsizeof(texts)/1024/1024
-                if gigs_used >= 0.2:
-                    break
-        suggested_key = self.scikit.get_phoenix_suggestion(texts, keys, query)
-        if suggested_key in commits:
-            commit = commits[suggested_key]
-            suggested_commit = {
-                'jira_id': suggested_key,
-                'percentage': 100,
-                'hits': [],
-                'link': self.environment.get_endpoint_git_link().format(commit['project'], suggested_key, private_token),
-                'project': None,
-                'creation': None,
-                'time_spent': None,
-                'title': commit['title']
-            }
-
-        return suggested_commit
-
-    def get_phoenix_document_suggestion(self, documents, query):
-        texts = []
-        keys = []
-        suggested_document = None
-        for confluence_id in documents:
-            document = documents[confluence_id]
-            text = document['title'] + ' ' + document['text']
-            texts.append(text)
-            keys.append(confluence_id)
-        suggested_id = self.scikit.get_phoenix_suggestion(texts, keys, query)
-        if suggested_id in documents:
-            document = documents[suggested_id]
-            suggested_document = {
-                'jira_id': suggested_id,
-                'percentage': 100,
-                'hits': [],
-                'link': document['link'],
-                'project': document['project'],
-                'creation': None,
-                'time_spent': None,
-                'title': document['title']
-            }
-
-        return suggested_document
