@@ -164,10 +164,10 @@ class Cache:
                     self.add_lost_jira_key(jira_key)
                     self.remove_jira_key(jira_key)
 
-            self.update_cache_diff(clean_cache)
             synced_current = len(clean_cache)
             synced_total += synced_current
             print('>>> successfully synced {} tickets of {} total'.format(synced_current, synced_total))
+            self.update_cache_diff(clean_cache)
             offset += max_results
             jira_keys = sd_api.request_service_jira_keys(offset, max_results)
 
@@ -249,7 +249,6 @@ class Cache:
             failed_jira_keys.append(jira_key)
             success = False
             return success
-        time.sleep(0.5)
         clean_cache[str(jira_id)] = mapped_ticket
         return success, clean_cache, failed_jira_keys
 
