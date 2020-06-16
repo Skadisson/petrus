@@ -139,14 +139,14 @@ class Cache:
 
     def sync(self, sd_api):
         failed_jira_keys = []
-        clean_cache = {}
-        success = True
+        synced_total = 0
 
         offset = 0
         max_results = 100
 
         jira_keys = sd_api.request_service_jira_keys(offset, max_results)
         while len(jira_keys) > 0:
+            clean_cache = {}
             for jira_id in jira_keys:
                 jira_key = jira_keys[jira_id]
                 try:
@@ -163,14 +163,13 @@ class Cache:
                     print(str(err) + "; with Ticket " + jira_key)
                     self.add_lost_jira_key(jira_key)
                     self.remove_jira_key(jira_key)
-                    success = False
 
+            self.update_cache_diff(clean_cache)
+            synced_current = len(clean_cache)
+            synced_total += synced_current
+            print('>>> successfully synced {} tickets of {} total'.format(synced_current, synced_total))
             offset += max_results
             jira_keys = sd_api.request_service_jira_keys(offset, max_results)
-
-        self.update_cache_diff(clean_cache)
-
-        return failed_jira_keys, success
 
     def update_cache_diff(self, clean_cache):
         old_cache = self.load_cached_tickets()
