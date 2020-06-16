@@ -105,7 +105,7 @@ class ServiceDeskAPI:
         tickets_endpoint = self.environment.get_endpoint_tickets()
         data_url = tickets_endpoint.format(max_results, offset)
         response, content = self.client.request(data_url, "GET")
-        if response['status'] != '200':
+        if response['status'] != '200' or content is False:
             raise Exception("Request failed with status code {}".format(response['status']))
         response_data = content.decode("utf-8")
         raw_data = json.loads(response_data)
