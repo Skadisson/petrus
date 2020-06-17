@@ -138,15 +138,16 @@ class Cache:
         pickle.dump(content, file)
 
     def sync(self, sd_api):
+        clean_cache = {}
         failed_jira_keys = []
-        synced_total = 0
+        ticket_total = 0
 
         offset = 0
         max_results = 100
 
         jira_keys = sd_api.request_service_jira_keys(offset, max_results)
         while len(jira_keys) > 0:
-            clean_cache = {}
+            ticket_total += len(jira_keys)
             for jira_id in jira_keys:
                 jira_key = jira_keys[jira_id]
                 try:
@@ -165,11 +166,12 @@ class Cache:
                     self.remove_jira_key(jira_key)
 
             synced_current = len(clean_cache)
-            synced_total += synced_current
-            print('>>> successfully synced {} tickets of {} total'.format(synced_current, synced_total))
-            self.update_cache_diff(clean_cache)
+            print('>>> successfully synced {} new or updated tickets out of {} total'.format(synced_current, ticket_total))
             offset += max_results
             jira_keys = sd_api.request_service_jira_keys(offset, max_results)
+        synced_current = len(clean_cache)
+        self.update_cache_diff(clean_cache)
+        print('>>> completed syncing {} new or updated tickets out of {} total'.format(synced_current, ticket_total))
 
     def update_cache_diff(self, clean_cache):
         old_cache = self.load_cached_tickets()
