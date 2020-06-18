@@ -164,6 +164,26 @@ class ServiceDeskAPI:
         response, content = self.client.request(info_endpoint, "GET")
         return response, content
 
+    def post_ticket_comment(self, jira_id, priority, days_to_go):
+        ticket_endpoint = self.environment.get_endpoint_comment().format(jira_id)
+        request_content = {
+            'body': 'Wir arbeiten im Customer Service in Warteschlangen um auch bei starker Nachfrage zeitgerecht '
+                    'reagieren zu können, hierbei ist die Priorität des Ticket ausschlaggebend. Mit der aktuellen '
+                    'Priorität "{}" wird das Ticket voraussichtlich in {} Tag(en) bearbeitet werden. Sollte das Thema '
+                    'allerdings dringend sein, antworten Sie bitte auf diese automatisierte Information, damit ein '
+                    'Customer Service Mitarbeiter die Priorität erhöhen kann. Ansonsten können Sie diese Information '
+                    'ignorieren.'.format(priority, days_to_go),
+            'public': False
+        }
+        request_body = json.dumps(request_content)
+        body = request_body.encode('utf-8')
+        headers = {'Content-Type': 'application/json'}
+        resp, content = self.client.request(ticket_endpoint, headers=headers, method="POST", body=body)
+        state = int(resp.get('status'))
+        success = state in [201, 204]
+
+        return success
+
     def update_ticket_times(self, jira_id, estimation, mapped_ticket):
         if mapped_ticket['Time_Spent'] is not None:
             time_spent = float(mapped_ticket['Time_Spent'])

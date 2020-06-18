@@ -80,7 +80,7 @@ class Estimate:
         if estimation is not None:
             estimation = float(estimation)
 
-        if normalized_ticket is not None and ticket_id is not None:
+        if normalized_ticket is not None and ticket_id is not None and mapped_ticket is not None:
             normalized_ticket['Diff'] = 0.0
             tickets = self.analyze.load_tickets_for_days(30)
             diff_normalized_tickets = []
@@ -98,6 +98,7 @@ class Estimate:
             )
             if diff_estimation > 0:
                 days_to_go = round(diff_estimation / 60 / 60 / 24)
+                comment_success = self.sd_api.post_ticket_comment(mapped_ticket['ID'], mapped_ticket['Priority'], days_to_go)
 
         ticket_score = self.analyze.rank_ticket(mapped_ticket)
         todays_score = self.cache.add_to_todays_score(self.jira_key, ticket_score)
