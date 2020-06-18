@@ -2,6 +2,8 @@ from bin.service import Environment
 from bin.service import RegEx
 import json
 import re
+import time
+import datetime
 
 
 class Map:
@@ -44,9 +46,11 @@ class Map:
         return None
 
     def normalize_tickets(self, tickets):
-        for ticket_id in tickets:
-            tickets[ticket_id] = self.normalize_ticket(tickets[ticket_id])
-        return tickets
+        normalized_tickets = []
+        for ticket in tickets:
+            normalized_ticket = self.normalize_ticket(ticket)
+            normalized_tickets.append(normalized_ticket)
+        return normalized_tickets
 
     def normalize_ticket(self, ticket, relevancy_percentage=100.0):
         normalized_ticket = {}
@@ -77,6 +81,18 @@ class Map:
             normalized_ticket['State_Changes'] = len(ticket['Status'])
         else:
             normalized_ticket['State_Changes'] = 0
+        if 'Created' in ticket and ticket['Created'] is not None:
+            normalized_ticket['Created'] = self.timestamp_from_ticket_time(ticket['Created'])
+        else:
+            normalized_ticket['Created'] = 0
+        if 'Updated' in ticket and ticket['Updated'] is not None:
+            normalized_ticket['Updated'] = self.timestamp_from_ticket_time(ticket['Updated'])
+        else:
+            normalized_ticket['Updated'] = 0
+        if 'Closed' in ticket and ticket['Closed'] is not None:
+            normalized_ticket['Closed'] = self.timestamp_from_ticket_time(ticket['Closed'])
+        else:
+            normalized_ticket['Closed'] = 0
         normalized_ticket['Key'] = 0
         if 'Key' in ticket and ticket['Key'] is not None:
             normalized_ticket['Key'] = 0
@@ -84,6 +100,12 @@ class Map:
                 if re.match(key, ticket['Key']):
                     normalized_ticket['Key'] = keys[key]
         return normalized_ticket
+
+    @staticmethod
+    def timestamp_from_ticket_time(ticket_time):
+        if ticket_time is None:
+            return 0
+        return time.mktime(datetime.datetime.strptime(ticket_time, "%Y-%m-%dT%H:%M:%S.%f%z").timetuple())
 
     @staticmethod
     def format_status_history(mapped_ticket):

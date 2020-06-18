@@ -52,10 +52,13 @@ class Estimate:
         estimation = None
         hits = None
         normalized_ticket = None
+        ticket_id = None
+        days_to_go = None
 
         try:
             if self.jira_key is not None:
                 mapped_ticket = self.retrieve_ticket()
+                ticket_id = mapped_ticket['ID']
                 jira_id = str(mapped_ticket['ID'])
                 self.cache.store_jira_key_and_id(self.jira_key, jira_id)
                 success = self.cache.store_ticket(jira_id, mapped_ticket)
@@ -76,6 +79,26 @@ class Estimate:
 
         if estimation is not None:
             estimation = float(estimation)
+
+        if normalized_ticket is not None and ticket_id is not None:
+            normalized_ticket['Diff'] = 0.0
+            tickets = self.analyze.load_tickets_for_days(30)
+            diff_normalized_tickets = []
+            normalized_tickets = self.mapper.normalize_tickets(tickets)
+            for diff_normalized_ticket in normalized_tickets:
+                if diff_normalized_ticket['Created'] > 0 and diff_normalized_ticket['Closed'] > 0:
+                    diff_normalized_ticket['Diff'] = diff_normalized_ticket['Closed'] - diff_normalized_ticket['Created']
+                    if diff_normalized_ticket['Diff'] > 0:
+                        diff_normalized_tickets.append(diff_normalized_ticket)
+            diff_estimation = self.sci_kit.estimate(
+                normalized_ticket,
+                diff_normalized_tickets,
+                'Diff',
+                ['Priority', 'Organization']
+            )
+            if diff_estimation > 0:
+                days_to_go = round(diff_estimation / 60 / 60 / 24)
+
         ticket_score = self.analyze.rank_ticket(mapped_ticket)
         todays_score = self.cache.add_to_todays_score(self.jira_key, ticket_score)
         highest_day, highest_score = self.cache.get_high_score()
@@ -88,6 +111,7 @@ class Estimate:
         items = [{
             'ticket': mapped_ticket,
             'estimation': estimation,
+            'days_to_go': days_to_go,
             'hits': hits,
             'normal_ticket': normalized_ticket,
             'score': score

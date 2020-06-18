@@ -155,6 +155,17 @@ class Analyze:
         tickets = self.sort_tickets(tickets)
         return tickets
 
+    def load_tickets_for_days(self, for_days=0):
+        tickets = []
+        stored_tickets = self.cache.load_cached_tickets()
+        for ticket in stored_tickets:
+            jira_key = self.cache.load_jira_key_for_id(ticket['ID'])
+            is_in_range = self.ticket_is_in_range(ticket, for_days)
+            if jira_key is not None and is_in_range is True:
+                tickets.append(ticket)
+
+        return tickets
+
     @staticmethod
     def seconds_to_hours(seconds):
         return seconds / 60 / 60

@@ -128,6 +128,7 @@ PS = (function(window, document, $) {
                     } else {
                         $('#search').css({'top': '50%', 'margin-top': '-100px'});
                         var hours = result.items[0].estimation/60/60;
+                        var days_to_go = result.items[0].days_to_go;
                         var new_score = result.items[0].score.today;
                         var diff = parseInt(new_score) - parseInt($('#score').text());
                         var high_score = result.items[0].score.highest_score;
@@ -147,7 +148,7 @@ PS = (function(window, document, $) {
                         $('#score').text(new_score.padStart(10, '0'));
                         $('#high-score').text(highest_day + ':' + high_score.padStart(10, '0'));
                         var cssClass = hours <= 2 ? 'green' : (hours <= 4 ? 'yellow' : 'red');
-                        $('#link-list').append('<p id="single">Ticket "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h <span class="corner ' + cssClass + '">&nbsp;</span></p>');
+                        $('#link-list').append('<p id="single">Ticket "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h and might take up to ' + days_to_go + ' days till completion <span class="corner ' + cssClass + '">&nbsp;</span></p>');
                         self.info();
                     }
                 }
