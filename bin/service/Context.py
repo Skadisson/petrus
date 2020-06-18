@@ -22,8 +22,8 @@ class Context:
         relevancy = []
         keyword_total = len(keywords)
         if keyword_total != 0:
-            for jira_id in tickets:
-                relevancy = self.add_to_relevancy(tickets, jira_id, keywords, relevancy, relations)
+            for ticket in tickets:
+                relevancy = self.add_to_relevancy(ticket, keywords, relevancy, relations)
             sorted_relevancy = self.sort_relevancy(relevancy)
             if len(sorted_relevancy) == 0:
                 phoenix_suggestion = self.get_phoenix_ticket_suggestion(tickets, " ".join(keywords))
@@ -31,14 +31,14 @@ class Context:
                     sorted_relevancy.append(phoenix_suggestion)
         return sorted_relevancy
 
-    def add_to_relevancy(self, tickets, jira_id, keywords, relevancy, relations):
-        ticket_data = tickets[str(jira_id)]
-        ticket_relevancy = self.calculate_ticket_relevancy(ticket_data, keywords, jira_id, relations)
+    def add_to_relevancy(self, ticket, keywords, relevancy, relations):
+        ticket_relevancy = self.calculate_ticket_relevancy(ticket, keywords, relations)
         if ticket_relevancy is not None and ticket_relevancy['percentage'] > 0:
             relevancy.append(ticket_relevancy)
         return relevancy
 
-    def calculate_ticket_relevancy(self, ticket, keywords, jira_id, relations):
+    def calculate_ticket_relevancy(self, ticket, keywords, relations):
+        jira_id = ticket['ID']
         relevancy = None
         keyword_total = len(keywords)
         keyword_hits = []
@@ -94,8 +94,8 @@ class Context:
         for rel_item in relevancy:
             rel_jira_id = str(rel_item['jira_id'])
             rel_percentage = rel_item['percentage']
-            if rel_jira_id != jira_id and rel_jira_id in cached_tickets:
-                similar_ticket = cached_tickets[rel_jira_id]
+            if rel_jira_id != jira_id:
+                similar_ticket = self.cache.load_cached_ticket(rel_jira_id)
                 if similar_ticket['Time_Spent'] is not None and similar_ticket['Time_Spent'] > 0:
                     normalized_similar_ticket = self.mapper.normalize_ticket(similar_ticket, rel_percentage)
                     similar_tickets.append(normalized_similar_ticket)

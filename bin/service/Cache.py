@@ -1,9 +1,8 @@
 from bin.service import Environment
 from bin.service import Map
-from shutil import copyfile
+from pymongo import MongoClient
 import pickle
 import os
-import time
 import datetime
 import numpy
 
@@ -14,6 +13,11 @@ class Cache:
     def __init__(self):
         self.environment = Environment.Environment()
         self.mapper = Map.Map()
+        self.client = MongoClient()
+        self.database = self.client.petrus
+        self.table_cache = self.database.cache
+        self.table_jira_keys = self.database.jira_keys
+        self.table_score = self.database.high_score
 
     def load_token(self):
         token_file = self.environment.get_path_token()
@@ -33,47 +37,32 @@ class Cache:
     def store_ticket(self, jira_id, ticket):
         is_valid = self.validate_ticket_data(ticket)
         if is_valid:
-            cache_file = self.environment.get_path_cache()
-            content = self.load_cached_tickets()
-            content[str(jira_id)] = ticket
-            file = open(cache_file, "wb")
-            pickle.dump(content, file)
+            stored_ticket = self.table_cache.find_one({'ID': jira_id})
+            if stored_ticket is not None:
+                self.table_cache.replace_one({'ID': jira_id}, ticket)
+            else:
+                self.table_cache.insert_one(ticket)
         return is_valid
 
     def load_jira_id_for_key(self, jira_key):
-        jira_key_path = self.environment.get_path_jira_key()
-        file_exists = os.path.exists(jira_key_path)
-        if file_exists:
-            file = open(jira_key_path, "rb")
-            content = pickle.load(file)
-            if jira_key in content:
-                return str(content[jira_key])
+        stored_relation = self.table_jira_keys.find_one({'key': jira_key})
+        if stored_relation is not None:
+            return stored_relation['id']
 
         return None
 
     def load_jira_key_for_id(self, jira_id):
-        jira_key_path = self.environment.get_path_jira_key()
-        file_exists = os.path.exists(jira_key_path)
-        if file_exists:
-            file = open(jira_key_path, "rb")
-            content = pickle.load(file)
-            for key, content_id in content.items():
-                if content_id == jira_id:
-                    return key
+        stored_relation = self.table_jira_keys.find_one({'id': jira_id})
+        if stored_relation is not None:
+            return stored_relation['key']
 
         return None
 
     def store_jira_key_and_id(self, jira_key, jira_id):
-        jira_key_path = self.environment.get_path_jira_key()
-        file_exists = os.path.exists(jira_key_path)
-        if file_exists:
-            file = open(jira_key_path, "rb")
-            content = pickle.load(file)
-        else:
-            content = {}
-        content[str(jira_key)] = str(jira_id)
-        file = open(jira_key_path, "wb")
-        pickle.dump(content, file)
+        relation = {'id': jira_id, 'key': jira_key}
+        stored_relation = self.table_jira_keys.find_one(relation)
+        if stored_relation is None:
+            self.table_jira_keys.insert_one(relation)
 
     @staticmethod
     def validate_ticket_data(ticket_data):
@@ -84,32 +73,13 @@ class Cache:
         return False
 
     def load_cached_tickets(self):
-        cache_file = self.environment.get_path_cache()
-        file_exists = os.path.exists(cache_file)
-        if file_exists:
-            file = open(cache_file, "rb")
-            content = pickle.load(file)
-        else:
-            content = {}
-        return content
+        return self.table_cache.find()
 
     def load_cached_ticket(self, jira_id):
-        ticket = None
-        tickets = self.load_cached_tickets()
-        if jira_id in tickets:
-            ticket = tickets[jira_id]
-
-        return ticket
+        return self.table_cache.find_one({'ID': jira_id})
 
     def load_jira_keys_and_ids(self):
-        cache_file = self.environment.get_path_jira_key()
-        file_exists = os.path.exists(cache_file)
-        if file_exists:
-            file = open(cache_file, "rb")
-            content = pickle.load(file)
-        else:
-            content = {}
-        return content
+        return self.table_jira_keys.find()
 
     def add_lost_jira_key(self, jira_key):
         cache_file = self.environment.get_path_lost_jira_key()
@@ -125,17 +95,7 @@ class Cache:
         pickle.dump(content, file)
 
     def remove_jira_key(self, jira_key):
-        cache_file = self.environment.get_path_jira_key()
-        file_exists = os.path.exists(cache_file)
-        if file_exists:
-            file = open(cache_file, "rb")
-            content = pickle.load(file)
-        else:
-            content = {}
-        if jira_key in content:
-            del(content[jira_key])
-        file = open(cache_file, "wb")
-        pickle.dump(content, file)
+        self.table_jira_keys.delete_one({'key': jira_key})
 
     def sync(self, sd_api):
         clean_cache = {}
@@ -174,53 +134,11 @@ class Cache:
         print('>>> completed syncing {} new or updated tickets out of {} total'.format(synced_current, ticket_total))
 
     def update_cache_diff(self, clean_cache):
-        old_cache = self.load_cached_tickets()
-        for jira_id in old_cache:
-            if jira_id not in clean_cache:
-                clean_cache[jira_id] = old_cache[jira_id]
-        cache_file = self.environment.get_path_cache()
-        file = open(cache_file, "wb")
-        pickle.dump(clean_cache, file)
-
-    def update_all_tickets(self, sd_api):
-        success = True
-        failed_jira_keys = []
-        clean_cache = {}
-        jira_keys_and_ids = self.load_jira_keys_and_ids()
-        current_ticket = 0
-
-        for jira_key in jira_keys_and_ids:
-            current_ticket += 1
-            jira_id = jira_keys_and_ids[jira_key]
-            try:
-                success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
-                    sd_api,
-                    jira_key,
-                    failed_jira_keys,
-                    clean_cache,
-                    jira_id
-                )
-            except Exception as err:
-                print(str(err) + "; with Ticket " + jira_key)
-                self.add_lost_jira_key(jira_key)
-                self.remove_jira_key(jira_key)
-                success = False
-
-        self.update_cache_diff(clean_cache)
-
-        return failed_jira_keys, success
-
-    def post_progress(self, current, total):
-        max_bars = 100
-        progress = current / total
-        percentage = int(round(progress * 100))
-        current_bars = int(round(progress * max_bars, 0))
-        diff_bars = max_bars - current_bars
-        bars = '=' * current_bars
-        diff = ' ' * diff_bars
-        os.system('cls' if os.name == 'nt' else 'clear')
-        os.system("echo [{}{}] {}%".format(bars, diff, percentage))
-        os.system("echo {} of {} ids processed".format(current, total))
+        for jira_id in clean_cache:
+            ticket = clean_cache[jira_id]
+            stored = self.store_ticket(jira_id, ticket)
+            if stored is False:
+                print('>>> ticket with id {} couldnt be stored'.format(jira_id))
 
     def add_to_clean_cache(self, sd_api, jira_key, failed_jira_keys, clean_cache, jira_id):
         success = True
@@ -254,10 +172,6 @@ class Cache:
         clean_cache[str(jira_id)] = mapped_ticket
         return success, clean_cache, failed_jira_keys
 
-    def backup(self):
-        cache_file = self.environment.get_path_cache()
-        copyfile(cache_file, "{}.backup".format(cache_file))
-
     def add_log_entry(self, code_reference, message):
         log_file = self.environment.get_path_log()
         now = datetime.datetime.now()
@@ -268,20 +182,31 @@ class Cache:
         file.close()
 
     def add_to_todays_score(self, jira_key, ticket_score):
-        cache_file = self.environment.get_path_score()
-        file_exists = os.path.exists(cache_file)
-        if file_exists:
-            file = open(cache_file, "rb")
-            content = pickle.load(file)
-        else:
-            content = {}
+
         today = datetime.date.today().strftime("%Y%m%d")
-        if today not in content:
-            content[today] = {}
-        content[today][jira_key] = ticket_score
-        file = open(cache_file, "wb")
-        pickle.dump(content, file)
-        return numpy.sum(numpy.array(list(content[today].values())).astype(int))
+        stored_score = self.table_score.find_one({'day': today})
+        if stored_score is None:
+            self.table_score.insert_one({
+                'day': today,
+                'scores': {
+                    jira_key: ticket_score
+                }
+            })
+            stored_score = self.table_score.find_one({'day': today})
+
+        stored_score['scores'][jira_key] = ticket_score
+        self.table_score.replace_one({'day': today}, stored_score)
+        total_score = self.calculate_score(stored_score)
+
+        return total_score
+
+    @staticmethod
+    def calculate_score(stored_score):
+        return numpy.sum(
+            numpy.array(
+                list(stored_score['scores'].values())
+            ).astype(int)
+        )
 
     def get_high_score(self):
         cache_file = self.environment.get_path_score()

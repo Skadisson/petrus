@@ -109,17 +109,9 @@ class Environment:
         service_yaml = self.load_yaml('map')
         return service_yaml['Relation']
 
-    def get_path_cache(self):
-        service_yaml = self.load_yaml('path')
-        return service_yaml['cache']
-
     def get_endpoint_ticket_link(self):
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['ticket_link']
-
-    def get_path_jira_key(self):
-        service_yaml = self.load_yaml('path')
-        return service_yaml['jira_key']
 
     def get_path_lost_jira_key(self):
         service_yaml = self.load_yaml('path')

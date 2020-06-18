@@ -3,7 +3,6 @@ from bin.service import Environment
 from bin.module import Estimate
 from bin.module import Search
 from bin.module import Trend
-from bin.module import Backup
 from bin.module import CacheOP
 from bin.module import Info
 from bin.module import Rank
@@ -31,9 +30,6 @@ def petrus(request):
         week_numbers = request.args.get('week_numbers', None)
         trend = Trend.Trend(months, year, week_numbers)
         items, success = trend.run()
-    elif function == 'Backup':
-        backup = Backup.Backup()
-        items, success = backup.run()
     elif function == 'Ping':
         success = True
     elif function == 'Cache':
