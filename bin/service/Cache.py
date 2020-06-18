@@ -75,6 +75,9 @@ class Cache:
     def load_cached_tickets(self):
         return self.table_cache.find()
 
+    def count_tickets(self):
+        return self.table_cache.count()
+
     def load_cached_ticket(self, jira_id):
         return self.table_cache.find_one({'ID': jira_id})
 
@@ -126,11 +129,11 @@ class Cache:
                     self.remove_jira_key(jira_key)
 
             synced_current = len(clean_cache)
+            self.update_cache_diff(clean_cache)
             print('>>> successfully synced {} new or updated tickets out of {} total'.format(synced_current, ticket_total))
             offset += max_results
             jira_keys = sd_api.request_service_jira_keys(offset, max_results)
         synced_current = len(clean_cache)
-        self.update_cache_diff(clean_cache)
         print('>>> completed syncing {} new or updated tickets out of {} total'.format(synced_current, ticket_total))
 
     def update_cache_diff(self, clean_cache):

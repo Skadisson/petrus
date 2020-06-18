@@ -14,10 +14,7 @@ class Info:
         ticket_opened_calendar = analyze.ticket_opened_calendar(tickets)
         ticket_closed_calendar = analyze.ticket_closed_calendar(tickets)
         ticket_effort_calendar = analyze.ticket_effort_calendar(tickets)
-
-        ticket_count = 0
-        for ticket in tickets:
-            ticket_count += 1
+        ticket_count = cache.count_tickets()
 
         items = [{
             'ticket_count': ticket_count,

@@ -52,7 +52,6 @@ class Estimate:
         estimation = None
         hits = None
         normalized_ticket = None
-        jira_id = None
 
         try:
             if self.jira_key is not None:

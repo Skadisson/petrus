@@ -80,7 +80,10 @@ class Trend:
 
         trend_file = self.environment.get_path_trend()
         categories = self.environment.get_map_categories()
-        tickets_per_hour = ticket_count / hours_total
+        if hours_total > 0.0:
+            tickets_per_hour = ticket_count / hours_total
+        else:
+            tickets_per_hour = 0
         payed_hours = 0.0
         un_payed_hours = 0.0
 

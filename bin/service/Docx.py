@@ -20,7 +20,10 @@ class Docx:
 
         self.document.add_paragraph("").add_run("Durch Petrus automatisiert erstellt.").italic = True
 
-        average = hours_total/ticket_count
+        if ticket_count > 0.0:
+            average = hours_total/ticket_count
+        else:
+            average = 0.0
         support_hours = 0.0
         bugfix_hours = 0.0
         for type_hours in hours_per_type:
@@ -32,8 +35,12 @@ class Docx:
                 support_hours += hours
         hours_sum = support_hours + bugfix_hours
         hours_total = round(hours_total)
-        support_relation = round((support_hours / hours_sum) * 100)
-        bugfix_relation = round((bugfix_hours / hours_sum) * 100)
+        if hours_sum > 0.0:
+            support_relation = round((support_hours / hours_sum) * 100)
+            bugfix_relation = round((bugfix_hours / hours_sum) * 100)
+        else:
+            support_relation = 50
+            bugfix_relation = 50
 
         days = self.months_to_days(months)
         paragraph = self.document.add_paragraph("In den letzten ")

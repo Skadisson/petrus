@@ -15,7 +15,6 @@ class Analyze:
 
     def __init__(self):
         self.cache = Cache.Cache()
-        self.tickets = self.cache.load_cached_tickets()
         self.sci_kit = SciKitLearn.SciKitLearn()
         self.context = Context.Context()
         self.mapper = Map.Map()
@@ -25,7 +24,8 @@ class Analyze:
         ticket_count = 0
         external_count = 0
         internal_count = 0
-        for ticket in self.tickets:
+        tickets = self.cache.load_cached_tickets()
+        for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
             if is_in_range is True:
                 ticket_count += 1
@@ -39,7 +39,8 @@ class Analyze:
 
     def hours_total(self, for_days=0, year="", week_numbers=""):
         total = 0.0
-        for ticket in self.tickets:
+        tickets = self.cache.load_cached_tickets()
+        for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
             if is_in_range is True and ticket['Time_Spent'] is not None and ticket['Time_Spent'] > 0:
                 total += ticket['Time_Spent'] / 60 / 60
@@ -50,7 +51,8 @@ class Analyze:
         projects = {}
         ticket_count = {}
         project_tickets = {}
-        for ticket in self.tickets:
+        tickets = self.cache.load_cached_tickets()
+        for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
             if is_in_range is True and 'Project' in ticket:
                 project_name = ticket['Project']
@@ -76,7 +78,8 @@ class Analyze:
         domains = {}
         ticket_count = {}
         system_tickets = {}
-        for ticket in self.tickets:
+        tickets = self.cache.load_cached_tickets()
+        for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
             if is_in_range is True and 'System' in ticket:
                 system_url = ticket['System']
@@ -101,7 +104,8 @@ class Analyze:
 
     def hours_per_type(self, for_days=0, year="", week_numbers=""):
         types = {}
-        for ticket in self.tickets:
+        tickets = self.cache.load_cached_tickets()
+        for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
             if is_in_range is True and 'Type' in ticket:
                 if ticket['Type'] not in types:
@@ -115,7 +119,8 @@ class Analyze:
     def hours_per_version(self, for_days=0, year="", week_numbers=""):
         versions = {}
         projects = {}
-        for ticket in self.tickets:
+        tickets = self.cache.load_cached_tickets()
+        for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
             if is_in_range is True and 'Keywords' in ticket:
                 version = None
@@ -137,7 +142,8 @@ class Analyze:
 
     def hours_per_ticket(self, for_days=0, year="", week_numbers=""):
         tickets = {}
-        for ticket in self.tickets:
+        stored_tickets = self.cache.load_cached_tickets()
+        for ticket in stored_tickets:
             jira_key = self.cache.load_jira_key_for_id(ticket['ID'])
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
             if jira_key is not None and is_in_range is True:
@@ -166,7 +172,8 @@ class Analyze:
 
     def problematic_tickets(self, for_days=0, year="", week_numbers=""):
         problematic_tickets = {}
-        for ticket in self.tickets:
+        tickets = self.cache.load_cached_tickets()
+        for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
             if is_in_range is True:
                 problematic_tickets = self.add_to_problematic_tickets(ticket, problematic_tickets)
@@ -238,7 +245,8 @@ class Analyze:
     def word_count_and_relations(self):
         words = []
         word_relations = {}
-        for ticket in self.tickets:
+        tickets = self.cache.load_cached_tickets()
+        for ticket in tickets:
             for keyword in ticket['Keywords']:
                 words.append(keyword)
                 if keyword not in word_relations:
@@ -271,8 +279,7 @@ class Analyze:
         ticket_effort_calendar = {}
         labels = []
         categories = self.environment.get_map_categories()
-        for ticket_id in tickets:
-            ticket = tickets[ticket_id]
+        for ticket in tickets:
             if 'Worklog' not in ticket or ticket['Worklog'] is None:
                 continue
             for worklog in ticket['Worklog']:
@@ -297,6 +304,7 @@ class Analyze:
                             if ticket_type not in ticket_effort_calendar[label]:
                                 ticket_effort_calendar[label][ticket_type] = 0
                             ticket_effort_calendar[label][ticket_type] += self.seconds_to_hours(int(worklog['timeSpentSeconds']))
+        tickets.rewind()
         ordered_labels = sorted(labels)
         ordered_effort_calendar = {}
         for label in ordered_labels:
@@ -326,6 +334,7 @@ class Analyze:
                 if ticket_type not in ticket_opened_calendar[label]:
                     ticket_opened_calendar[label][ticket_type] = 0
                 ticket_opened_calendar[label][ticket_type] += 1
+        tickets.rewind()
         ordered_labels = sorted(labels)
         ordered_opened_calendar = {}
         for label in ordered_labels:

@@ -48,7 +48,7 @@ class Context:
         hit_count = len(keyword_hits)
         if jira_id in relations:
             hit_count += 1
-        if hit_count >= 2:
+        if hit_count >= 2 and keyword_total > 0:
             percentage = hit_count / keyword_total * 100
             jira_key = self.cache.load_jira_key_for_id(jira_id)
             ticket_link = self.environment.get_endpoint_ticket_link().format(jira_key)
