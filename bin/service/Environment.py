@@ -141,10 +141,6 @@ class Environment:
         service_yaml = self.load_yaml('path')
         return service_yaml['word_cloud']
 
-    def get_path_score(self):
-        service_yaml = self.load_yaml('path')
-        return service_yaml['score']
-
     def load_yaml(self, name):
         file = open("{}env\\{}.yaml".format(self.base_path, name), "r", encoding='utf8')
         return yaml.load(file, Loader=yaml.FullLoader)
