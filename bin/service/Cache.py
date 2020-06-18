@@ -18,6 +18,7 @@ class Cache:
         self.table_cache = self.database.cache
         self.table_jira_keys = self.database.jira_keys
         self.table_score = self.database.high_score
+        self.table_comments = self.database.comments
 
     def load_token(self):
         token_file = self.environment.get_path_token()
@@ -222,3 +223,10 @@ class Cache:
                 highest_score = day_score
                 highest_day = score['day']
         return highest_day, highest_score
+
+    def comment_exists(self, jira_id):
+        comment = self.table_comments.find_one({'jira_id': jira_id})
+        return comment is not None
+
+    def store_comment(self, jira_id, comment):
+        self.table_comments.insert_one({'jira_id': jira_id, 'comment': comment})

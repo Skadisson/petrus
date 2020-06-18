@@ -165,14 +165,13 @@ class ServiceDeskAPI:
         return response, content
 
     def post_ticket_comment(self, jira_id, priority, days_to_go):
+        comment = 'Wir arbeiten im Customer Service in Warteschlangen um auch bei starker Nachfrage zeitgerecht reagieren zu können, hierbei ist die Priorität des Ticket ausschlaggebend. Mit der aktuellen Priorität "{}" wird das Ticket voraussichtlich in {} Tag(en) bearbeitet werden. Sollte das Thema allerdings dringend sein, antworten Sie bitte auf diese automatisierte Information, damit ein Customer Service Mitarbeiter die Priorität erhöhen kann. Ansonsten können Sie diese Information ignorieren.'.format(priority, days_to_go)
+        if self.cache.comment_exists(jira_id):
+            return True
+
         ticket_endpoint = self.environment.get_endpoint_comment().format(jira_id)
         request_content = {
-            'body': 'Wir arbeiten im Customer Service in Warteschlangen um auch bei starker Nachfrage zeitgerecht '
-                    'reagieren zu können, hierbei ist die Priorität des Ticket ausschlaggebend. Mit der aktuellen '
-                    'Priorität "{}" wird das Ticket voraussichtlich in {} Tag(en) bearbeitet werden. Sollte das Thema '
-                    'allerdings dringend sein, antworten Sie bitte auf diese automatisierte Information, damit ein '
-                    'Customer Service Mitarbeiter die Priorität erhöhen kann. Ansonsten können Sie diese Information '
-                    'ignorieren.'.format(priority, days_to_go),
+            'body': comment,
             'public': False
         }
         request_body = json.dumps(request_content)
@@ -181,6 +180,9 @@ class ServiceDeskAPI:
         resp, content = self.client.request(ticket_endpoint, headers=headers, method="POST", body=body)
         state = int(resp.get('status'))
         success = state in [201, 204]
+
+        if success:
+            self.cache.store_comment(jira_id, comment)
 
         return success
 

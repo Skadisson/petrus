@@ -97,8 +97,8 @@ class Estimate:
                 ['Priority', 'Organization']
             )
             if diff_estimation > 0:
-                days_to_go = round(diff_estimation / 60 / 60 / 24)
-                comment_success = self.sd_api.post_ticket_comment(mapped_ticket['ID'], mapped_ticket['Priority'], days_to_go)
+                days_to_go = int(round(diff_estimation / 60 / 60 / 24))
+                self.sd_api.post_ticket_comment(mapped_ticket['ID'], mapped_ticket['Priority'], days_to_go)
 
         ticket_score = self.analyze.rank_ticket(mapped_ticket)
         todays_score = self.cache.add_to_todays_score(self.jira_key, ticket_score)
