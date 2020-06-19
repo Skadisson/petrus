@@ -98,7 +98,9 @@ class Estimate:
             )
             if diff_estimation > 0:
                 days_to_go = int(round(diff_estimation / 60 / 60 / 24))
-                self.sd_api.post_ticket_comment(mapped_ticket['ID'], mapped_ticket['Priority'], days_to_go)
+                if days_to_go > 14:
+                    days_to_go = 14
+                """self.sd_api.post_ticket_comment(mapped_ticket['ID'], mapped_ticket['Priority'], days_to_go)"""
 
         ticket_score = self.analyze.rank_ticket(mapped_ticket)
         todays_score = self.cache.add_to_todays_score(self.jira_key, ticket_score)
@@ -109,6 +111,8 @@ class Estimate:
             'highest_score': str(highest_score),
             'highest_day': str(highest_day)
         }
+        if '_id' in mapped_ticket:
+            del(mapped_ticket['_id'])
         items = [{
             'ticket': mapped_ticket,
             'estimation': estimation,

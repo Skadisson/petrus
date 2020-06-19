@@ -148,7 +148,11 @@ PS = (function(window, document, $) {
                         $('#score').text(new_score.padStart(10, '0'));
                         $('#high-score').text(highest_day + ':' + high_score.padStart(10, '0'));
                         var cssClass = hours <= 2 ? 'green' : (hours <= 4 ? 'yellow' : 'red');
-                        $('#link-list').append('<p id="single">Ticket "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h and might take up to ' + days_to_go + ' days till completion <span class="corner ' + cssClass + '">&nbsp;</span></p>');
+                        if(days_to_go > 0) {
+                            $('#link-list').append('<p id="single">Ticket "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h and might take up to ' + days_to_go + ' days till completion <span class="corner ' + cssClass + '">&nbsp;</span></p>');
+                        } else {
+                            $('#link-list').append('<p id="single">Ticket "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h <span class="corner ' + cssClass + '">&nbsp;</span></p>');
+                        }
                         self.info();
                     }
                 }
