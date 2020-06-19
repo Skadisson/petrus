@@ -122,31 +122,32 @@ class Context:
             if project is not None:
                 description += " || " + project
             key = ticket['Key']
-            if description is not None and key is not None:
+            if description is not None and key is not None and description != '':
                 keys.append(key)
                 texts.append(str(description))
-        suggested_key = self.scikit.get_phoenix_suggestion(texts, keys, query)
-        for ticket_id in tickets:
-            ticket = tickets[ticket_id]
-            key = ticket['Key']
-            creation = self.timestamp_from_ticket_time(ticket['Created'])
-            if ticket['Time_Spent'] is not None:
-                time_spent = self.seconds_to_hours(int(ticket['Time_Spent']))
-            else:
-                time_spent = 0
-            if 'Title' in ticket:
-                title = ticket['Title']
-            else:
-                title = ''
-            if suggested_key == key:
-                suggested_ticket = {
-                    'jira_id': ticket_id,
-                    'percentage': 100,
-                    'hits': [],
-                    'link': self.environment.get_endpoint_ticket_link().format(key),
-                    'project': ticket['Project'],
-                    'creation': creation,
-                    'time_spent': time_spent,
-                    'title': title
-                }
+        if len(texts) > 0:
+            suggested_key = self.scikit.get_phoenix_suggestion(texts, keys, query)
+            for ticket_id in tickets:
+                ticket = tickets[ticket_id]
+                key = ticket['Key']
+                creation = self.timestamp_from_ticket_time(ticket['Created'])
+                if ticket['Time_Spent'] is not None:
+                    time_spent = self.seconds_to_hours(int(ticket['Time_Spent']))
+                else:
+                    time_spent = 0
+                if 'Title' in ticket:
+                    title = ticket['Title']
+                else:
+                    title = ''
+                if suggested_key == key:
+                    suggested_ticket = {
+                        'jira_id': ticket_id,
+                        'percentage': 100,
+                        'hits': [],
+                        'link': self.environment.get_endpoint_ticket_link().format(key),
+                        'project': ticket['Project'],
+                        'creation': creation,
+                        'time_spent': time_spent,
+                        'title': title
+                    }
         return suggested_ticket
