@@ -16,19 +16,13 @@ class Context:
 
     def calculate_relevancy_for_tickets(self, tickets, mapped_ticket):
         keywords = mapped_ticket['Keywords']
-        relations = mapped_ticket['Related']
 
         sorted_relevancy = []
-        relevancy = []
         keyword_total = len(keywords)
         if keyword_total != 0:
-            for ticket in tickets:
-                relevancy = self.add_to_relevancy(ticket, keywords, relevancy, relations)
-            sorted_relevancy = self.sort_relevancy(relevancy)
-            if len(sorted_relevancy) == 0:
-                phoenix_suggestion = self.get_phoenix_ticket_suggestion(tickets, " ".join(keywords))
-                if phoenix_suggestion is not None:
-                    sorted_relevancy.append(phoenix_suggestion)
+            phoenix_suggestion = self.get_phoenix_ticket_suggestion(tickets, " ".join(keywords))
+            if phoenix_suggestion is not None:
+                sorted_relevancy.append(phoenix_suggestion)
         return sorted_relevancy
 
     def add_to_relevancy(self, ticket, keywords, relevancy, relations):
@@ -106,9 +100,10 @@ class Context:
     def get_phoenix_ticket_suggestion(self, tickets, query):
         texts = []
         keys = []
+        check_tickets = []
         suggested_ticket = None
-        for ticket_id in tickets:
-            ticket = tickets[ticket_id]
+        for ticket in tickets:
+            check_tickets.append(ticket)
             title = str(ticket['Title'])
             description = str(ticket['Text'])
             description += " || " + str(title)
@@ -126,9 +121,8 @@ class Context:
                 keys.append(key)
                 texts.append(str(description))
         if len(texts) > 0:
-            suggested_key = self.scikit.get_phoenix_suggestion(texts, keys, query)
-            for ticket_id in tickets:
-                ticket = tickets[ticket_id]
+            suggested_keys = self.scikit.get_phoenix_suggestion(texts, keys, query)
+            for ticket in check_tickets:
                 key = ticket['Key']
                 creation = self.timestamp_from_ticket_time(ticket['Created'])
                 if ticket['Time_Spent'] is not None:
@@ -139,9 +133,9 @@ class Context:
                     title = ticket['Title']
                 else:
                     title = ''
-                if suggested_key == key:
+                if key in suggested_keys:
                     suggested_ticket = {
-                        'jira_id': ticket_id,
+                        'jira_id': ticket['ID'],
                         'percentage': 100,
                         'hits': [],
                         'link': self.environment.get_endpoint_ticket_link().format(key),

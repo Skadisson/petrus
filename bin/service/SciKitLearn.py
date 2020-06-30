@@ -1,5 +1,5 @@
 from pandas import DataFrame
-from sklearn import linear_model, gaussian_process, tree, naive_bayes, neural_network, feature_extraction
+from sklearn import linear_model, gaussian_process, tree, neural_network, naive_bayes, feature_extraction, pipeline
 from bin.service import Cache
 from bin.service import Environment
 import numpy
@@ -84,16 +84,15 @@ class SciKitLearn:
         return x, y
 
     def get_phoenix_suggestion(self, texts, keys, query):
-        count_vectorizer = feature_extraction.text.CountVectorizer()
-        X_train_counts = count_vectorizer.fit_transform(texts)
-        tfidf_transformer = feature_extraction.text.TfidfTransformer()
-        X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
-        clf = naive_bayes.MultinomialNB().fit(X_train_tfidf, keys)
+
         docs_new = [query]
-        X_new_counts = count_vectorizer.transform(docs_new)
-        X_new_tfidf = tfidf_transformer.transform(X_new_counts)
-        predicted = clf.predict(X_new_tfidf)
-        suggested_key = None
-        for doc, category in zip(docs_new, predicted):
-            suggested_key = category
-        return suggested_key
+
+        text_clf = pipeline.Pipeline([
+            ('vect', feature_extraction.text.CountVectorizer()),
+            ('tfidf', feature_extraction.text.TfidfTransformer()),
+            ('clf', naive_bayes.MultinomialNB()),
+        ])
+        text_context = text_clf.fit(texts, keys)
+        text_ids = text_context.predict(docs_new)
+
+        return text_ids
