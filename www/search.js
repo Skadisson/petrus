@@ -89,6 +89,8 @@ PS = (function(window, document, $) {
         $('#link-list').html('<p id="single">loading ...</p>').fadeIn();
         $('#search').css({'top': '50%', 'margin-top': '-100px'});
         var keywords = $('#keywords').val();
+        var $keywordLogEntry = $('<li>' + keywords + '</li>');
+        $('.keywords').append($keywordLogEntry);
         var getUrl = 'http://localhost:55888/?function=Search&keywords=' + encodeURIComponent(keywords);
         var formContentType = 'application/x-www-form-urlencoded';
         try {
@@ -97,6 +99,9 @@ PS = (function(window, document, $) {
             xhr.setRequestHeader('Content-type', formContentType);
             xhr.onreadystatechange = function() {
                 if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200 && xhr.responseText) {
+                    $keywordLogEntry.fadeOut('slow', function() {
+                        $(this).remove();
+                    });
                     $('body').css('cursor', 'auto');
                     $('#link-list').html('');
                     var result = JSON.parse(xhr.responseText);
