@@ -1,6 +1,6 @@
 from bin.service import Environment
 from bin.service import Map
-from pymongo import MongoClient
+import pymongo
 import pickle
 import os
 import datetime
@@ -13,12 +13,16 @@ class Cache:
     def __init__(self):
         self.environment = Environment.Environment()
         self.mapper = Map.Map()
-        self.client = MongoClient()
+        self.client = pymongo.MongoClient()
         self.database = self.client.petrus
         self.table_cache = self.database.cache
         self.table_jira_keys = self.database.jira_keys
         self.table_score = self.database.high_score
         self.table_comments = self.database.comments
+        self.add_text_indices()
+
+    def add_text_indices(self):
+        self.table_cache.create_index([('Key', pymongo.TEXT)])
 
     def load_token(self):
         token_file = self.environment.get_path_token()
@@ -74,7 +78,7 @@ class Cache:
         return False
 
     def load_cached_tickets(self):
-        return self.table_cache.find()
+        return self.table_cache.find({'$text': {'$search': 'SERVICE'}})
 
     def count_tickets(self):
         return self.table_cache.count()
