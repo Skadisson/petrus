@@ -125,8 +125,8 @@ class Docx:
 
     def place_tickets(self, hours_per_ticket, months):
         days = self.months_to_days(months)
-        self.document.add_heading('Tickets', level=1)
-        self.document.add_paragraph('Eine Liste aller getrackten Tickets der letzten {} Tage und deren bisherige Aufwände.'.format(days))
+        self.document.add_heading('SERVICE Tickets', level=1)
+        self.document.add_paragraph('Eine Liste aller {} SERVICE Tickets der letzten {} Tage und deren bisherige Aufwände.'.format(len(hours_per_ticket), days))
         for ticket_hours in hours_per_ticket:
             paragraph = self.document.add_paragraph('')
             paragraph.add_run("{}".format(ticket_hours[0])).bold = True
@@ -134,6 +134,25 @@ class Docx:
                 paragraph.add_run(" - {} Stunden".format(round(ticket_hours[1], ndigits=2)))
             else:
                 paragraph.add_run(" - n/a")
+
+    def place_qs_tickets(self, qs_tickets_and_relations, months):
+        days = self.months_to_days(months)
+        self.document.add_heading('QS Tickets', level=1)
+        count_qs = len(qs_tickets_and_relations)
+        count_qs_service = 0
+        service_tickets = []
+        for qs_ticket in qs_tickets_and_relations:
+            if len(qs_tickets_and_relations[qs_ticket]) > 0:
+                count_qs_service += 1
+                service_tickets += qs_tickets_and_relations[qs_ticket]
+        if count_qs_service > 0:
+            self.document.add_paragraph('Es wurden {} QS Tickets in den letzten {} Tagen erstellt, {} davon in Verbindung mit folgenden SERVICE Tickets:'.format(count_qs, days, count_qs_service))
+            for service_ticket in service_tickets:
+                paragraph = self.document.add_paragraph('')
+                paragraph.add_run("{}".format(service_ticket)).bold = True
+        else:
+            self.document.add_paragraph('Es wurden {} QS Tickets in den letzten {} Tagen erstellt, keines davon in Verbindung mit SERVICE Tickets.'.format(count_qs, days))
+
 
     def place_plot(self):
         self.document.add_heading('Aufwände pro Kalender-Woche', level=1)

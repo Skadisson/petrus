@@ -155,6 +155,23 @@ class Analyze:
         tickets = self.sort_tickets(tickets)
         return tickets
 
+    def qs_tickets_and_relations(self, for_days=0, year="", week_numbers=""):
+        tickets = {}
+        qs_tickets = self.cache.load_cached_tickets('QS')
+        for qs_ticket in qs_tickets:
+            jira_key = self.cache.load_jira_key_for_id(qs_ticket['ID'])
+            is_in_range = self.ticket_is_in_range(qs_ticket, for_days, year, week_numbers)
+            if jira_key is not None and is_in_range is True:
+                if jira_key not in tickets:
+                    tickets[jira_key] = []
+                if 'Related' in qs_ticket and qs_ticket['Related'] is not None:
+                    for ticket_id in qs_ticket['Related']:
+                        related_ticket = self.cache.load_cached_ticket(ticket_id)
+                        if related_ticket is not None:
+                            tickets[jira_key].append(str(related_ticket['Key']))
+
+        return tickets
+
     def load_tickets_for_days(self, for_days=0):
         tickets = []
         stored_tickets = self.cache.load_cached_tickets()
