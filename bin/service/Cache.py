@@ -106,34 +106,36 @@ class Cache:
         failed_jira_keys = []
         ticket_total = 0
 
-        offset = 0
         max_results = 100
 
-        jira_keys = sd_api.request_service_jira_keys(offset, max_results)
-        while len(jira_keys) > 0:
-            ticket_total += len(jira_keys)
-            for jira_id in jira_keys:
-                jira_key = jira_keys[jira_id]
-                try:
-                    success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
-                        sd_api,
-                        jira_key,
-                        failed_jira_keys,
-                        clean_cache,
-                        jira_id
-                    )
-                    if success:
-                        self.store_jira_key_and_id(jira_key, jira_id)
-                except Exception as err:
-                    print(str(err) + "; with Ticket " + jira_key)
-                    self.add_lost_jira_key(jira_key)
-                    self.remove_jira_key(jira_key)
+        projects = self.environment.get_service_projects()
+        for project in projects:
+            offset = 0
+            jira_keys = sd_api.request_service_jira_keys(offset, max_results, project)
+            while len(jira_keys) > 0:
+                ticket_total += len(jira_keys)
+                for jira_id in jira_keys:
+                    jira_key = jira_keys[jira_id]
+                    try:
+                        success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
+                            sd_api,
+                            jira_key,
+                            failed_jira_keys,
+                            clean_cache,
+                            jira_id
+                        )
+                        if success:
+                            self.store_jira_key_and_id(jira_key, jira_id)
+                    except Exception as err:
+                        print(str(err) + "; with Ticket " + jira_key)
+                        self.add_lost_jira_key(jira_key)
+                        self.remove_jira_key(jira_key)
 
-            synced_current = len(clean_cache)
-            self.update_cache_diff(clean_cache)
-            print('>>> successfully synced {} new or updated tickets out of {} total'.format(synced_current, ticket_total))
-            offset += max_results
-            jira_keys = sd_api.request_service_jira_keys(offset, max_results)
+                synced_current = len(clean_cache)
+                self.update_cache_diff(clean_cache)
+                print('>>> successfully synced {} new or updated tickets out of {} total in project "{}"'.format(synced_current, ticket_total, project))
+                offset += max_results
+                jira_keys = sd_api.request_service_jira_keys(offset, max_results, project)
         synced_current = len(clean_cache)
         print('>>> completed syncing {} new or updated tickets out of {} total'.format(synced_current, ticket_total))
 

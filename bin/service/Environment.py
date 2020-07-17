@@ -25,6 +25,10 @@ class Environment:
         service_yaml = self.load_yaml('service')
         return service_yaml['port']
 
+    def get_service_projects(self):
+        service_yaml = self.load_yaml('service')
+        return service_yaml['projects']
+
     def get_endpoint_consumer_key(self):
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['consumer_key']
