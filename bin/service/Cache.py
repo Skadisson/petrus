@@ -77,8 +77,8 @@ class Cache:
                 return True
         return False
 
-    def load_cached_tickets(self):
-        return self.table_cache.find({'$text': {'$search': 'SERVICE'}})
+    def load_cached_tickets(self, project='SERVICE'):
+        return self.table_cache.find({'$text': {'$search': project}})
 
     def count_tickets(self):
         return self.table_cache.count()
