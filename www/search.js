@@ -18,6 +18,7 @@ PS = (function(window, document, $) {
         self = this;
         weeks = {
             'year': 53,
+            'half': 26,
             'quarter': 13,
             'month': 4
         };
