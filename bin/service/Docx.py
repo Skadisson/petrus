@@ -171,6 +171,24 @@ class Docx:
         else:
             self.document.add_paragraph('Es wurden {} DevOps Tickets in den letzten {} Tagen erstellt, keines davon in Verbindung mit SERVICE Tickets.'.format(count_devops, days))
 
+    def place_bb5_tickets(self, bb5_tickets_and_relations, months):
+        days = self.months_to_days(months)
+        self.document.add_heading('BRANDBOX5 Tickets', level=1)
+        count_bb5 = len(bb5_tickets_and_relations)
+        count_bb5_service = 0
+        service_tickets = []
+        for bb5_ticket in bb5_tickets_and_relations:
+            if len(bb5_tickets_and_relations[bb5_ticket]) > 0:
+                count_bb5_service += 1
+                service_tickets += bb5_tickets_and_relations[bb5_ticket]
+        if count_bb5_service > 0:
+            self.document.add_paragraph('Es wurden {} BRANDBOX5 Tickets in den letzten {} Tagen erstellt, {} davon in Verbindung mit folgenden SERVICE Tickets:'.format(count_bb5, days, count_bb5_service))
+            for service_ticket in service_tickets:
+                paragraph = self.document.add_paragraph('')
+                paragraph.add_run("{}".format(service_ticket)).bold = True
+        else:
+            self.document.add_paragraph('Es wurden {} BRANDBOX5 Tickets in den letzten {} Tagen erstellt.'.format(count_bb5, days))
+
     def place_plot(self):
         self.document.add_heading('Aufwände pro Kalender-Woche', level=1)
         plot_path = self.environment.get_path_plot()
