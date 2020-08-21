@@ -37,6 +37,28 @@ class Analyze:
 
         return ticket_count, internal_count, external_count
 
+    def pe_ticket_count(self, for_days=0, year="", week_numbers=""):
+        ticket_count = 0
+        tickets = self.cache.load_cached_tickets()
+        for ticket in tickets:
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            if is_in_range is True:
+                if 'Produktentwicklung' in ticket['Keywords']:
+                    ticket_count += 1
+
+        return ticket_count
+
+    def is_ticket_count(self, for_days=0, year="", week_numbers=""):
+        ticket_count = 0
+        tickets = self.cache.load_cached_tickets()
+        for ticket in tickets:
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            if is_in_range is True:
+                if 'ressourcenplanung' in ticket['Keywords'] or 'ressourcenplanung' in ticket['Keywords']:
+                    ticket_count += 1
+
+        return ticket_count
+
     def bb5_ticket_count(self, for_days=0, year="", week_numbers=""):
         ticket_count = 0
         bb5_tickets = self.cache.load_cached_tickets('BRANDBOX5')
