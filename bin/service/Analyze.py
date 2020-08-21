@@ -37,6 +37,16 @@ class Analyze:
 
         return ticket_count, internal_count, external_count
 
+    def bb5_ticket_count(self, for_days=0, year="", week_numbers=""):
+        ticket_count = 0
+        bb5_tickets = self.cache.load_cached_tickets('BRANDBOX5')
+        for bb5_ticket in bb5_tickets:
+            is_in_range = self.ticket_is_in_range(bb5_ticket, for_days, year, week_numbers)
+            if is_in_range is True:
+                ticket_count += 1
+
+        return ticket_count
+
     def hours_total(self, for_days=0, year="", week_numbers=""):
         total = 0.0
         tickets = self.cache.load_cached_tickets()
@@ -44,6 +54,16 @@ class Analyze:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
             if is_in_range is True and ticket['Time_Spent'] is not None and ticket['Time_Spent'] > 0:
                 total += ticket['Time_Spent'] / 60 / 60
+
+        return total
+
+    def bb5_hours_total(self, for_days=0, year="", week_numbers=""):
+        total = 0.0
+        bb5_tickets = self.cache.load_cached_tickets('BRANDBOX5')
+        for bb5_ticket in bb5_tickets:
+            is_in_range = self.ticket_is_in_range(bb5_ticket, for_days, year, week_numbers)
+            if is_in_range is True and bb5_ticket['Time_Spent'] is not None and bb5_ticket['Time_Spent'] > 0:
+                total += bb5_ticket['Time_Spent'] / 60 / 60
 
         return total
 
