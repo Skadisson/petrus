@@ -57,8 +57,8 @@ class Docx:
         paragraph.add_run("{}:{}".format(bugfix_relation, support_relation)).bold = True
         paragraph.add_run(". Durchschnittliche Bearbeitungszeit pro Ticket war damit ")
         paragraph.add_run("{} Stunden".format(round(average, ndigits=2))).bold = True
-        paragraph.add_run(".")
-        paragraph.add_run(f"Es wurden {pe_ticket_count} Tickets an die Produktentwicklung übertragen, {is_ticket_count} Tickets wurden an Individual Service übergeben.")
+        paragraph.add_run(". ")
+        self.document.add_paragraph(f"Es wurden {pe_ticket_count} Tickets an die Produktentwicklung übertragen, {is_ticket_count} Tickets wurden an Individual Service übergeben.")
 
     @staticmethod
     def months_to_days(months):
