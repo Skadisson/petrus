@@ -16,7 +16,7 @@ class Docx:
         date = datetime.strftime(now, "%Y/%m/%d")
         self.document.add_heading("Support Report {}".format(date), 0)
 
-    def place_stats(self, ticket_count, internal_count, external_count, hours_total, hours_per_type, months, pe_ticket_count, is_ticket_count):
+    def place_stats(self, ticket_count, internal_count, external_count, hours_total, hours_per_type, months, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops):
 
         self.document.add_paragraph("").add_run("Durch Petrus automatisiert erstellt.").italic = True
 
@@ -58,7 +58,7 @@ class Docx:
         paragraph.add_run(". Durchschnittliche Bearbeitungszeit pro Ticket war damit ")
         paragraph.add_run("{} Stunden".format(round(average, ndigits=2))).bold = True
         paragraph.add_run(". ")
-        self.document.add_paragraph(f"Es wurden {pe_ticket_count} Tickets an die Produktentwicklung übertragen, {is_ticket_count} Tickets wurden an Individual Service übergeben.")
+        self.document.add_paragraph(f"Es wurden {pe_ticket_count} Tickets an die Produktentwicklung übertragen, {is_ticket_count} Tickets wurden an Individual Service übergeben. Für {cs_to_qs} Tickets wurden QA Tickets erstellt. Zu {cs_to_devops} Tickets war ein DevOps Ticket erstellt worden.")
 
     @staticmethod
     def months_to_days(months):

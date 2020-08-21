@@ -199,6 +199,7 @@ class Analyze:
 
     def qs_tickets_and_relations(self, for_days=0, year="", week_numbers=""):
         tickets = {}
+        cs_to_qs = 0
         qs_tickets = self.cache.load_cached_tickets('QS')
         for qs_ticket in qs_tickets:
             jira_key = self.cache.load_jira_key_for_id(qs_ticket['ID'])
@@ -211,11 +212,13 @@ class Analyze:
                         related_ticket = self.cache.load_cached_ticket(ticket_id)
                         if related_ticket is not None:
                             tickets[jira_key].append(str(related_ticket['Key']))
+                            cs_to_qs += 1
 
-        return tickets
+        return tickets, cs_to_qs
 
     def devops_tickets_and_relations(self, for_days=0, year="", week_numbers=""):
         tickets = {}
+        cs_to_devops = 0
         devops_tickets = self.cache.load_cached_tickets('DEVOPS')
         for devops_ticket in devops_tickets:
             jira_key = self.cache.load_jira_key_for_id(devops_ticket['ID'])
@@ -228,8 +231,9 @@ class Analyze:
                         related_ticket = self.cache.load_cached_ticket(ticket_id)
                         if related_ticket is not None:
                             tickets[jira_key].append(str(related_ticket['Key']))
+                            cs_to_devops += 1
 
-        return tickets
+        return tickets, cs_to_devops
 
     def bb5_tickets_and_relations(self, for_days=0, year="", week_numbers=""):
         tickets = {}
