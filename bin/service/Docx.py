@@ -153,6 +153,23 @@ class Docx:
         else:
             self.document.add_paragraph('Es wurden {} QS Tickets in den letzten {} Tagen erstellt, keines davon in Verbindung mit SERVICE Tickets.'.format(count_qs, days))
 
+    def place_devops_tickets(self, devops_tickets_and_relations, months):
+        days = self.months_to_days(months)
+        self.document.add_heading('DevOps Tickets', level=1)
+        count_devops = len(devops_tickets_and_relations)
+        count_devops_service = 0
+        service_tickets = []
+        for devops_ticket in devops_tickets_and_relations:
+            if len(devops_tickets_and_relations[devops_ticket]) > 0:
+                count_devops_service += 1
+                service_tickets += devops_tickets_and_relations[devops_ticket]
+        if count_devops_service > 0:
+            self.document.add_paragraph('Es wurden {} DevOps Tickets in den letzten {} Tagen erstellt, {} davon in Verbindung mit folgenden SERVICE Tickets:'.format(count_devops, days, count_devops_service))
+            for service_ticket in service_tickets:
+                paragraph = self.document.add_paragraph('')
+                paragraph.add_run("{}".format(service_ticket)).bold = True
+        else:
+            self.document.add_paragraph('Es wurden {} DevOps Tickets in den letzten {} Tagen erstellt, keines davon in Verbindung mit SERVICE Tickets.'.format(count_devops, days))
 
     def place_plot(self):
         self.document.add_heading('Aufwände pro Kalender-Woche', level=1)
