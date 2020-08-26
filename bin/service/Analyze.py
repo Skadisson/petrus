@@ -1,8 +1,8 @@
 from bin.service import Cache
-from bin.service import SciKitLearn
 from bin.service import Context
 from bin.service import Map
 from bin.service import Environment
+from bin.service import Ranking
 import time
 import datetime
 from collections import Counter
@@ -15,10 +15,10 @@ class Analyze:
 
     def __init__(self):
         self.cache = Cache.Cache()
-        self.sci_kit = SciKitLearn.SciKitLearn()
         self.context = Context.Context()
         self.mapper = Map.Map()
         self.environment = Environment.Environment()
+        self.ranking = Ranking.Ranking()
 
     def ticket_count(self, for_days=0, year="", week_numbers=""):
         ticket_count = 0
@@ -273,7 +273,6 @@ class Analyze:
         normalized_ticket = self.mapper.normalize_ticket(mapped_ticket)
         similar_tickets, hits = self.context.filter_similar_tickets(
             relevancy,
-            cached_tickets,
             mapped_ticket['ID']
         )
         return normalized_ticket, similar_tickets, hits
@@ -466,46 +465,10 @@ class Analyze:
         return ticket_ranks
 
     def rank_ticket(self, ticket):
-        normalized_ticket = self.normalize_ticket_for_ranks(ticket)
-        ticket_score = self.score_ticket(normalized_ticket)
+        return self.score_ticket(ticket)
 
-        return ticket_score
-
-    def score_tickets(self, normalized_tickets):
-        for ticket_id in normalized_tickets:
-            normalized_tickets[ticket_id] = self.score_ticket(normalized_tickets[ticket_id])
-        return normalized_tickets
-
-    @staticmethod
-    def score_ticket(normalized_ticket):
-        scoring = {
-            'comments': 200,
-            'breached': 200,
-            'persons': 125,
-            'relations': 125,
-            'closed': 300,
-            'support': 50
-        }
-        ticket_score = 0
-        if normalized_ticket['comments'] < 10:
-            ticket_score += scoring['comments']
-        if normalized_ticket['breached'] == 0:
-            ticket_score += scoring['breached']
-        if normalized_ticket['persons'] < 3:
-            ticket_score += scoring['persons']
-        if normalized_ticket['relations'] < 2:
-            ticket_score += scoring['relations']
-        if normalized_ticket['closed'] == 1:
-            ticket_score += scoring['closed']
-        if normalized_ticket['support'] == 1:
-            ticket_score += scoring['support']
-
-        return ticket_score
-
-    def normalize_tickets_for_ranks(self, tickets):
-        for ticket_id in tickets:
-            tickets[ticket_id] = self.normalize_ticket_for_ranks(tickets[ticket_id])
-        return tickets
+    def score_ticket(self, ticket):
+        return self.ranking.score_ticket(ticket)
 
     def normalize_ticket_for_ranks(self, ticket):
         closed_count = 0

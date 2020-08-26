@@ -41,7 +41,6 @@ class Estimate:
         normalized_ticket = self.mapper.normalize_ticket(mapped_ticket)
         similar_tickets, hits = self.context.filter_similar_tickets(
             relevancy,
-            cached_tickets,
             mapped_ticket['ID']
         )
         return normalized_ticket, similar_tickets, hits
@@ -52,13 +51,11 @@ class Estimate:
         estimation = None
         hits = None
         normalized_ticket = None
-        ticket_id = None
         days_to_go = None
 
         try:
             if self.jira_key is not None:
                 mapped_ticket = self.retrieve_ticket()
-                ticket_id = mapped_ticket['ID']
                 jira_id = str(mapped_ticket['ID'])
                 self.cache.store_jira_key_and_id(self.jira_key, jira_id)
                 success = self.cache.store_ticket(jira_id, mapped_ticket)
@@ -71,7 +68,7 @@ class Estimate:
                             normalized_ticket,
                             similar_tickets,
                             'Time_Spent',
-                            ['Relevancy', 'Key', 'Priority', 'State_Changes', 'Type', 'Organization']
+                            ['Rank', 'Relevancy', 'Key', 'Priority', 'State_Changes', 'Type', 'Organization']
                         )
                     success = self.sd_api.update_ticket_times(jira_id, estimation, mapped_ticket)
         except Exception as e:

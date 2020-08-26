@@ -1,5 +1,6 @@
 from bin.service import Environment
 from bin.service import RegEx
+from bin.service import Ranking
 import json
 import re
 import time
@@ -12,6 +13,7 @@ class Map:
     def __init__(self):
         self.environment = Environment.Environment()
         self.regex = RegEx.RegEx()
+        self.ranking = Ranking.Ranking()
 
     def get_mapped_ticket(self, ticket_data_json):
         converted_data = {}
@@ -68,6 +70,7 @@ class Map:
             if normalized_value is None:
                 normalized_value = -1
             normalized_ticket[field_name] = normalized_value
+        normalized_ticket['Rank'] = self.ranking.score_ticket(ticket)
         normalized_ticket['Relevancy'] = relevancy_percentage
         if ticket['Time_Spent'] is None:
             normalized_ticket['Time_Spent'] = 0
@@ -99,6 +102,7 @@ class Map:
             for key in keys:
                 if re.match(key, ticket['Key']):
                     normalized_ticket['Key'] = keys[key]
+
         return normalized_ticket
 
     @staticmethod

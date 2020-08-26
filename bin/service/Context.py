@@ -83,7 +83,7 @@ class Context:
             return item['percentage']
         return sorted(relevancy, key=get_key, reverse=True)
 
-    def filter_similar_tickets(self, relevancy, cached_tickets, jira_id):
+    def filter_similar_tickets(self, relevancy, jira_id):
         similar_tickets = []
         for rel_item in relevancy:
             rel_jira_id = str(rel_item['jira_id'])
