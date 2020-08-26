@@ -37,6 +37,34 @@ class Analyze:
 
         return ticket_count, internal_count, external_count
 
+    def top_and_bottom_tickets(self, for_days=0, year="", week_numbers="", top_count=5):
+        ranked_tickets = []
+        tickets = self.cache.load_cached_tickets()
+        for ticket in tickets:
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            concluded = len(ticket['Status']) > 0 and 'type' in ticket['Status'][0] and ticket['Status'][0]['type'] == 'Fertig'
+            actually_needed_effort = 'Time_Spent' in ticket and ticket['Time_Spent'] is not None and ticket['Time_Spent'] > 0
+            if actually_needed_effort is True and is_in_range is True and concluded is True:
+                ranked_ticket = ticket
+                ranked_ticket['Rank'] = self.score_ticket(ticket)
+                ranked_tickets.append(ranked_ticket)
+
+        sorted_ranked_tickets = sorted(ranked_tickets, key=lambda ticket: ticket['Rank'], reverse=True)
+        top_tickets = sorted_ranked_tickets[:top_count]
+        bottom_tickets = sorted_ranked_tickets[-top_count:]
+
+        top_ticket_ranks = {}
+        for top_ticket in top_tickets:
+            if 'Key' in top_ticket and 'Rank' in top_ticket:
+                top_ticket_ranks[top_ticket['Key']] = top_ticket['Rank']
+
+        bottom_ticket_ranks = {}
+        for bottom_ticket in bottom_tickets:
+            if 'Key' in bottom_ticket and 'Rank' in bottom_ticket:
+                bottom_ticket_ranks[bottom_ticket['Key']] = bottom_ticket['Rank']
+
+        return top_ticket_ranks, bottom_ticket_ranks
+
     def pe_ticket_count(self, for_days=0, year="", week_numbers=""):
         ticket_count = 0
         tickets = self.cache.load_cached_tickets()

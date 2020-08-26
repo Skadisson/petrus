@@ -136,6 +136,22 @@ class Docx:
             else:
                 paragraph.add_run(" - n/a")
 
+    def place_top_tickets(self, tickets, months):
+        days = self.months_to_days(months)
+        self.document.add_heading('Abgeschlossene Top Tickets in den letzten {} Tagen'.format(days), level=1)
+        for ticket_key in tickets:
+            paragraph = self.document.add_paragraph('')
+            paragraph.add_run("{}".format(ticket_key)).bold = True
+            paragraph.add_run(" - Punktezahl: {}".format(tickets[ticket_key]))
+
+    def place_bottom_tickets(self, tickets, months):
+        days = self.months_to_days(months)
+        self.document.add_heading('Abeschlossene Worst Tickets in den letzten {} Tagen'.format(days), level=1)
+        for ticket_key in tickets:
+            paragraph = self.document.add_paragraph('')
+            paragraph.add_run("{}".format(ticket_key)).bold = True
+            paragraph.add_run(" - Punktezahl: {}".format(tickets[ticket_key]))
+
     def place_qs_tickets(self, qs_tickets_and_relations, months):
         days = self.months_to_days(months)
         self.document.add_heading('QS Tickets', level=1)
