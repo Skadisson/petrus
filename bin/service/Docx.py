@@ -203,15 +203,13 @@ class Docx:
                 service_tickets += bb5_tickets_and_relations[bb5_ticket]
         if count_bb5_service > 0:
             self.document.add_paragraph('Es wurden {} BRANDBOX5 Tickets in den letzten {} Tagen erstellt, {} davon in Verbindung mit folgenden SERVICE Tickets:'.format(bb5_ticket_count, days, count_bb5_service))
-            if average > 0:
-                self.document.add_paragraph(f"Insgesamt mit einem Aufwand von {bb5_hours_total} Stunden, also durchschnittlich {average} Stunden pro Ticket.")
             for service_ticket in service_tickets:
                 paragraph = self.document.add_paragraph('')
                 paragraph.add_run("{}".format(service_ticket)).bold = True
         else:
             self.document.add_paragraph('Es wurden {} BRANDBOX5 Tickets in den letzten {} Tagen erstellt.'.format(bb5_ticket_count, days))
-            if average > 0:
-                self.document.add_paragraph(f"Insgesamt mit einem Aufwand von {bb5_hours_total} Stunden, also durchschnittlich {average} Stunden pro Ticket.")
+        if average > 0:
+            self.document.add_paragraph(f"Insgesamt mit einem Aufwand von {bb5_hours_total} Stunden, also durchschnittlich {average} Stunden pro Ticket.")
 
     def place_plot(self):
         self.document.add_heading('Aufwände pro Kalender-Woche', level=1)
