@@ -193,7 +193,7 @@ class Docx:
         self.document.add_heading('BRANDBOX5 Tickets', level=1)
         count_bb5_service = 0
         if bb5_ticket_count > 0:
-            average = round(bb5_hours_total/bb5_ticket_count)
+            average = bb5_hours_total/bb5_ticket_count
         else:
             average = 0
         service_tickets = []
