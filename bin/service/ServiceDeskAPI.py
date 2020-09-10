@@ -166,9 +166,9 @@ class ServiceDeskAPI:
 
     def post_ticket_comment(self, jira_id, priority, days_to_go, today=False):
         if today:
-            comment = 'Dies ist eine automatisierte Nachricht. Wir arbeiten im Customer Service in Warteschlangen um auch bei starker Nachfrage zeitgerecht reagieren zu können, hierbei ist die Priorität des Ticket ausschlaggebend. Mit der aktuellen Priorität "{}" wird das Ticket voraussichtlich heute bearbeitet werden. Ist das Thema dringend und Sie hören heute noch nichts von uns, können Sie gern im Ticket noch mal auf die Dringlichkeit hinweisen.'.format(priority)
+            comment = 'Mit der aktuellen Priorität "{}" wird das Ticket voraussichtlich heute bearbeitet werden. - Automatisierte Nachricht von Petrus'.format(priority)
         else:
-            comment = 'Dies ist eine automatisierte Nachricht. Wir arbeiten im Customer Service in Warteschlangen um auch bei starker Nachfrage zeitgerecht reagieren zu können, hierbei ist die Priorität des Ticket ausschlaggebend. Mit der aktuellen Priorität "{}" wird das Ticket voraussichtlich innerhalb von {} Tagen bearbeitet werden. Sollte das Thema allerdings dringender sein, antworten Sie bitte auf diese Nachricht, damit ein Customer Service Mitarbeiter die Priorität des Ticket für Sie erhöhen kann. Ansonsten können Sie diese Nachricht ignorieren.'.format(priority, days_to_go)
+            comment = 'Mit der aktuellen Priorität "{}" wird das Ticket voraussichtlich innerhalb von {} Tagen bearbeitet werden. - Automatisierte Nachricht von Petrus'.format(priority, days_to_go)
         if self.cache.comment_exists(jira_id):
             return True
 
