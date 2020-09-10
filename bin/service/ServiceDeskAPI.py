@@ -168,7 +168,7 @@ class ServiceDeskAPI:
         if today:
             comment = 'Mit der aktuellen Priorität "{}" wird das Ticket voraussichtlich heute bearbeitet werden. - Automatisierte Nachricht von Petrus'.format(priority)
         else:
-            comment = 'Mit der aktuellen Priorität "{}" wird das Ticket voraussichtlich innerhalb von {} Tagen bearbeitet werden. - Automatisierte Nachricht von Petrus'.format(priority, days_to_go)
+            comment = 'Mit der aktuellen Priorität "{}" wird das Ticket voraussichtlich innerhalb der nächsten {} Arbeitstage bearbeitet werden. - Automatisierte Nachricht von Petrus'.format(priority, days_to_go)
         if self.cache.comment_exists(jira_id):
             return True
 
