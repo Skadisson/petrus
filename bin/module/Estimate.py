@@ -106,7 +106,8 @@ class Estimate:
                 elif days_to_go > 14:
                     days_to_go = 14
                 else:
-                    self.sd_api.post_ticket_comment(mapped_ticket['ID'], mapped_ticket['Priority'], days_to_go)
+                    is_today = days_to_go == 0
+                    self.sd_api.post_ticket_comment(mapped_ticket['ID'], mapped_ticket['Priority'], is_today)
 
         ticket_score = self.analyze.rank_ticket(mapped_ticket)
         todays_score = self.cache.add_to_todays_score(self.jira_key, ticket_score)
