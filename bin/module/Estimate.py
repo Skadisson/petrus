@@ -4,6 +4,7 @@ from bin.service import Cache
 from bin.service import Context
 from bin.service import SciKitLearn
 from bin.service import Analyze
+import time
 
 
 class Estimate:
@@ -52,6 +53,7 @@ class Estimate:
         hits = None
         normalized_ticket = None
         days_to_go = None
+        jira_id = None
 
         try:
             if self.jira_key is not None:
@@ -77,9 +79,11 @@ class Estimate:
         if estimation is not None:
             estimation = float(estimation)
 
-        """if normalized_ticket is not None and ticket_id is not None and mapped_ticket is not None:
+        if normalized_ticket is not None and jira_id is not None and mapped_ticket is not None:
             normalized_ticket['Diff'] = 0.0
-            tickets = self.analyze.load_tickets_for_days(30)
+            if normalized_ticket['Created'] > 0:
+                normalized_ticket['Diff'] = round(time.time()) - normalized_ticket['Created']
+            tickets = self.analyze.load_tickets_for_days(10)
             diff_normalized_tickets = []
             normalized_tickets = self.mapper.normalize_tickets(tickets)
             for diff_normalized_ticket in normalized_tickets:
@@ -95,10 +99,14 @@ class Estimate:
             )
             if diff_estimation > 0:
                 days_to_go = int(round(diff_estimation / 60 / 60 / 24))
-                if days_to_go > 14:
+                if 'Diff' in normalized_ticket and 0 < normalized_ticket['Diff']:
+                    days_to_go -= int(round(normalized_ticket['Diff'] / 60 / 60 / 24))
+                if days_to_go < 0:
+                    days_to_go = 0
+                elif days_to_go > 14:
                     days_to_go = 14
                 else:
-                    self.sd_api.post_ticket_comment(mapped_ticket['ID'], mapped_ticket['Priority'], days_to_go)"""
+                    self.sd_api.post_ticket_comment(mapped_ticket['ID'], mapped_ticket['Priority'], days_to_go)
 
         ticket_score = self.analyze.rank_ticket(mapped_ticket)
         todays_score = self.cache.add_to_todays_score(self.jira_key, ticket_score)
