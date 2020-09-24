@@ -87,6 +87,11 @@ class Docx:
             paragraph.add_run("{}".format(system_hours[0])).bold = True
             paragraph.add_run(" - {} Stunden auf {} Tickets".format(round(system_hours[1], ndigits=2), system_ticket_count[system_hours[0]]))
 
+    def place_keywords(self, keywords, months):
+        days = self.months_to_days(months)
+        self.document.add_heading('Top Keywords der letzten {} Tage'.format(days), level=1)
+        self.document.add_paragraph(', '.join(keywords))
+
     def place_type_weight(self, hours_per_version, projects_per_version, months):
         bb_versions = self.environment.get_bb_versions()
         weights = {}
@@ -110,10 +115,11 @@ class Docx:
                             if project not in projects[bb_type]:
                                 projects[bb_type].append(project)
         for bb_type in weights:
-            bb_type_versions = bb_versions[bb_type].split(" ")
-            paragraph = self.document.add_paragraph('')
-            paragraph.add_run("{} ({})".format(bb_type, bb_type_versions[0] + ' - ' + bb_type_versions[-1])).bold = True
-            paragraph.add_run(" - {} Stunden auf {} Projekte".format(weights[bb_type], len(projects[bb_type])))
+            if bb_type in projects:
+                bb_type_versions = bb_versions[bb_type].split(" ")
+                paragraph = self.document.add_paragraph('')
+                paragraph.add_run("{} ({})".format(bb_type, bb_type_versions[0] + ' - ' + bb_type_versions[-1])).bold = True
+                paragraph.add_run(" - {} Stunden auf {} Projekte".format(weights[bb_type], len(projects[bb_type])))
 
     def place_versions(self, hours_per_version, months):
         days = self.months_to_days(months)

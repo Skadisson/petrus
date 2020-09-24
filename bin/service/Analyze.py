@@ -331,6 +331,40 @@ class Analyze:
 
         return problematic_tickets
 
+    def top_keywords(self, for_days=0, year="", week_numbers=""):
+        all_keywords = {}
+        tickets = self.cache.load_cached_tickets()
+        for ticket in tickets:
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            if is_in_range is True:
+                for keyword in ticket['Keywords']:
+                    reg = re.compile('bb[0-9]{2,3}|ressourcenplanung|produktentwicklung', re.IGNORECASE)
+                    if reg.match(str(keyword)):
+                        continue
+                    if keyword not in all_keywords:
+                        all_keywords[keyword] = {'time_spent': 0, 'count': 0}
+                    all_keywords[keyword]['count'] += 1
+                    if ticket['Time_Spent'] is not None:
+                        all_keywords[keyword]['time_spent'] += int(ticket['Time_Spent'])
+
+        keywords = []
+        for keyword in all_keywords:
+            keywords.append({
+                'keyword': keyword,
+                'count': all_keywords[keyword]['count'],
+                'time_spent': all_keywords[keyword]['time_spent']
+            })
+
+        time_sorted_keywords = sorted(keywords, key=lambda keyword: keyword['time_spent'], reverse=True)
+        count_sorted_keywords = sorted(time_sorted_keywords, key=lambda keyword: keyword['count'], reverse=True)
+        top_10_keywords = count_sorted_keywords[:30]
+
+        top_keywords = []
+        for keyword in top_10_keywords:
+            top_keywords.append(keyword['keyword'])
+
+        return top_keywords
+
     @staticmethod
     def sort_tickets(seconds_spent_per_attribute):
         accumulated_hours_spent = {}
