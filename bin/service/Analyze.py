@@ -148,6 +148,7 @@ class Analyze:
         domains = {}
         ticket_count = {}
         system_tickets = {}
+        system_versions = {}
         tickets = self.cache.load_cached_tickets()
         for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
@@ -168,9 +169,18 @@ class Analyze:
                             domains[domain].append(ticket['Time_Spent'])
                             ticket_count[domain] += 1
                         system_tickets[domain][ticket['ID']] = ticket
+                        version = None
+                        for keyword in ticket['Keywords']:
+                            if re.match(r"bb[0-9.]", keyword):
+                                version = keyword
+                        if version is not None:
+                            if domain not in system_versions:
+                                system_versions[domain] = []
+                            if version not in system_versions[domain]:
+                                system_versions[domain].append(version)
 
         systems = self.sort_tickets(domains)
-        return systems, ticket_count, system_tickets
+        return systems, ticket_count, system_tickets, system_versions
 
     def hours_per_type(self, for_days=0, year="", week_numbers=""):
         types = {}
