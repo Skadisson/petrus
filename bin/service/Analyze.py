@@ -243,9 +243,9 @@ class Analyze:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
             if jira_key is not None and is_in_range is True:
                 if len(ticket['Status']) > 0 and 'type' in ticket['Status'][0] and ticket['Status'][0]['type'] in ["Fertig"] \
-                        and ticket['Created'] is not None and ticket['Updated'] is not None:
+                        and ticket['Created'] is not None and ticket['Closed'] is not None:
                     time_created = self.timestamp_from_ticket_time(ticket['Created'])
-                    time_closed = self.timestamp_from_ticket_time(ticket['Updated'])
+                    time_closed = self.timestamp_from_ticket_time(ticket['Closed'])
                     if 0 < time_created < time_closed and time_closed > 0:
                         diff = time_closed - time_created
                         if jira_key not in tickets:

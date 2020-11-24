@@ -22,11 +22,17 @@ class Docx:
 
         lifetime_count = 0
         lifetime_total = 0.0
+        lifetime_max = 0.0
+        max_days_key = ''
         for lifetime in lifetime_per_ticket:
-            lifetime_count += 1
-            lifetime_total += lifetime[1]
+            if lifetime[1] > 0:
+                lifetime_count += 1
+                lifetime_total += lifetime[1]
+                if lifetime[1] > lifetime_max:
+                    lifetime_max = lifetime[1]
+                    max_days_key = lifetime[0]
         if lifetime_count > 0:
-            lifetime_average = round((lifetime_total / lifetime_count) / 24, ndigits=2)
+            lifetime_average = (lifetime_total / lifetime_count)
         else:
             lifetime_average = 0.0
 
@@ -35,6 +41,9 @@ class Docx:
         else:
             average = 0.0
         hours_average = round(average, ndigits=2)
+
+        lifetime_average_days = round(lifetime_average/24, ndigits=2)
+        lifetime_max_days = round(lifetime_max/24, ndigits=2)
 
         support_hours = 0.0
         bugfix_hours = 0.0
@@ -69,9 +78,8 @@ class Docx:
         paragraph.add_run("{}:{}".format(bugfix_relation, support_relation)).bold = True
         paragraph.add_run(". Durchschnittlicher Aufwand pro Ticket war damit ")
         paragraph.add_run("{} Stunden".format(hours_average)).bold = True
-        paragraph.add_run(f", durchschnittliche Dauer zur Lösung ")
-        paragraph.add_run(f"{lifetime_average} Tage").bold = True
-        paragraph.add_run(". ")
+        paragraph.add_run(".")
+        self.document.add_paragraph(f"Die durchschnittliche Wartezeit bis zur Lösung war {lifetime_average_days} Tage, die längste Wartezeit war {lifetime_max_days} Tage in Ticket {max_days_key}.")
         self.document.add_paragraph(f"Es wurden {pe_ticket_count} Tickets an die Produktentwicklung übertragen, {is_ticket_count} Tickets wurden an Individual Service übergeben. Für {cs_to_qs} Tickets wurden QA Tickets erstellt. Zu {cs_to_devops} Tickets war ein DevOps Ticket erstellt worden.")
 
     @staticmethod
