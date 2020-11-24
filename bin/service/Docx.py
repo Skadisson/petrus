@@ -112,12 +112,6 @@ class Docx:
             else:
                 paragraph.add_run(" - {} Stunden auf {} Tickets".format(round(system_hours[1], ndigits=2), system_ticket_count[system_hours[0]]))
 
-    def place_keywords(self, keywords, months):
-        days = self.months_to_days(months)
-        self.document.add_heading('Top Keywords der letzten {} Tage'.format(days), level=1)
-        self.document.add_paragraph('Sortiert nach Anzahl und verbundenen Gesamtaufwänden.')
-        self.document.add_paragraph(', '.join(keywords))
-
     def place_type_weight(self, hours_per_version, projects_per_version, months):
         bb_versions = self.environment.get_bb_versions()
         weights = {}
