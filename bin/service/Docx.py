@@ -103,7 +103,7 @@ class Docx:
     def place_systems(self, hours_per_system, system_ticket_count, system_versions, months):
         days = self.months_to_days(months)
         self.document.add_heading('Systeme', level=1)
-        self.document.add_paragraph('Im folgenden getrackte Aufwände der letzten {} Tage pro System.'.format(days))
+        self.document.add_paragraph('Im folgenden getrackte Aufwände der letzten {} Tage pro System von insgesamt {} Systemen.'.format(days, len(hours_per_system)))
         for system_hours in hours_per_system:
             paragraph = self.document.add_paragraph('')
             paragraph.add_run("{}".format(system_hours[0])).bold = True
