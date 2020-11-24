@@ -89,7 +89,7 @@ class Trend:
         }]
         return items, success
 
-    def output_trend_json(self, ticket_count, internal_count, external_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, top_keywords):
+    def output_trend_json(self, ticket_count, internal_count, external_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks):
 
         trend_file = self.environment.get_path_trend()
         categories = self.environment.get_map_categories()
@@ -134,8 +134,7 @@ class Trend:
             "cs_to_qs": cs_to_qs,
             "cs_to_devops": cs_to_devops,
             "top_5_ticket_ranks": top_5_ticket_ranks,
-            "bottom_5_ticket_ranks": bottom_5_ticket_ranks,
-            'top_keywords': top_keywords
+            "bottom_5_ticket_ranks": bottom_5_ticket_ranks
         }
 
         file = open(trend_file, "w+")
