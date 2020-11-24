@@ -83,7 +83,7 @@ class Estimate:
             normalized_ticket['Diff'] = 0.0
             if normalized_ticket['Created'] > 0:
                 normalized_ticket['Diff'] = round(time.time()) - normalized_ticket['Created']
-            tickets = self.analyze.load_tickets_for_days(10)
+            tickets = self.analyze.load_tickets_for_days(14)
             diff_normalized_tickets = []
             normalized_tickets = self.mapper.normalize_tickets(tickets)
             for diff_normalized_ticket in normalized_tickets:

@@ -16,14 +16,26 @@ class Docx:
         date = datetime.strftime(now, "%Y/%m/%d")
         self.document.add_heading("Support Report {}".format(date), 0)
 
-    def place_stats(self, ticket_count, internal_count, external_count, hours_total, hours_per_type, months, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops):
+    def place_stats(self, ticket_count, internal_count, external_count, hours_total, lifetime_per_ticket, hours_per_type, months, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops):
 
         self.document.add_paragraph("").add_run("Durch Petrus automatisiert erstellt.").italic = True
+
+        lifetime_count = 0
+        lifetime_total = 0.0
+        for lifetime in lifetime_per_ticket:
+            lifetime_count += 1
+            lifetime_total += lifetime[1]
+        if lifetime_count > 0:
+            lifetime_average = round((lifetime_total / lifetime_count) / 24, ndigits=2)
+        else:
+            lifetime_average = 0.0
 
         if ticket_count > 0.0:
             average = hours_total/ticket_count
         else:
             average = 0.0
+        hours_average = round(average, ndigits=2)
+
         support_hours = 0.0
         bugfix_hours = 0.0
         for type_hours in hours_per_type:
@@ -55,8 +67,10 @@ class Docx:
         paragraph.add_run("{} Stunden".format(hours_total)).bold = True
         paragraph.add_run(". Fehler-Support-Verhältnis war ")
         paragraph.add_run("{}:{}".format(bugfix_relation, support_relation)).bold = True
-        paragraph.add_run(". Durchschnittliche Bearbeitungszeit pro Ticket war damit ")
-        paragraph.add_run("{} Stunden".format(round(average, ndigits=2))).bold = True
+        paragraph.add_run(". Durchschnittlicher Aufwand pro Ticket war damit ")
+        paragraph.add_run("{} Stunden".format(hours_average)).bold = True
+        paragraph.add_run(f", durchschnittliche Dauer zur Lösung ")
+        paragraph.add_run(f"{lifetime_average} Tage").bold = True
         paragraph.add_run(". ")
         self.document.add_paragraph(f"Es wurden {pe_ticket_count} Tickets an die Produktentwicklung übertragen, {is_ticket_count} Tickets wurden an Individual Service übergeben. Für {cs_to_qs} Tickets wurden QA Tickets erstellt. Zu {cs_to_devops} Tickets war ein DevOps Ticket erstellt worden.")
 

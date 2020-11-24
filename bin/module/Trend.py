@@ -31,6 +31,7 @@ class Trend:
         is_ticket_count = analyze.is_ticket_count(days, self.year, self.week_numbers)
         bb5_ticket_count = analyze.bb5_ticket_count(days, self.year, self.week_numbers)
         hours_per_ticket = analyze.hours_per_ticket(days, self.year, self.week_numbers)
+        lifetime_per_ticket = analyze.lifetime_per_ticket(days, self.year, self.week_numbers)
         top_5_ticket_ranks, bottom_5_ticket_ranks = analyze.top_and_bottom_tickets(days, self.year, self.week_numbers)
         qs_tickets_and_relations, cs_to_qs = analyze.qs_tickets_and_relations(days, self.year, self.week_numbers)
         devops_tickets_and_relations, cs_to_devops = analyze.devops_tickets_and_relations(days, self.year, self.week_numbers)
@@ -38,7 +39,7 @@ class Trend:
         problematic_tickets = analyze.problematic_tickets(days, self.year, self.week_numbers)
         top_keywords = analyze.top_keywords(days, self.year, self.week_numbers)
         self.output_trend_json(ticket_count, internal_count, external_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, top_keywords)
-        return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, top_keywords
+        return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, top_keywords
 
     def run(self):
         success = True
@@ -51,6 +52,7 @@ class Trend:
         hours_per_type = None
         hours_per_version = None
         hours_per_ticket = None
+        lifetime_per_ticket = None
         docx_path = None
         projects_per_version = None
         internal_count = None
@@ -60,9 +62,9 @@ class Trend:
         system_versions = None
 
         try:
-            hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, top_keywords = \
+            hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, top_keywords = \
                 self.analyze_trend()
-            docx_path = self.output_docx(hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, top_keywords)
+            docx_path = self.output_docx(hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, top_keywords)
         except Exception as e:
             self.cache.add_log_entry(self.__class__.__name__, e)
             success = False
@@ -80,6 +82,7 @@ class Trend:
             'hours_per_version': hours_per_version,
             'projects_per_version': projects_per_version,
             'hours_per_ticket': hours_per_ticket,
+            'lifetime_per_ticket': lifetime_per_ticket,
             'docx_path': docx_path,
             'project_scores': project_scores,
             "system_versions": system_versions,
@@ -154,10 +157,10 @@ class Trend:
         json.dump(obj=word_cloud_output, fp=file)
         file.close()
 
-    def output_docx(self, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, top_keywords):
+    def output_docx(self, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, top_keywords):
         docx_generator = Docx.Docx()
         docx_generator.place_headline()
-        docx_generator.place_stats(ticket_count, internal_count, external_count, hours_total, hours_per_type, self.months, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops)
+        docx_generator.place_stats(ticket_count, internal_count, external_count, hours_total, lifetime_per_ticket, hours_per_type, self.months, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops)
         docx_generator.place_keywords(top_keywords, self.months)
         docx_generator.place_type_weight(hours_per_version, projects_per_version, self.months)
         docx_generator.place_versions(hours_per_version, self.months)

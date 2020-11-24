@@ -138,7 +138,7 @@ class Analyze:
                         ticket_count[project_name] += 1
                     project_tickets[project_name][ticket['ID']] = ticket
 
-        projects = self.sort_tickets(projects)
+        projects = self.sort_tickets_and_seconds_to_hours(projects)
         return projects, ticket_count, project_tickets
 
     def hours_per_system(self, for_days=0, year="", week_numbers=""):
@@ -179,7 +179,7 @@ class Analyze:
                             if version not in system_versions[domain]:
                                 system_versions[domain].append(version)
 
-        systems = self.sort_tickets(domains)
+        systems = self.sort_tickets_and_seconds_to_hours(domains)
         return systems, ticket_count, system_tickets, system_versions
 
     def hours_per_type(self, for_days=0, year="", week_numbers=""):
@@ -193,7 +193,7 @@ class Analyze:
                 if ticket['Time_Spent'] is not None:
                     types[ticket['Type']].append(ticket['Time_Spent'])
 
-        types = self.sort_tickets(types)
+        types = self.sort_tickets_and_seconds_to_hours(types)
         return types
 
     def hours_per_version(self, for_days=0, year="", week_numbers=""):
@@ -217,7 +217,7 @@ class Analyze:
                         if ticket['Project'] is not None and ticket['Project'] not in projects[version]:
                             projects[version].append(ticket['Project'])
 
-        versions = self.sort_tickets(versions)
+        versions = self.sort_tickets_and_seconds_to_hours(versions)
         return versions, projects
 
     def hours_per_ticket(self, for_days=0, year="", week_numbers=""):
@@ -232,7 +232,27 @@ class Analyze:
                 if ticket['Time_Spent'] is not None:
                     tickets[jira_key].append(ticket['Time_Spent'])
 
-        tickets = self.sort_tickets(tickets)
+        tickets = self.sort_tickets_and_seconds_to_hours(tickets)
+        return tickets
+
+    def lifetime_per_ticket(self, for_days=0, year="", week_numbers=""):
+        tickets = {}
+        stored_tickets = self.cache.load_cached_tickets()
+        for ticket in stored_tickets:
+            jira_key = self.cache.load_jira_key_for_id(ticket['ID'])
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            if jira_key is not None and is_in_range is True:
+                if len(ticket['Status']) > 0 and 'type' in ticket['Status'][0] and ticket['Status'][0]['type'] in ["Fertig"] \
+                        and ticket['Created'] is not None and ticket['Updated'] is not None:
+                    time_created = self.timestamp_from_ticket_time(ticket['Created'])
+                    time_closed = self.timestamp_from_ticket_time(ticket['Updated'])
+                    if 0 < time_created < time_closed and time_closed > 0:
+                        diff = time_closed - time_created
+                        if jira_key not in tickets:
+                            tickets[jira_key] = []
+                        tickets[jira_key].append(diff)
+
+        tickets = self.sort_tickets_and_seconds_to_hours(tickets)
         return tickets
 
     def qs_tickets_and_relations(self, for_days=0, year="", week_numbers=""):
@@ -323,7 +343,7 @@ class Analyze:
             if is_in_range is True:
                 problematic_tickets = self.add_to_problematic_tickets(ticket, problematic_tickets)
 
-        problematic_tickets = self.sort_tickets(problematic_tickets)
+        problematic_tickets = self.sort_tickets_and_seconds_to_hours(problematic_tickets)
         return problematic_tickets
 
     def add_to_problematic_tickets(self, ticket, problematic_tickets):
@@ -376,7 +396,7 @@ class Analyze:
         return top_keywords
 
     @staticmethod
-    def sort_tickets(seconds_spent_per_attribute):
+    def sort_tickets_and_seconds_to_hours(seconds_spent_per_attribute):
         accumulated_hours_spent = {}
         for attribute in seconds_spent_per_attribute:
             accumulated_hours_spent[attribute] = 0
