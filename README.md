@@ -18,7 +18,7 @@ ___
 pip list -l
 <pre>
 Package         Version
---------------- ------------
+--------------- -----------
 certifi         2019.11.28
 colorclass      2.2.0
 cycler          0.10.0
@@ -39,14 +39,15 @@ python-dateutil 2.8.1
 python-docx     0.8.10
 pytz            2019.3
 PyYAML          5.3
-scikit-learn    0.22.2.post1
-scipy           1.4.1
-setuptools      46.0.0
-six             1.14.0
+scikit-learn    0.23.1
+scipy           1.5.0
+setuptools      47.3.1
+six             1.15.0
 sklearn         0.0
 terminaltables  3.1.0
+threadpoolctl   2.1.0
 tlslite         0.4.9
-Werkzeug        1.0.0
+Werkzeug        1.0.1
 wheel           0.34.2
 wincertstore    0.2
 </pre>
