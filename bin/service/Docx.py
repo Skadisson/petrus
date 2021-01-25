@@ -2,6 +2,7 @@ from docx import Document
 from docx.shared import Inches
 from datetime import datetime
 from bin.service import Environment
+import matplotlib.pyplot as plt
 
 
 class Docx:
@@ -237,10 +238,48 @@ class Docx:
         if average > 0:
             self.document.add_paragraph(f"Insgesamt mit einem Aufwand von {bb5_hours_total} Stunden, also durchschnittlich {average} Stunden pro Ticket.")
 
-    def place_plot(self):
-        self.document.add_heading('Aufwände pro Kalender-Woche', level=1)
+    def place_plot(self, plot_data):
         plot_path = self.environment.get_path_plot()
-        self.document.add_picture(plot_path, width=Inches(6))
+        i = 1
+        for axis in plot_data:
+            sub_plot_path = str(plot_path).replace('plot', f"plot_{i}")
+
+            axis_data = plot_data[axis]
+            two_axis = axis.split('/')
+            x_axis = two_axis[1]
+            y_axis = two_axis[0]
+
+            x_values = []
+            y_values = []
+
+            for x_value in axis_data:
+                y_values.append(axis_data[x_value])
+                if x_axis == 'day':
+                    x_value = str(x_value)
+                    x_value = str(f"{x_value[6]}{x_value[7]}.")
+                elif x_axis == 'priority':
+                    priorities = ["Unwesentlich", "Blocker", "Lowest", "low", "Medium", "High", "Highest"]
+                    x_value = priorities[(x_value+1)]
+                x_values.append(x_value)
+
+            plt.figure(i)
+            plt.bar(x_values, y_values)
+            plt.xlabel(x_axis)
+            plt.ylabel(y_axis)
+            plt.grid(True)
+            plt.savefig(sub_plot_path)
+
+            headline = axis
+            if axis == "new tickets/day":
+                headline = "Neue Tickets am Tag"
+            elif axis == "closed tickets/day":
+                headline = "Geschlossene Tickets am Tag"
+            elif axis == "average days/priority":
+                headline = "Durchschnittliche Tage Wartezeit pro Priorität"
+            self.document.add_heading(headline, level=1)
+            self.document.add_picture(sub_plot_path, width=Inches(6))
+
+            i += 1
 
     def save(self):
         path = 'temp/trend.docx'

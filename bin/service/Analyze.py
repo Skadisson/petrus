@@ -6,8 +6,10 @@ from bin.service import Ranking
 import time
 import datetime
 from collections import Counter
+import collections
 import re
 import numpy
+import matplotlib.pyplot as plt
 
 
 class Analyze:
@@ -345,6 +347,50 @@ class Analyze:
 
         problematic_tickets = self.sort_tickets_and_seconds_to_hours(problematic_tickets)
         return problematic_tickets
+
+    def plot_data(self, for_days=0, year="", week_numbers=""):
+        tickets = self.cache.load_cached_tickets()
+        relevant_tickets = []
+        for ticket in tickets:
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            if is_in_range is True:
+                ticket = self.mapper.normalize_ticket(ticket)
+                relevant_tickets.append(ticket)
+
+        new_tickets_per_day = {}
+        for ticket in relevant_tickets:
+            date = int(datetime.datetime.fromtimestamp(ticket['Created']).strftime("%Y%m%d"))
+            if date in new_tickets_per_day:
+                new_tickets_per_day[date] += 1
+            else:
+                new_tickets_per_day[date] = 1
+
+        closed_tickets_per_day = {}
+        for ticket in relevant_tickets:
+            date = int(datetime.datetime.fromtimestamp(ticket['Closed']).strftime("%Y%m%d"))
+            if date in closed_tickets_per_day:
+                closed_tickets_per_day[date] += 1
+            else:
+                closed_tickets_per_day[date] = 1
+
+        wait_per_priority = {}
+        for ticket in relevant_tickets:
+            priority = ticket['Priority']
+            if priority not in wait_per_priority:
+                wait_per_priority[priority] = []
+            if ticket['Created'] > 0 and ticket['Closed'] > 0:
+                wait_per_priority[priority].append((ticket['Closed'] - ticket['Created']) / 60 / 60 / 24)
+        time_per_priority = {}
+        for priority in wait_per_priority:
+            time_per_priority[priority] = numpy.average(wait_per_priority[priority])
+
+        plot_data = {
+            "new tickets/day": collections.OrderedDict(sorted(new_tickets_per_day.items())),
+            "closed tickets/day": collections.OrderedDict(sorted(closed_tickets_per_day.items())),
+            "average days/priority": collections.OrderedDict(sorted(time_per_priority.items()))
+        }
+
+        return plot_data
 
     def add_to_problematic_tickets(self, ticket, problematic_tickets):
         jira_key = self.cache.load_jira_key_for_id(ticket['ID'])
