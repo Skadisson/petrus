@@ -258,7 +258,7 @@ class Docx:
                     x_value = str(x_value)
                     x_value = str(f"{x_value[6]}{x_value[7]}.")
                 elif x_axis == 'priority':
-                    priorities = ["Unwesentlich", "Blocker", "Lowest", "low", "Medium", "High", "Highest"]
+                    priorities = ["Unwesentlich", "Blocker", "Lowest", "Low", "Medium", "High", "Highest"]
                     x_value = priorities[(x_value+1)]
                 x_values.append(x_value)
 
