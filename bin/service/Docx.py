@@ -1,8 +1,10 @@
 from docx import Document
 from docx.shared import Inches
+from docx.enum.text import WD_BREAK
 from datetime import datetime
 from bin.service import Environment
 import matplotlib.pyplot as plt
+import numpy
 
 
 class Docx:
@@ -46,24 +48,9 @@ class Docx:
         lifetime_average_days = round(lifetime_average/24, ndigits=2)
         lifetime_max_days = round(lifetime_max/24, ndigits=2)
 
-        support_hours = 0.0
-        bugfix_hours = 0.0
-        for type_hours in hours_per_type:
-            type = type_hours[0]
-            hours = type_hours[1]
-            if type in ['Fehler', 'Bug', 'Maintenance']:
-                bugfix_hours += hours
-            else:
-                support_hours += hours
-        hours_sum = support_hours + bugfix_hours
-        hours_total = round(hours_total)
-        if hours_sum > 0.0:
-            support_relation = round((support_hours / hours_sum) * 100)
-            bugfix_relation = round((bugfix_hours / hours_sum) * 100)
-        else:
-            support_relation = 50
-            bugfix_relation = 50
+        support_relation, bugfix_relation = self.calculate_type_relation(hours_per_type)
 
+        hours_total = round(hours_total)
         days = self.months_to_days(months)
         paragraph = self.document.add_paragraph("In den letzten ")
         paragraph.add_run("{} Tagen".format(days)).bold = True
@@ -238,9 +225,52 @@ class Docx:
         if average > 0:
             self.document.add_paragraph(f"Insgesamt mit einem Aufwand von {bb5_hours_total} Stunden, also durchschnittlich {average} Stunden pro Ticket.")
 
+    @staticmethod
+    def calculate_type_relation(hours_per_type):
+
+        support_hours = 0.0
+        bugfix_hours = 0.0
+        for type_hours in hours_per_type:
+            type = type_hours[0]
+            hours = type_hours[1]
+            if type in ['Fehler', 'Bug', 'Maintenance']:
+                bugfix_hours += hours
+            else:
+                support_hours += hours
+        hours_sum = support_hours + bugfix_hours
+        if hours_sum > 0.0:
+            support_relation = round((support_hours / hours_sum) * 100)
+            bugfix_relation = round((bugfix_hours / hours_sum) * 100)
+        else:
+            support_relation = 50
+            bugfix_relation = 50
+
+        return support_relation, bugfix_relation
+
+    def place_pie_chart(self, hours_per_type):
+
+        support_relation, bugfix_relation = self.calculate_type_relation(hours_per_type)
+
+        values = [support_relation, bugfix_relation]
+        labels = [f"Support [{support_relation}%]", f"Fehler [{bugfix_relation}%]"]
+
+        plot_path = self.environment.get_path_plot()
+        sub_plot_path = str(plot_path).replace('plot', f"plot_1")
+
+        plt.figure(1)
+        plt.pie(values, labels=labels, colors=['#16BAE7', '#FD5A2F'])
+        plt.savefig(sub_plot_path)
+
+        self.document.add_picture(sub_plot_path, width=Inches(6))
+
+    def place_page_break(self):
+        paragraph = self.document.add_paragraph()
+        run = paragraph.add_run()
+        run.add_break(WD_BREAK.PAGE)
+
     def place_plot(self, plot_data):
         plot_path = self.environment.get_path_plot()
-        i = 1
+        i = 2
         for axis in plot_data:
             sub_plot_path = str(plot_path).replace('plot', f"plot_{i}")
 
@@ -262,8 +292,15 @@ class Docx:
                     x_value = priorities[(x_value+1)]
                 x_values.append(x_value)
 
+            y_avg = []
+            if len(y_values) > 0:
+                average_y = numpy.average(y_values)
+                y_avg = [average_y]*len(x_values)
+
             plt.figure(i)
-            plt.bar(x_values, y_values)
+            plt.bar(x_values, y_values, color=(['#16BAE7']*len(y_values)))
+            if len(y_avg) > 0:
+                plt.plot(x_values, y_avg, color='#FD5A2F')
             plt.xlabel(x_axis)
             plt.ylabel(y_axis)
             plt.grid(True)
