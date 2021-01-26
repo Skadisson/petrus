@@ -359,19 +359,21 @@ class Analyze:
 
         new_tickets_per_day = {}
         for ticket in relevant_tickets:
-            date = int(datetime.datetime.fromtimestamp(ticket['Created']).strftime("%Y%m%d"))
-            if date in new_tickets_per_day:
-                new_tickets_per_day[date] += 1
-            else:
-                new_tickets_per_day[date] = 1
+            if ticket['Created'] != '':
+                date = int(datetime.datetime.fromtimestamp(ticket['Created']).strftime("%Y%m%d"))
+                if date in new_tickets_per_day:
+                    new_tickets_per_day[date] += 1
+                else:
+                    new_tickets_per_day[date] = 1
 
         closed_tickets_per_day = {}
         for ticket in relevant_tickets:
-            date = int(datetime.datetime.fromtimestamp(ticket['Closed']).strftime("%Y%m%d"))
-            if date in closed_tickets_per_day:
-                closed_tickets_per_day[date] += 1
-            else:
-                closed_tickets_per_day[date] = 1
+            if ticket['Closed'] != '':
+                date = int(datetime.datetime.fromtimestamp(ticket['Closed']).strftime("%Y%m%d"))
+                if date in closed_tickets_per_day:
+                    closed_tickets_per_day[date] += 1
+                else:
+                    closed_tickets_per_day[date] = 1
 
         wait_per_priority = {}
         for ticket in relevant_tickets:
