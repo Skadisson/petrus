@@ -22,7 +22,7 @@ class Docx:
     def place_stats(self, ticket_count, internal_count, external_count, hours_total, lifetime_per_ticket, hours_per_type, months, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops):
 
         self.document.add_paragraph("").add_run("Durch Petrus automatisiert erstellt.").italic = True
-        self.document.add_paragraph("").add_run("Petrus kennt und berechnet keine personen bezogenen Daten, alle angegebenen Rechnungen und Werte betreffen den gesamten Service Desk, das heißt reine CS-Tickets so wie auch auf Produkt- oder Projekt-Bord gesyncte Tickets.").italic = True
+        self.document.add_paragraph("").add_run("Petrus kennt und berechnet keine personen bezogenen Daten, alle angegebenen Rechnungen und Werte betreffen den gesamten Service Desk, das heißt reine CS-Tickets so wie auch auf Produkt-, QS-, DevOps- oder Projekt-Bords gesyncte Tickets.").italic = True
 
         lifetime_count = 0
         lifetime_total = 0.0
