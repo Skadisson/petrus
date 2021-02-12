@@ -13,6 +13,7 @@ class Docx:
     def __init__(self):
         self.document = Document()
         self.environment = Environment.Environment()
+        self.figure_number = 1
 
     def place_headline(self):
         now = datetime.now()
@@ -129,6 +130,7 @@ class Docx:
                 paragraph = self.document.add_paragraph('')
                 paragraph.add_run("{} ({})".format(bb_type, bb_type_versions[0] + ' - ' + bb_type_versions[-1])).bold = True
                 paragraph.add_run(" - {} Stunden auf {} Projekte".format(weights[bb_type], len(projects[bb_type])))
+        self.place_pie_chart(list(weights.values()), list(weights.keys()))
 
     def place_versions(self, hours_per_version, months):
         days = self.months_to_days(months)
@@ -248,18 +250,22 @@ class Docx:
 
         return support_relation, bugfix_relation
 
-    def place_pie_chart(self, hours_per_type):
+    def place_type_pie_chart(self, hours_per_type):
 
         support_relation, bugfix_relation = self.calculate_type_relation(hours_per_type)
 
         values = [support_relation, bugfix_relation]
         labels = [f"Support [{support_relation}%]", f"Fehler [{bugfix_relation}%]"]
+        self.place_pie_chart(values, labels)
+
+    def place_pie_chart(self, values, labels):
 
         plot_path = self.environment.get_path_plot()
-        sub_plot_path = str(plot_path).replace('plot', f"plot_1")
+        sub_plot_path = str(plot_path).replace('plot', f"pie_plot_{self.figure_number}")
 
-        plt.figure(1)
-        plt.pie(values, labels=labels, colors=['#16BAE7', '#FD5A2F'])
+        plt.figure(self.figure_number)
+        self.figure_number += 1
+        plt.pie(values, labels=labels, colors=['#00FFAE', '#FD5A2F', '#16BAE7'])
         plt.savefig(sub_plot_path)
 
         self.document.add_picture(sub_plot_path, width=Inches(6))
@@ -271,9 +277,8 @@ class Docx:
 
     def place_plot(self, plot_data):
         plot_path = self.environment.get_path_plot()
-        i = 2
         for axis in plot_data:
-            sub_plot_path = str(plot_path).replace('plot', f"plot_{i}")
+            sub_plot_path = str(plot_path).replace('plot', f"axis_plot_{self.figure_number}")
 
             axis_data = plot_data[axis]
             two_axis = axis.split('/')
@@ -298,7 +303,8 @@ class Docx:
                 average_y = numpy.average(y_values)
                 y_avg = [average_y]*len(x_values)
 
-            plt.figure(i)
+            plt.figure(self.figure_number)
+            self.figure_number += 1
             plt.bar(x_values, y_values, color=(['#16BAE7']*len(y_values)))
             if len(y_avg) > 0:
                 plt.plot(x_values, y_avg, color='#FD5A2F')
@@ -316,8 +322,6 @@ class Docx:
                 headline = "Durchschnittliche Lebensdauer pro Priorität"
             self.document.add_heading(headline, level=1)
             self.document.add_picture(sub_plot_path, width=Inches(5))
-
-            i += 1
 
     def save(self):
         path = 'temp/trend.docx'
