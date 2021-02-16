@@ -130,7 +130,11 @@ class Docx:
                 paragraph = self.document.add_paragraph('')
                 paragraph.add_run("{} ({})".format(bb_type, bb_type_versions[0] + ' - ' + bb_type_versions[-1])).bold = True
                 paragraph.add_run(" - {} Stunden auf {} Projekte".format(weights[bb_type], len(projects[bb_type])))
-        self.place_pie_chart(list(weights.values()), list(weights.keys()))
+        total = sum(list(weights.values()))
+        labels = []
+        for label in list(weights.keys()):
+            labels.append(f"{label} [{str(round((weights[label] / total) * 100))}%]")
+        self.place_pie_chart(list(weights.values()), labels)
 
     def place_versions(self, hours_per_version, months):
         days = self.months_to_days(months)
