@@ -384,7 +384,8 @@ class Analyze:
                 wait_per_priority[priority].append((ticket['Closed'] - ticket['Created']) / 60 / 60 / 24)
         time_per_priority = {}
         for priority in wait_per_priority:
-            time_per_priority[priority] = numpy.average(wait_per_priority[priority])
+            if len(wait_per_priority[priority]) > 0:
+                time_per_priority[priority] = numpy.average(wait_per_priority[priority])
 
         plot_data = {
             "new tickets/day": collections.OrderedDict(sorted(new_tickets_per_day.items())),
