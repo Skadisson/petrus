@@ -381,7 +381,9 @@ class Analyze:
             if priority not in wait_per_priority:
                 wait_per_priority[priority] = []
             if ticket['Created'] > 0 and ticket['Closed'] > 0:
-                wait_per_priority[priority].append((ticket['Closed'] - ticket['Created']) / 60 / 60 / 24)
+                days = (ticket['Closed'] - ticket['Created']) / 60 / 60 / 24
+                if ticket['Time_Spent'] is not None and ticket['Time_Spent'] > 0:
+                    wait_per_priority[priority].append(days)
         time_per_priority = {}
         for priority in wait_per_priority:
             if len(wait_per_priority[priority]) > 0:
