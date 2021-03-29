@@ -309,9 +309,29 @@ class Docx:
 
             plt.figure(self.figure_number)
             self.figure_number += 1
+                
             plt.bar(x_values, y_values, color=(['#16BAE7']*len(y_values)))
             if len(y_avg) > 0:
                 plt.plot(x_values, y_avg, color='#FD5A2F')
+
+            if axis == "average days/priority":
+                y_bonus = []
+                for priority in x_values:
+                    target_days = 7
+                    if priority in ["Unwesentlich", "Blocker", "Lowest"]:
+                        target_days = 30
+                    elif priority in ["Low"]:
+                        target_days = 21
+                    elif priority in ["Medium"]:
+                        target_days = 7
+                    elif priority in ["High"]:
+                        target_days = 2
+                    elif priority in ["Highest"]:
+                        target_days = 1
+                    y_bonus.append(target_days)
+                plt.ylim(0, 14)
+                plt.bar(x_values, y_bonus, color='#00FFAE', alpha=.5)
+
             plt.xlabel(x_axis)
             plt.ylabel(y_axis)
             plt.grid(True)
