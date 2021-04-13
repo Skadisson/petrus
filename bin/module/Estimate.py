@@ -111,10 +111,13 @@ class Estimate:
 
         ticket_score = self.analyze.rank_ticket(mapped_ticket)
         todays_score = self.cache.add_to_todays_score(self.jira_key, ticket_score)
+        top_month_score, monthly_score = self.cache.get_monthly_top_score()
         highest_day, highest_score = self.cache.get_high_score()
         score = {
             'ticket': str(ticket_score),
             'today': str(todays_score),
+            'monthly_score': monthly_score,
+            'top_month_score': top_month_score,
             'highest_score': str(highest_score),
             'highest_day': str(highest_day)
         }

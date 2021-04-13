@@ -139,7 +139,15 @@ PS = (function(window, document, $) {
                         var diff = parseInt(new_score) - parseInt($('#score').text());
                         var high_score = result.items[0].score.highest_score;
                         var highest_day = result.items[0].score.highest_day;
+                        var monthly_score = result.items[0].score.monthly_score;
+                        var top_month_score = result.items[0].score.top_month_score;
                         var is_positive = diff > 0;
+                        for(var calendar_month in monthly_score) {
+                            var month_score = monthly_score[calendar_month];
+                            var month_relation = month_score / top_month_score;
+                            var image_height = parseInt(50 * month_relation);
+                            $('#monthly-scores').prepend('<div class="score"><img width="3" height="' + image_height + '" /><p>' + calendar_month + ':' + month_score + '</p></div>');
+                        }
                         $('#scored').text((is_positive ? "+" : "") + ("" + diff + "").padStart(4, '0'));
                         if(diff != 0) {
                             if(is_positive) {

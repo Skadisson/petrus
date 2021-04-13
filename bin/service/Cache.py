@@ -230,6 +230,20 @@ class Cache:
                 highest_day = score['day']
         return highest_day, highest_score
 
+    def get_monthly_top_score(self):
+        monthly_score = {}
+
+        all_scores = self.table_score.find()
+        for score in all_scores:
+            month = score['day'][0:6]
+            day_score = self.calculate_score(score)
+            if month not in monthly_score:
+                monthly_score[month] = int(day_score)
+            else:
+                monthly_score[month] += int(day_score)
+
+        return max(monthly_score), monthly_score
+
     def comment_exists(self, jira_id):
         comment = self.table_comments.find_one({'jira_id': jira_id})
         return comment is not None

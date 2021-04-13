@@ -350,3 +350,29 @@ body.dark #image-copyright {
     color:beige;
     padding:5px 10px;
 }
+#monthly-scores {
+    display:block;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100px;
+    background-color:rgba(0,0,0,0.3);
+    overflow:hidden;
+    opacity:0.5;
+}
+#monthly-scores:hover {
+    opacity:1;
+}
+#monthly-scores .score {
+    width: 160px;
+    overflow: hidden;
+    display: block;
+    float: left;
+    position: relative;
+    height: 100%;
+    text-align: center;
+}
+#monthly-scores img {
+    background-color:#FCF7E0;
+}
