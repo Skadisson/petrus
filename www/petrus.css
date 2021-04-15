@@ -370,7 +370,7 @@ body.dark #image-copyright {
     display: block;
     float: left;
     position: relative;
-    height: 100%;
+    height: 110px;
     text-align: center;
 }
 #monthly-scores img {
