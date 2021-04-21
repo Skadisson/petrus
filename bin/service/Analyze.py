@@ -241,6 +241,8 @@ class Analyze:
         tickets = {}
         stored_tickets = self.cache.load_cached_tickets()
         for ticket in stored_tickets:
+            if 'Versions' in ticket and len(ticket['Versions']) > 0:
+                continue
             jira_key = self.cache.load_jira_key_for_id(ticket['ID'])
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
             if jira_key is not None and is_in_range is True:
@@ -378,6 +380,8 @@ class Analyze:
         wait_per_priority = {}
         for ticket in relevant_tickets:
             priority = ticket['Priority']
+            if 'Versions' in ticket and len(ticket['Versions']) > 0:
+                continue
             if priority not in wait_per_priority:
                 wait_per_priority[priority] = []
             if ticket['Created'] > 0 and ticket['Closed'] > 0:

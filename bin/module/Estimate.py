@@ -34,6 +34,7 @@ class Estimate:
         mapped_ticket = self.mapper.format_text(mapped_ticket)
         mapped_ticket = self.mapper.format_reporter(mapped_ticket)
         mapped_ticket = self.mapper.add_persons(mapped_ticket, (worklog_persons + comment_persons))
+        mapped_ticket = self.mapper.format_versions(mapped_ticket)
         return mapped_ticket
 
     def format_tickets(self, mapped_ticket):
@@ -87,16 +88,20 @@ class Estimate:
             diff_normalized_tickets = []
             normalized_tickets = self.mapper.normalize_tickets(tickets)
             for diff_normalized_ticket in normalized_tickets:
+                if 'Versions' in diff_normalized_ticket and len(diff_normalized_ticket['Versions']) == 0:
+                    continue
                 if diff_normalized_ticket['Created'] > 0 and diff_normalized_ticket['Closed'] > 0:
                     diff_normalized_ticket['Diff'] = diff_normalized_ticket['Closed'] - diff_normalized_ticket['Created']
                     if diff_normalized_ticket['Diff'] > 0:
                         diff_normalized_tickets.append(diff_normalized_ticket)
-            diff_estimation = self.sci_kit.estimate(
-                normalized_ticket,
-                diff_normalized_tickets,
-                'Diff',
-                ['Priority', 'Organization']
-            )
+            diff_estimation = 0
+            if len(diff_normalized_tickets) > 0:
+                diff_estimation = self.sci_kit.estimate(
+                    normalized_ticket,
+                    diff_normalized_tickets,
+                    'Diff',
+                    ['Priority', 'Organization']
+                )
             if diff_estimation > 0:
                 days_to_go = int(round(diff_estimation / 60 / 60 / 24))
                 if 'Diff' in normalized_ticket and 0 < normalized_ticket['Diff']:

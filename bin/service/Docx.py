@@ -343,7 +343,7 @@ class Docx:
             elif axis == "closed tickets/day":
                 headline = "Geschlossene Tickets am Tag"
             elif axis == "average days/priority":
-                headline = "Durchschnittliche Lebensdauer pro Priorität"
+                headline = "Durchschnittliche Lebensdauer pro Priorität\nfür nicht versionierte Tickets"
             self.document.add_heading(headline, level=1)
             self.document.add_picture(sub_plot_path, width=Inches(5))
 

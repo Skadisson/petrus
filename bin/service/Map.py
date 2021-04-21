@@ -205,6 +205,15 @@ class Map:
         return mapped_ticket
 
     @staticmethod
+    def format_versions(mapped_ticket):
+        formatted_versions = []
+        for ticket_version in mapped_ticket['Versions']:
+            if 'name' in ticket_version:
+                formatted_versions.append(ticket_version['name'])
+        mapped_ticket['Versions'] = formatted_versions
+        return mapped_ticket
+
+    @staticmethod
     def add_persons(mapped_ticket, persons):
         unique_persons = list(dict.fromkeys(persons))
         mapped_ticket['Persons'] = len(unique_persons)
