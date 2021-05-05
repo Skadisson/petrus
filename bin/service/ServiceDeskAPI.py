@@ -173,7 +173,7 @@ class ServiceDeskAPI:
             comment += f" innerhalb der nächsten {days_to_go} Arbeitstage bearbeitet werden."
         if estimation > 0:
             hours = estimation / 60 / 60
-            comment += f" In der Vergangenheit dauerte die aktive Bearbeitung ähnlicher Tickets {hours} Stunden."
+            comment += f" In der Vergangenheit dauerte die aktive Bearbeitung ähnlicher Tickets in etwa {hours} Stunden."
         if similar_jira_keys is not None and len(similar_jira_keys) > 0:
             comment += f" Ähnliche Tickets könnten sein: {(', '.join(similar_jira_keys))}."
         comment += f" - Automatisierte Nachricht von Petrus"
