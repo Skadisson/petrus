@@ -39,13 +39,13 @@ class Estimate:
 
     def format_tickets(self, mapped_ticket):
         cached_tickets = self.cache.load_cached_tickets()
-        relevancy = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket)
+        relevancy, similar_jira_keys = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket)
         normalized_ticket = self.mapper.normalize_ticket(mapped_ticket)
         similar_tickets, hits = self.context.filter_similar_tickets(
             relevancy,
             mapped_ticket['ID']
         )
-        return normalized_ticket, similar_tickets, hits
+        return normalized_ticket, similar_tickets, hits, similar_jira_keys
 
     def run(self):
         mapped_ticket = None
@@ -55,6 +55,7 @@ class Estimate:
         normalized_ticket = None
         days_to_go = None
         jira_id = None
+        similar_jira_keys = None
 
         try:
             if self.jira_key is not None:
@@ -63,7 +64,7 @@ class Estimate:
                 self.cache.store_jira_key_and_id(self.jira_key, jira_id)
                 success = self.cache.store_ticket(jira_id, mapped_ticket)
                 if success:
-                    normalized_ticket, similar_tickets, hits = self.format_tickets(mapped_ticket)
+                    normalized_ticket, similar_tickets, hits, similar_jira_keys = self.format_tickets(mapped_ticket)
                     if hits == 0:
                         estimation = 900
                     else:
@@ -81,38 +82,39 @@ class Estimate:
             estimation = float(estimation)
 
         if normalized_ticket is not None and jira_id is not None and mapped_ticket is not None:
-            normalized_ticket['Diff'] = 0.0
-            if normalized_ticket['Created'] > 0:
-                normalized_ticket['Diff'] = round(time.time()) - normalized_ticket['Created']
-            tickets = self.analyze.load_tickets_for_days(14)
-            diff_normalized_tickets = []
-            normalized_tickets = self.mapper.normalize_tickets(tickets)
-            for diff_normalized_ticket in normalized_tickets:
-                if 'Versions' in diff_normalized_ticket and len(diff_normalized_ticket['Versions']) == 0:
-                    continue
-                if diff_normalized_ticket['Created'] > 0 and diff_normalized_ticket['Closed'] > 0:
-                    diff_normalized_ticket['Diff'] = diff_normalized_ticket['Closed'] - diff_normalized_ticket['Created']
-                    if diff_normalized_ticket['Diff'] > 0:
-                        diff_normalized_tickets.append(diff_normalized_ticket)
-            diff_estimation = 0
-            if len(diff_normalized_tickets) > 0:
-                diff_estimation = self.sci_kit.estimate(
-                    normalized_ticket,
-                    diff_normalized_tickets,
-                    'Diff',
-                    ['Priority', 'Organization']
-                )
-            if diff_estimation > 0:
-                days_to_go = int(round(diff_estimation / 60 / 60 / 24))
-                if 'Diff' in normalized_ticket and 0 < normalized_ticket['Diff']:
-                    days_to_go -= int(round(normalized_ticket['Diff'] / 60 / 60 / 24))
-                if days_to_go < 0:
-                    days_to_go = 0
-                elif days_to_go > 14:
-                    days_to_go = 14
-                else:
+            comment_exists = self.cache.comment_exists(jira_id)
+            if comment_exists is False:
+                normalized_ticket['Diff'] = 0.0
+                if normalized_ticket['Created'] > 0:
+                    normalized_ticket['Diff'] = round(time.time()) - normalized_ticket['Created']
+                tickets = self.analyze.load_tickets_for_days(14)
+                diff_normalized_tickets = []
+                normalized_tickets = self.mapper.normalize_tickets(tickets)
+                for diff_normalized_ticket in normalized_tickets:
+                    if 'Versions' in diff_normalized_ticket and len(diff_normalized_ticket['Versions']) == 0:
+                        continue
+                    if diff_normalized_ticket['Created'] > 0 and diff_normalized_ticket['Closed'] > 0:
+                        diff_normalized_ticket['Diff'] = diff_normalized_ticket['Closed'] - diff_normalized_ticket['Created']
+                        if diff_normalized_ticket['Diff'] > 0:
+                            diff_normalized_tickets.append(diff_normalized_ticket)
+                diff_estimation = 0
+                if len(diff_normalized_tickets) > 0:
+                    diff_estimation = self.sci_kit.estimate(
+                        normalized_ticket,
+                        diff_normalized_tickets,
+                        'Diff',
+                        ['Priority', 'Organization']
+                    )
+                if diff_estimation > 0:
+                    days_to_go = int(round(diff_estimation / 60 / 60 / 24))
+                    if 'Diff' in normalized_ticket and 0 < normalized_ticket['Diff']:
+                        days_to_go -= int(round(normalized_ticket['Diff'] / 60 / 60 / 24))
+                    if days_to_go < 0:
+                        days_to_go = 0
+                    elif days_to_go > 14:
+                        days_to_go = 14
                     is_today = days_to_go == 0
-                    self.sd_api.post_ticket_comment(mapped_ticket['ID'], mapped_ticket['Priority'], days_to_go, is_today)
+                    self.sd_api.post_ticket_comment(mapped_ticket['ID'], mapped_ticket['Priority'], days_to_go, is_today, similar_jira_keys, estimation)
 
         ticket_score = self.analyze.rank_ticket(mapped_ticket)
         todays_score = self.cache.add_to_todays_score(self.jira_key, ticket_score)

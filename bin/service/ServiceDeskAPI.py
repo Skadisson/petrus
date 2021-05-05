@@ -164,13 +164,19 @@ class ServiceDeskAPI:
         response, content = self.client.request(info_endpoint, "GET")
         return response, content
 
-    def post_ticket_comment(self, jira_id, priority, days_to_go, today=False):
+    def post_ticket_comment(self, jira_id, priority, days_to_go, today=False, similar_jira_keys=None, estimation=None):
+
+        comment = f"Mit der aktuellen Priorität '{priority}' wird das Ticket voraussichtlich"
         if today:
-            comment = 'Mit der aktuellen Priorität "{}" wird das Ticket voraussichtlich heute bearbeitet werden. - Automatisierte Nachricht von Petrus'.format(priority)
+            comment += f" heute bearbeitet werden."
         else:
-            comment = 'Mit der aktuellen Priorität "{}" wird das Ticket voraussichtlich innerhalb der nächsten {} Arbeitstage bearbeitet werden. - Automatisierte Nachricht von Petrus'.format(priority, days_to_go)
-        if self.cache.comment_exists(jira_id):
-            return True
+            comment += f" innerhalb der nächsten {days_to_go} Arbeitstage bearbeitet werden."
+        if estimation > 0:
+            hours = estimation / 60 / 60
+            comment += f" In der Vergangenheit dauerte die aktive Bearbeitung ähnlicher Tickets {hours} Stunden."
+        if similar_jira_keys is not None and len(similar_jira_keys) > 0:
+            comment += f" Ähnliche Tickets könnten sein: {(', '.join(similar_jira_keys))}."
+        comment += f" - Automatisierte Nachricht von Petrus"
 
         ticket_endpoint = self.environment.get_endpoint_comment().format(jira_id)
         request_content = {

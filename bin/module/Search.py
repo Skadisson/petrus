@@ -18,7 +18,7 @@ class Search:
             mod_estimate = Estimate.Estimate(formatted_keywords[0])
             items, success = mod_estimate.run()
         elif len(formatted_keywords) > 1:
-            relevancy = self.context.calculate_relevancy_for_tickets(tickets, {'Keywords': formatted_keywords, 'Related': []})
+            relevancy, suggested_keys = self.context.calculate_relevancy_for_tickets(tickets, {'Keywords': formatted_keywords, 'Related': []})
             items = [{
                 'relevancy': relevancy,
                 'keywords': formatted_keywords

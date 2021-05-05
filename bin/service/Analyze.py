@@ -331,7 +331,7 @@ class Analyze:
 
     def format_tickets(self, mapped_ticket):
         cached_tickets = self.cache.load_cached_tickets()
-        relevancy = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket)
+        relevancy, suggested_keys = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket)
         normalized_ticket = self.mapper.normalize_ticket(mapped_ticket)
         similar_tickets, hits = self.context.filter_similar_tickets(
             relevancy,

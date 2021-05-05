@@ -17,13 +17,14 @@ class Context:
     def calculate_relevancy_for_tickets(self, tickets, mapped_ticket):
         keywords = mapped_ticket['Keywords']
 
+        suggested_keys = []
         sorted_relevancy = []
         keyword_total = len(keywords)
         if keyword_total != 0:
-            phoenix_suggestion = self.get_phoenix_ticket_suggestion(tickets, " ".join(keywords))
+            phoenix_suggestion, suggested_keys = self.get_phoenix_ticket_suggestion(tickets, " ".join(keywords))
             if phoenix_suggestion is not None:
                 sorted_relevancy.append(phoenix_suggestion)
-        return sorted_relevancy
+        return sorted_relevancy, suggested_keys
 
     def add_to_relevancy(self, ticket, keywords, relevancy, relations):
         ticket_relevancy = self.calculate_ticket_relevancy(ticket, keywords, relations)
@@ -101,6 +102,7 @@ class Context:
         texts = []
         keys = []
         check_tickets = []
+        suggested_keys = []
         suggested_ticket = None
         for ticket in tickets:
             check_tickets.append(ticket)
@@ -144,4 +146,4 @@ class Context:
                         'time_spent': time_spent,
                         'title': title
                     }
-        return suggested_ticket
+        return suggested_ticket, suggested_keys
