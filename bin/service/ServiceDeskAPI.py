@@ -175,8 +175,9 @@ class ServiceDeskAPI:
             hours = estimation / 60 / 60
             comment += f" In der Vergangenheit dauerte die aktive Bearbeitung ähnlicher Tickets in etwa {hours} Stunden."
         if similar_jira_keys is not None and len(similar_jira_keys) > 0:
-            same_id = similar_jira_keys.index(jira_key)
-            del(similar_jira_keys[same_id])
+            if jira_key in similar_jira_keys:
+                same_id = similar_jira_keys.index(jira_key)
+                del(similar_jira_keys[same_id])
             comment += f" Ähnliche Tickets könnten sein: {(', '.join(similar_jira_keys))}."
         comment += f" - Automatisierte Nachricht von Petrus"
 
