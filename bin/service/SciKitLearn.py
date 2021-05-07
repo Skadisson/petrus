@@ -83,9 +83,12 @@ class SciKitLearn:
 
         return x, y
 
-    def get_phoenix_suggestion(self, texts, keys, query):
+    @staticmethod
+    def get_phoenix_suggestion(texts, keys, query):
 
         docs_new = [query]
+        text_ids = []
+        ticket_relevancies = []
 
         text_clf = pipeline.Pipeline([
             ('vect', feature_extraction.text.CountVectorizer()),
@@ -93,6 +96,20 @@ class SciKitLearn:
             ('clf', naive_bayes.MultinomialNB()),
         ])
         text_context = text_clf.fit(texts, keys)
-        text_ids = text_context.predict(docs_new)
+        top_suggestion = text_context.predict(docs_new)
+        probabilities = text_context.predict_proba(docs_new)
+        probability_list = list(probabilities[0])
 
-        return text_ids
+        top_index = keys.index(top_suggestion[0])
+        probability_list[top_index] = 100
+
+        for i in range(0, 9):
+            max_probability = max(probability_list)
+            max_index = list(probability_list).index(max_probability)
+            text_ids += [keys[max_index]]
+            ticket_relevancies.append(max_probability)
+            del(keys[max_index])
+            del(texts[max_index])
+            del(probability_list[max_index])
+
+        return text_ids, ticket_relevancies

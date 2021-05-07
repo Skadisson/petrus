@@ -18,13 +18,11 @@ class Context:
         keywords = mapped_ticket['Keywords']
 
         suggested_keys = []
-        sorted_relevancy = []
+        phoenix_suggestions = []
         keyword_total = len(keywords)
         if keyword_total != 0:
-            phoenix_suggestion, suggested_keys = self.get_phoenix_ticket_suggestion(tickets, " ".join(keywords))
-            if phoenix_suggestion is not None:
-                sorted_relevancy.append(phoenix_suggestion)
-        return sorted_relevancy, suggested_keys
+            phoenix_suggestions, suggested_keys = self.get_phoenix_ticket_suggestion(tickets, " ".join(keywords))
+        return phoenix_suggestions, suggested_keys
 
     def add_to_relevancy(self, ticket, keywords, relevancy, relations):
         ticket_relevancy = self.calculate_ticket_relevancy(ticket, keywords, relations)
@@ -103,7 +101,7 @@ class Context:
         keys = []
         check_tickets = []
         suggested_keys = []
-        suggested_ticket = None
+        suggested_tickets = []
         for ticket in tickets:
             check_tickets.append(ticket)
             title = str(ticket['Title'])
@@ -123,7 +121,7 @@ class Context:
                 keys.append(key)
                 texts.append(str(description))
         if len(texts) > 0:
-            suggested_keys = self.scikit.get_phoenix_suggestion(texts, keys, query)
+            suggested_keys, relevancies = self.scikit.get_phoenix_suggestion(texts, keys, query)
             for ticket in check_tickets:
                 key = ticket['Key']
                 creation = self.timestamp_from_ticket_time(ticket['Created'])
@@ -136,14 +134,16 @@ class Context:
                 else:
                     title = ''
                 if key in suggested_keys:
-                    suggested_ticket = {
+                    rel_index = suggested_keys.index(key)
+                    suggested_tickets.append({
                         'jira_id': ticket['ID'],
-                        'percentage': 100,
+                        'percentage': min(100, round(relevancies[rel_index] * 10000)),
                         'hits': [],
                         'link': self.environment.get_endpoint_ticket_link().format(key),
                         'project': ticket['Project'],
                         'creation': creation,
                         'time_spent': time_spent,
                         'title': title
-                    }
-        return suggested_ticket, suggested_keys
+                    })
+        sorted_suggested_tickets = sorted(suggested_tickets, key=lambda ticket: ticket['percentage'], reverse=True)
+        return sorted_suggested_tickets, suggested_keys
