@@ -178,7 +178,7 @@ class ServiceDeskAPI:
             if jira_key in similar_jira_keys:
                 same_id = similar_jira_keys.index(jira_key)
                 del(similar_jira_keys[same_id])
-            comment += f" Ähnliche Tickets könnten sein: {(', '.join(similar_jira_keys))}."
+            comment += f" Ein ähnliches Ticket könnte sein: {similar_jira_keys[0]}."
         comment += f" - Automatisierte Nachricht von Petrus"
 
         ticket_endpoint = self.environment.get_endpoint_comment().format(jira_id)
