@@ -5,6 +5,7 @@ import pickle
 import os
 import datetime
 import numpy
+import re
 
 
 class Cache:
@@ -78,7 +79,12 @@ class Cache:
         return False
 
     def load_cached_tickets(self, project='SERVICE'):
-        return self.table_cache.find({'$text': {'$search': project}})
+        rgx = re.compile(f"{project}.*", re.IGNORECASE)
+        return self.table_cache.find({'Key': {'$regex': rgx}})
+
+    def load_cached_tickets_except(self, ticket_key, project='SERVICE'):
+        rgx = re.compile(f"{project}.*", re.IGNORECASE)
+        return self.table_cache.find({'Key': {'$regex': rgx, '$ne': ticket_key}})
 
     def count_tickets(self):
         return self.table_cache.count()
