@@ -129,6 +129,10 @@ class Environment:
         service_yaml = self.load_yaml('path')
         return service_yaml['log']
 
+    def get_path_jira_log(self):
+        service_yaml = self.load_yaml('path')
+        return service_yaml['jira_log']
+
     def get_path_plot(self):
         service_yaml = self.load_yaml('path')
         return service_yaml['plot']

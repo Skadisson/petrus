@@ -329,16 +329,6 @@ class Analyze:
     def seconds_to_hours(seconds):
         return seconds / 60 / 60
 
-    def format_tickets(self, mapped_ticket):
-        cached_tickets = self.cache.load_cached_tickets_except(mapped_ticket['Key'])
-        relevancy, suggested_keys = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket)
-        normalized_ticket = self.mapper.normalize_ticket(mapped_ticket)
-        similar_tickets, hits = self.context.filter_similar_tickets(
-            relevancy,
-            mapped_ticket['ID']
-        )
-        return normalized_ticket, similar_tickets, hits
-
     def problematic_tickets(self, for_days=0, year="", week_numbers=""):
         problematic_tickets = {}
         tickets = self.cache.load_cached_tickets()

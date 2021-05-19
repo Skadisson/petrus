@@ -133,7 +133,7 @@ PS = (function(window, document, $) {
                         }
                     } else {
                         $('#search').css({'top': '50%', 'margin-top': '-100px'});
-                        var hours = result.items[0].estimation/60/60;
+                        var hours = Math.round(result.items[0].estimation/60/60);
                         var days_to_go = result.items[0].days_to_go;
                         var new_score = result.items[0].score.today;
                         var diff = parseInt(new_score) - parseInt($('#score').text());

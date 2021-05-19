@@ -6,6 +6,7 @@ import os
 import datetime
 import numpy
 import re
+import time
 
 
 class Cache:
@@ -50,6 +51,9 @@ class Cache:
                 self.table_cache.insert_one(ticket)
         return is_valid
 
+    def get_all_jira_keys(self):
+        return list(self.table_cache.distinct('Key'))
+
     def load_jira_id_for_key(self, jira_key):
         stored_relation = self.table_jira_keys.find_one({'key': jira_key})
         if stored_relation is not None:
@@ -84,7 +88,7 @@ class Cache:
 
     def load_cached_tickets_except(self, ticket_key, project='SERVICE'):
         rgx = re.compile(f"{project}.*", re.IGNORECASE)
-        return self.table_cache.find({'Key': {'$regex': rgx, '$ne': ticket_key}})
+        return self.table_cache.find({'Key': {'$regex': rgx, '$ne': ticket_key}, 'Time_Spent': {'$gt': 0}})
 
     def count_tickets(self):
         return self.table_cache.count()
@@ -118,6 +122,10 @@ class Cache:
 
         max_results = 100
 
+        leftover_keys = self.get_all_jira_keys()
+        new_keys = []
+        start = time.time()
+
         projects = self.environment.get_service_projects()
         for project in projects:
             offset = 0
@@ -126,6 +134,10 @@ class Cache:
                 ticket_total += len(jira_keys)
                 for jira_id in jira_keys:
                     jira_key = jira_keys[jira_id]
+                    if jira_key in leftover_keys:
+                        leftover_keys.remove(jira_key)
+                    else:
+                        new_keys.append(jira_key)
                     try:
                         success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
                             sd_api,
@@ -147,7 +159,11 @@ class Cache:
                 offset += max_results
                 jira_keys = sd_api.request_service_jira_keys(offset, max_results, project)
         synced_current = len(clean_cache)
-        print('>>> completed syncing {} new or updated tickets out of {} total'.format(synced_current, ticket_total))
+        hours = round((time.time() - start) / 60 / 60, 2)
+        print('>>> completed syncing {} new or updated tickets out of {} total after {} hours'.format(synced_current, ticket_total, hours))
+        self.add_jira_log_entry(self.__class__.__name__, f"{ticket_total} tickets processed after {hours} hours, {len(new_keys)} of those were new tickets")
+        if len(leftover_keys) > 0:
+            self.add_jira_log_entry(self.__class__.__name__, f"Following tickets seem to have been deleted: {', '.join(leftover_keys)}")
 
     def update_cache_diff(self, clean_cache):
         for jira_id in clean_cache:
@@ -191,6 +207,15 @@ class Cache:
 
     def add_log_entry(self, code_reference, message):
         log_file = self.environment.get_path_log()
+        now = datetime.datetime.now()
+        current_time = now.strftime("%Y/%m/%d %H:%M:%S")
+        entry = "{}: {} - {}\n".format(current_time, code_reference, message)
+        file = open(log_file, "a")
+        file.write(entry)
+        file.close()
+
+    def add_jira_log_entry(self, code_reference, message):
+        log_file = self.environment.get_path_jira_log()
         now = datetime.datetime.now()
         current_time = now.strftime("%Y/%m/%d %H:%M:%S")
         entry = "{}: {} - {}\n".format(current_time, code_reference, message)

@@ -172,7 +172,7 @@ class ServiceDeskAPI:
         else:
             comment += f" innerhalb der nächsten {days_to_go} Arbeitstage bearbeitet werden."
         if estimation > 0:
-            hours = estimation / 60 / 60
+            hours = round(estimation / 60 / 60, 2)
             comment += f" In der Vergangenheit dauerte die aktive Bearbeitung ähnlicher Tickets in etwa {hours} Stunden."
         if similar_jira_keys is not None and len(similar_jira_keys) > 0:
             if jira_key in similar_jira_keys:
@@ -209,9 +209,9 @@ class ServiceDeskAPI:
         estimation_float_hours = self.seconds_to_hours(estimation)
         remaining_float_hours = self.seconds_to_hours(remaining_time)
         estimation_hours = int(estimation_float_hours)
-        estimation_minutes = round((float(estimation_float_hours) - estimation_hours) * 60, 0)
+        estimation_minutes = round((estimation_float_hours - estimation_hours) * 60, 0)
         remaining_hours = int(remaining_float_hours)
-        remaining_minutes = round((float(remaining_float_hours) - remaining_hours) * 60, 0)
+        remaining_minutes = round((remaining_float_hours - remaining_hours) * 60, 0)
         request_content = {
             "fields": {
                 'timetracking': {
@@ -231,7 +231,7 @@ class ServiceDeskAPI:
 
     @staticmethod
     def seconds_to_hours(seconds):
-        return seconds / 60 / 60
+        return round(seconds / 60 / 60, 2)
 
     @staticmethod
     def calculate_remaining_time(estimation, time_spent):
