@@ -133,7 +133,11 @@ class Docx:
         total = sum(list(weights.values()))
         labels = []
         for label in list(weights.keys()):
-            labels.append(f"{label} [{str(round((weights[label] / total) * 100))}%]")
+            if total > 0:
+                sub_total = (weights[label] / total) * 100
+            else:
+                sub_total = 0
+            labels.append(f"{label} [{str(round(sub_total))}%]")
         self.place_pie_chart(list(weights.values()), labels)
 
     def place_versions(self, hours_per_version, months):
