@@ -7,6 +7,7 @@ import datetime
 import numpy
 import re
 import time
+import random
 
 
 class Cache:
@@ -85,6 +86,9 @@ class Cache:
                 stored_relation['frequency'] = 'low'
             self.table_jira_keys.replace_one(relation, stored_relation)
 
+    def get_jira_id_pairs_for_frequency(self, frequency="high"):
+        return self.table_jira_keys.find({'frequency': frequency})
+
     @staticmethod
     def validate_ticket_data(ticket_data):
         for i in ticket_data:
@@ -126,8 +130,64 @@ class Cache:
     def remove_jira_key(self, jira_key):
         self.table_jira_keys.delete_one({'key': jira_key})
 
-    def parallel_sync(self):
-        """TBI"""
+    def parallel_sync(self, sd_api, max_tickets=10):
+        while True:
+            if int(time.time()) % (5*60) == 0:
+                clean_cache = {}
+                failed_jira_keys = []
+
+                current_time = self.get_current_time()
+                print(f">>> {current_time}: Starting Parallel Sync Run")
+                processed_jira_keys = []
+                high_pairs = list(self.get_jira_id_pairs_for_frequency("high"))
+                low_pairs = list(self.get_jira_id_pairs_for_frequency("low"))
+                i = 0
+                while i < max_tickets:
+                    high_pair = random.choice(high_pairs)
+                    low_pair = random.choice(low_pairs)
+                    if high_pair['key'] not in processed_jira_keys:
+                        processed_jira_keys.append(high_pair['key'])
+                        jira_id = int(high_pair['id'])
+                        jira_key = str(high_pair['key'])
+                        success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache, False)
+                        if success and str(jira_id) in clean_cache:
+                            self.store_jira_key_and_id(jira_key, jira_id, "high")
+                        i += 1
+                    if low_pair['key'] not in processed_jira_keys:
+                        processed_jira_keys.append(low_pair['key'])
+                        jira_id = int(low_pair['id'])
+                        jira_key = str(low_pair['key'])
+                        success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache, False)
+                        if success and str(jira_id) in clean_cache:
+                            self.store_jira_key_and_id(jira_key, jira_id, "high")
+                        i += 1
+                self.update_cache_diff(clean_cache)
+                time.sleep(1)
+
+                current_time = self.get_current_time()
+                print(f">>> {current_time}: Completed Parallel Sync Run with Tickets {', '.join(processed_jira_keys)}")
+            else:
+                time.sleep(1)
+
+    def update_jira_ticket_in_cache(self, sd_api, jira_key, jira_id, failed_jira_keys=[], clean_cache={}, update_frequency=True):
+        success = False
+
+        try:
+            success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
+                sd_api,
+                jira_key,
+                failed_jira_keys,
+                clean_cache,
+                jira_id
+            )
+            if success and update_frequency:
+                self.store_jira_key_and_id(jira_key, jira_id)
+        except Exception as err:
+            print(str(err) + "; with Ticket " + jira_key)
+            self.add_lost_jira_key(jira_key)
+            self.remove_jira_key(jira_key)
+
+        return success, failed_jira_keys, clean_cache
 
     def sync(self, sd_api):
         clean_cache = {}
@@ -155,20 +215,7 @@ class Cache:
                         self.store_jira_key_and_id(jira_key, jira_id)
                     else:
                         new_keys.append(jira_key)
-                        try:
-                            success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
-                                sd_api,
-                                jira_key,
-                                failed_jira_keys,
-                                clean_cache,
-                                jira_id
-                            )
-                            if success:
-                                self.store_jira_key_and_id(jira_key, jira_id)
-                        except Exception as err:
-                            print(str(err) + "; with Ticket " + jira_key)
-                            self.add_lost_jira_key(jira_key)
-                            self.remove_jira_key(jira_key)
+                        success, clean_cache, failed_jira_keys = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache, True)
                 synced_current = len(clean_cache)
                 self.update_cache_diff(clean_cache)
                 print('>>> successfully synced {} new tickets out of {} total in project "{}"'.format(synced_current, ticket_total, project))
@@ -224,10 +271,14 @@ class Cache:
         clean_cache[str(jira_id)] = mapped_ticket
         return success, clean_cache, failed_jira_keys
 
+    @staticmethod
+    def get_current_time():
+        now = datetime.datetime.now()
+        return now.strftime("%Y/%m/%d %H:%M:%S")
+
     def add_log_entry(self, code_reference, message):
         log_file = self.environment.get_path_log()
-        now = datetime.datetime.now()
-        current_time = now.strftime("%Y/%m/%d %H:%M:%S")
+        current_time = self.get_current_time()
         entry = "{}: {} - {}\n".format(current_time, code_reference, message)
         file = open(log_file, "a")
         file.write(entry)
@@ -235,8 +286,7 @@ class Cache:
 
     def add_jira_log_entry(self, code_reference, message):
         log_file = self.environment.get_path_jira_log()
-        now = datetime.datetime.now()
-        current_time = now.strftime("%Y/%m/%d %H:%M:%S")
+        current_time = self.get_current_time()
         entry = "{}: {} - {}\n".format(current_time, code_reference, message)
         file = open(log_file, "a")
         file.write(entry)
