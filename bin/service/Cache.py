@@ -120,6 +120,9 @@ class Cache:
     def remove_jira_key(self, jira_key):
         self.table_jira_keys.delete_one({'key': jira_key})
 
+    def parallel_sync(self):
+        """TBI"""
+
     def sync(self, sd_api):
         clean_cache = {}
         failed_jira_keys = []
@@ -142,6 +145,7 @@ class Cache:
                     is_old_key = jira_key in leftover_keys
                     if is_old_key:
                         leftover_keys.remove(jira_key)
+                        self.store_jira_key_and_id(jira_key, jira_id)
                     else:
                         new_keys.append(jira_key)
                         try:

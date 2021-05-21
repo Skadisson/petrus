@@ -35,3 +35,13 @@ class Sync:
         stop = float(time.time())
         minutes = (stop - start) / 60
         print('--- Synchronization with Jira SD API {} completed after {} minutes ---'.format(state, minutes))
+
+        print('--- Starting Infinite Parallel Sync, shutdown process to stop sync ---')
+
+        try:
+            _thread.start_new_thread(self.cache.parallel_sync, (self.sd_api, ))
+        except Exception as e:
+            self.cache.add_log_entry(self.__class__.__name__, e)
+
+        while threading.active_count():
+            pass
