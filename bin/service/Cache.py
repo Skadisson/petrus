@@ -68,15 +68,21 @@ class Cache:
 
         return None
 
-    def store_jira_key_and_id(self, jira_key, jira_id):
+    def store_jira_key_and_id(self, jira_key, jira_id, frequency=None):
         relation = {'id': jira_id, 'key': jira_key}
         stored_relation = self.table_jira_keys.find_one(relation)
         if stored_relation is None:
             stored_relation = relation
-            stored_relation['frequency'] = 'high'
+            if frequency is not None:
+                stored_relation['frequency'] = frequency
+            else:
+                stored_relation['frequency'] = 'high'
             self.table_jira_keys.insert_one(stored_relation)
         else:
-            stored_relation['frequency'] = 'low'
+            if frequency is not None:
+                stored_relation['frequency'] = frequency
+            else:
+                stored_relation['frequency'] = 'low'
             self.table_jira_keys.replace_one(relation, stored_relation)
 
     @staticmethod
@@ -126,6 +132,7 @@ class Cache:
     def sync(self, sd_api):
         clean_cache = {}
         failed_jira_keys = []
+        jira_keys = {}
         ticket_total = 0
 
         max_results = 100
@@ -164,15 +171,18 @@ class Cache:
                             self.remove_jira_key(jira_key)
                 synced_current = len(clean_cache)
                 self.update_cache_diff(clean_cache)
-                print('>>> successfully synced {} new or updated tickets out of {} total in project "{}"'.format(synced_current, ticket_total, project))
+                print('>>> successfully synced {} new tickets out of {} total in project "{}"'.format(synced_current, ticket_total, project))
                 offset += max_results
                 jira_keys = sd_api.request_service_jira_keys(offset, max_results, project)
         synced_current = len(clean_cache)
         hours = round((time.time() - start) / 60 / 60, 2)
-        print('>>> completed syncing {} new or updated tickets out of {} total after {} hours'.format(synced_current, ticket_total, hours))
+        print('>>> completed syncing {} new tickets out of {} total after {} hours'.format(synced_current, ticket_total, hours))
         self.add_jira_log_entry(self.__class__.__name__, f"{ticket_total} tickets processed after {hours} hours, {len(new_keys)} of those were new tickets")
         if len(leftover_keys) > 0:
             self.add_jira_log_entry(self.__class__.__name__, f"Following tickets seem to have been deleted: {', '.join(leftover_keys)}")
+            for jira_key in leftover_keys:
+                jira_id = list(jira_keys.keys())[list(jira_keys.values()).index(jira_key)]
+                self.store_jira_key_and_id(jira_key, jira_id, "zero")
 
     def update_cache_diff(self, clean_cache):
         for jira_id in clean_cache:
