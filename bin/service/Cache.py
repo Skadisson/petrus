@@ -144,21 +144,20 @@ class Cache:
                         leftover_keys.remove(jira_key)
                     else:
                         new_keys.append(jira_key)
-                    try:
-                        success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
-                            sd_api,
-                            jira_key,
-                            failed_jira_keys,
-                            clean_cache,
-                            jira_id
-                        )
-                        if success:
-                            self.store_jira_key_and_id(jira_key, jira_id)
-                    except Exception as err:
-                        print(str(err) + "; with Ticket " + jira_key)
-                        self.add_lost_jira_key(jira_key)
-                        self.remove_jira_key(jira_key)
-
+                        try:
+                            success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
+                                sd_api,
+                                jira_key,
+                                failed_jira_keys,
+                                clean_cache,
+                                jira_id
+                            )
+                            if success:
+                                self.store_jira_key_and_id(jira_key, jira_id)
+                        except Exception as err:
+                            print(str(err) + "; with Ticket " + jira_key)
+                            self.add_lost_jira_key(jira_key)
+                            self.remove_jira_key(jira_key)
                 synced_current = len(clean_cache)
                 self.update_cache_diff(clean_cache)
                 print('>>> successfully synced {} new or updated tickets out of {} total in project "{}"'.format(synced_current, ticket_total, project))
