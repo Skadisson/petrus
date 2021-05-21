@@ -156,15 +156,8 @@ class ServiceDeskAPI:
             mapped_ticket['Comments'] = None
             return mapped_ticket
         comments_raw = content.decode("utf-8")
-        mapped_ticket['Comments'] = self.filter_petrus_comments(json.loads(comments_raw))
+        mapped_ticket['Comments'] = json.loads(comments_raw)
         return mapped_ticket
-
-    def filter_petrus_comments(self, comments_og):
-        comments_filtered = []
-        for comment in comments_og:
-            if comment.find('Petrus') == -1:
-                comments_filtered.append(comment)
-        return comments_filtered
 
     def request_info(self):
         info_endpoint = self.environment.get_endpoint_info()
