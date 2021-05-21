@@ -72,10 +72,12 @@ class Cache:
         relation = {'id': jira_id, 'key': jira_key}
         stored_relation = self.table_jira_keys.find_one(relation)
         if stored_relation is None:
-            relation['frequency'] = 'high'
+            stored_relation = relation
+            stored_relation['frequency'] = 'high'
+            self.table_jira_keys.insert_one(stored_relation)
         else:
-            relation['frequency'] = 'low'
-        self.table_jira_keys.insert_one(relation)
+            stored_relation['frequency'] = 'low'
+            self.table_jira_keys.replace_one(relation, stored_relation)
 
     @staticmethod
     def validate_ticket_data(ticket_data):
