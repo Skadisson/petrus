@@ -141,6 +141,11 @@ class Cache:
                 processed_jira_keys = []
                 high_pairs = list(self.get_jira_id_pairs_for_frequency("high"))
                 low_pairs = list(self.get_jira_id_pairs_for_frequency("low"))
+                latest_jira_keys = sd_api.request_service_jira_keys(0, max_tickets, 'SERVICE')
+                for jira_id in latest_jira_keys:
+                    jira_key = latest_jira_keys[jira_id]
+                    processed_jira_keys.append(jira_key)
+                    success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache, True)
                 i = 0
                 while i < max_tickets:
                     high_pair = random.choice(high_pairs)
@@ -165,7 +170,7 @@ class Cache:
                 time.sleep(1)
 
                 current_time = self.get_current_time()
-                print(f">>> {current_time}: Completed Parallel Sync Run with Tickets {', '.join(processed_jira_keys)}")
+                print(f">>> {current_time}: Completed Parallel Sync Run with {len(processed_jira_keys)} Tickets: {', '.join(processed_jira_keys)}")
             else:
                 time.sleep(1)
 
@@ -228,8 +233,10 @@ class Cache:
         if len(leftover_keys) > 0:
             self.add_jira_log_entry(self.__class__.__name__, f"Following tickets seem to have been deleted: {', '.join(leftover_keys)}")
             for jira_key in leftover_keys:
-                jira_id = list(jira_keys.keys())[list(jira_keys.values()).index(jira_key)]
-                self.store_jira_key_and_id(jira_key, jira_id, "zero")
+                jira_key_values = list(jira_keys.values())
+                if jira_key in jira_key_values:
+                    jira_id = list(jira_keys.keys())[jira_key_values.index(jira_key)]
+                    self.store_jira_key_and_id(jira_key, jira_id, "zero")
 
     def update_cache_diff(self, clean_cache):
         for jira_id in clean_cache:
