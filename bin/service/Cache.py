@@ -72,7 +72,10 @@ class Cache:
         relation = {'id': jira_id, 'key': jira_key}
         stored_relation = self.table_jira_keys.find_one(relation)
         if stored_relation is None:
-            self.table_jira_keys.insert_one(relation)
+            relation['frequency'] = 'high'
+        else:
+            relation['frequency'] = 'low'
+        self.table_jira_keys.insert_one(relation)
 
     @staticmethod
     def validate_ticket_data(ticket_data):
@@ -134,7 +137,8 @@ class Cache:
                 ticket_total += len(jira_keys)
                 for jira_id in jira_keys:
                     jira_key = jira_keys[jira_id]
-                    if jira_key in leftover_keys:
+                    is_old_key = jira_key in leftover_keys
+                    if is_old_key:
                         leftover_keys.remove(jira_key)
                     else:
                         new_keys.append(jira_key)
