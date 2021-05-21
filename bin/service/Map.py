@@ -167,9 +167,10 @@ class Map:
                 for comment in mapped_ticket['Comments']['values']:
                     if comment['body'] is not None:
                         comment_text = self.regex.mask_text(comment['body'])
-                        formatted_comments.append(comment_text)
-                    if comment['author']['name'] not in persons:
-                        persons.append(comment['author']['name'])
+                        if comment_text.find('Petrus') == -1:
+                            formatted_comments.append(comment_text)
+                            if comment['author']['name'] not in persons:
+                                persons.append(comment['author']['name'])
                 mapped_ticket['Comments'] = formatted_comments
         else:
             mapped_ticket['Comments'] = []

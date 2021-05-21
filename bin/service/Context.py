@@ -107,8 +107,8 @@ class Context:
             title = str(ticket['Title'])
             description = str(ticket['Text'])
             description += " || " + str(title)
-            comments = ticket['Comments']
-            if comments is not None:
+            comments = self.filter_petrus_comments(ticket['Comments'])
+            if len(comments) > 0:
                 description += " || " + (" || ".join(comments))
             keywords = ticket['Keywords']
             if keywords is not None:
@@ -147,3 +147,11 @@ class Context:
                     })
         sorted_suggested_tickets = sorted(suggested_tickets, key=lambda ticket: ticket['percentage'], reverse=True)
         return sorted_suggested_tickets, suggested_keys
+
+    def filter_petrus_comments(self, comments):
+        filtered_comments = []
+        if comments is not None:
+            for comment in comments:
+                if comment.find('Petrus') == -1:
+                    filtered_comments.append(comment)
+        return filtered_comments
