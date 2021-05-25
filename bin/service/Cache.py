@@ -220,7 +220,7 @@ class Cache:
                         self.store_jira_key_and_id(jira_key, jira_id)
                     else:
                         new_keys.append(jira_key)
-                        success, clean_cache, failed_jira_keys = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache, True)
+                        success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache, True)
                 synced_current = len(clean_cache)
                 self.update_cache_diff(clean_cache)
                 print('>>> successfully synced {} new tickets out of {} total in project "{}"'.format(synced_current, ticket_total, project))
