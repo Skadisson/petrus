@@ -80,8 +80,12 @@ class Cache:
             stored_relation['frequency'] = frequency
             self.table_jira_keys.replace_one(relation, stored_relation)
 
-    def get_jira_id_pairs_for_frequency(self, frequency="high"):
-        return self.table_jira_keys.find({'frequency': frequency})
+    def get_jira_id_pairs_for_frequency(self, frequency="high", project=None):
+        if project is None:
+            return self.table_jira_keys.find({'frequency': frequency})
+        else:
+            rgx = re.compile(f"{project}.*", re.IGNORECASE)
+            return self.table_jira_keys.find({'frequency': frequency, 'key': {'$regex': rgx}})
 
     @staticmethod
     def validate_ticket_data(ticket_data):
@@ -103,7 +107,7 @@ class Cache:
         return self.table_cache.count()
 
     def load_cached_ticket(self, jira_id):
-        return self.table_cache.find_one({'ID': jira_id})
+        return self.table_cache.find_one({'ID': str(jira_id)})
 
     def load_jira_keys_and_ids(self):
         return self.table_jira_keys.find()
@@ -134,8 +138,8 @@ class Cache:
                 print(f">>> {current_time}: Starting Parallel Sync Run")
 
                 i = 0
-                high_pairs = list(self.get_jira_id_pairs_for_frequency("high"))
-                low_pairs = list(self.get_jira_id_pairs_for_frequency("low"))
+                high_pairs = list(self.get_jira_id_pairs_for_frequency("high", "SERVICE"))
+                low_pairs = list(self.get_jira_id_pairs_for_frequency("low", "SERVICE"))
                 processed_jira_keys = []
                 while i < max_tickets:
                     high_pair = random.choice(high_pairs)
