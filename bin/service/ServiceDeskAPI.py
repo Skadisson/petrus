@@ -104,9 +104,14 @@ class ServiceDeskAPI:
 
         tickets_endpoint = self.environment.get_endpoint_tickets()
         data_url = tickets_endpoint.format(project, max_results, offset)
-        response, content = self.client.request(data_url, "GET")
+        try:
+            response, content = self.client.request(data_url, "GET")
+        except Exception as e:
+            self.cache.add_log_entry(self.__class__.__name__, str(e))
+            return jira_keys
         if response['status'] != '200' or content is False:
-            raise Exception("Request failed with status code {}".format(response['status']))
+            self.cache.add_log_entry(self.__class__.__name__, "Request failed with status code {}".format(response['status']))
+            return jira_keys
         response_data = content.decode("utf-8")
         raw_data = json.loads(response_data)
         if 'issues' in raw_data:

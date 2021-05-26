@@ -61,7 +61,7 @@ class Estimate:
             if self.jira_key is not None:
                 mapped_ticket = self.retrieve_ticket()
                 jira_id = str(mapped_ticket['ID'])
-                self.cache.store_jira_key_and_id(self.jira_key, jira_id)
+                self.cache.store_jira_key_and_id(self.jira_key, jira_id, "high")
                 success = self.cache.store_ticket(jira_id, mapped_ticket)
                 if success:
                     normalized_ticket, similar_tickets, hits, similar_jira_keys = self.format_tickets(mapped_ticket)

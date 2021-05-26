@@ -69,21 +69,15 @@ class Cache:
 
         return None
 
-    def store_jira_key_and_id(self, jira_key, jira_id, frequency=None):
+    def store_jira_key_and_id(self, jira_key, jira_id, frequency="high"):
         relation = {'id': jira_id, 'key': jira_key}
         stored_relation = self.table_jira_keys.find_one(relation)
         if stored_relation is None:
             stored_relation = relation
-            if frequency is not None:
-                stored_relation['frequency'] = frequency
-            else:
-                stored_relation['frequency'] = 'high'
+            stored_relation['frequency'] = frequency
             self.table_jira_keys.insert_one(stored_relation)
         else:
-            if frequency is not None:
-                stored_relation['frequency'] = frequency
-            else:
-                stored_relation['frequency'] = 'low'
+            stored_relation['frequency'] = frequency
             self.table_jira_keys.replace_one(relation, stored_relation)
 
     def get_jira_id_pairs_for_frequency(self, frequency="high"):
@@ -130,7 +124,7 @@ class Cache:
     def remove_jira_key(self, jira_key):
         self.table_jira_keys.delete_one({'key': jira_key})
 
-    def parallel_sync(self, sd_api, max_tickets=10):
+    def parallel_sync(self, sd_api, max_tickets=20):
         while True:
             if int(time.time()) % (5*60) == 0:
                 clean_cache = {}
@@ -138,15 +132,11 @@ class Cache:
 
                 current_time = self.get_current_time()
                 print(f">>> {current_time}: Starting Parallel Sync Run")
-                processed_jira_keys = []
+
+                i = 0
                 high_pairs = list(self.get_jira_id_pairs_for_frequency("high"))
                 low_pairs = list(self.get_jira_id_pairs_for_frequency("low"))
-                latest_jira_keys = sd_api.request_service_jira_keys(0, max_tickets, 'SERVICE')
-                for jira_id in latest_jira_keys:
-                    jira_key = latest_jira_keys[jira_id]
-                    processed_jira_keys.append(jira_key)
-                    success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache, True)
-                i = 0
+                processed_jira_keys = []
                 while i < max_tickets:
                     high_pair = random.choice(high_pairs)
                     low_pair = random.choice(low_pairs)
@@ -154,17 +144,13 @@ class Cache:
                         processed_jira_keys.append(high_pair['key'])
                         jira_id = int(high_pair['id'])
                         jira_key = str(high_pair['key'])
-                        success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache, False)
-                        if success and str(jira_id) in clean_cache:
-                            self.store_jira_key_and_id(jira_key, jira_id, "high")
+                        success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache)
                         i += 1
                     if low_pair['key'] not in processed_jira_keys:
                         processed_jira_keys.append(low_pair['key'])
                         jira_id = int(low_pair['id'])
                         jira_key = str(low_pair['key'])
-                        success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache, False)
-                        if success and str(jira_id) in clean_cache:
-                            self.store_jira_key_and_id(jira_key, jira_id, "high")
+                        success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache)
                         i += 1
                 self.update_cache_diff(clean_cache)
                 time.sleep(1)
@@ -174,7 +160,7 @@ class Cache:
             else:
                 time.sleep(1)
 
-    def update_jira_ticket_in_cache(self, sd_api, jira_key, jira_id, failed_jira_keys=[], clean_cache={}, update_frequency=True):
+    def update_jira_ticket_in_cache(self, sd_api, jira_key, jira_id, failed_jira_keys=[], clean_cache={}):
         success = False
 
         try:
@@ -185,8 +171,6 @@ class Cache:
                 clean_cache,
                 jira_id
             )
-            if success and update_frequency:
-                self.store_jira_key_and_id(jira_key, jira_id)
         except Exception as err:
             print(str(err) + "; with Ticket " + jira_key)
             self.add_lost_jira_key(jira_key)
@@ -217,10 +201,10 @@ class Cache:
                     is_old_key = jira_key in leftover_keys
                     if is_old_key:
                         leftover_keys.remove(jira_key)
-                        self.store_jira_key_and_id(jira_key, jira_id)
+                        self.store_jira_key_and_id(jira_key, jira_id, "low")
                     else:
                         new_keys.append(jira_key)
-                        success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache, True)
+                        success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache)
                 synced_current = len(clean_cache)
                 self.update_cache_diff(clean_cache)
                 print('>>> successfully synced {} new tickets out of {} total in project "{}"'.format(synced_current, ticket_total, project))
@@ -237,6 +221,8 @@ class Cache:
                 if jira_key in jira_key_values:
                     jira_id = list(jira_keys.keys())[jira_key_values.index(jira_key)]
                     self.store_jira_key_and_id(jira_key, jira_id, "zero")
+
+        self.parallel_sync(sd_api)
 
     def update_cache_diff(self, clean_cache):
         for jira_id in clean_cache:
@@ -256,6 +242,7 @@ class Cache:
             mapped_ticket = self.mapper.get_mapped_ticket(raw_ticket_data)
             if last_updated is not None and 'Updated' in mapped_ticket and mapped_ticket['Updated'] is not None:
                 if last_updated == mapped_ticket['Updated']:
+                    self.store_jira_key_and_id(jira_key, jira_id, "low")
                     return True, clean_cache, failed_jira_keys
             mapped_ticket = self.mapper.format_related_tickets(mapped_ticket)
             mapped_ticket = sd_api.request_ticket_status(mapped_ticket)
@@ -276,6 +263,7 @@ class Cache:
             success = False
             return success
         clean_cache[str(jira_id)] = mapped_ticket
+        self.store_jira_key_and_id(jira_key, jira_id, "high")
         return success, clean_cache, failed_jira_keys
 
     @staticmethod
