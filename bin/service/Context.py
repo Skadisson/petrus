@@ -179,6 +179,6 @@ class Context:
             tickets = self.cache.load_cached_tickets()
             keywords = given_command.split(" ")
             phoenix_suggestions, suggested_keys = self.calculate_relevancy_for_tickets(tickets, {'Keywords': keywords, 'Related': []})
-            feedback = f"Phoenix hat zu einer Suchanfrage aus einem vorherigen Kommentar folgende Tickets finden können: {', '.join(suggested_keys)}"
+            feedback = f"Petrus hat zu einer Suchanfrage aus einem vorherigen Kommentar folgende Tickets finden können: {', '.join(suggested_keys)}"
 
         return feedback

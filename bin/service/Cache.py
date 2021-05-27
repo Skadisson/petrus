@@ -44,11 +44,13 @@ class Cache:
         pickle.dump(token, file)
 
     def store_ticket(self, jira_id, ticket):
+        if '_id' in ticket:
+            del(ticket['_id'])
         is_valid = self.validate_ticket_data(ticket)
         if is_valid:
-            stored_ticket = self.table_cache.find_one({'ID': jira_id})
+            stored_ticket = self.table_cache.find_one({'ID': str(jira_id)})
             if stored_ticket is not None:
-                self.table_cache.replace_one({'ID': jira_id}, ticket)
+                self.table_cache.replace_one({'ID': str(jira_id)}, ticket)
             else:
                 self.table_cache.insert_one(ticket)
         return is_valid
@@ -171,7 +173,6 @@ class Cache:
 
     def process_commands(self, sd_api, context, jira_id, jira_key, commands):
         for command in commands:
-            print(command)
             if command.find('Petrus: ') == 0:
                 current_time = self.get_current_time()
                 actual_command = command.replace('Petrus: ', '')
@@ -179,9 +180,7 @@ class Cache:
                 if feedback is not None:
                     feedback_exists = self.feedback_exists(jira_id, feedback)
                     if feedback_exists is False:
-                        success = True
-                        print(f"Test Feedback >>> {feedback}")
-                        """success = sd_api.post_comment(jira_id, feedback, "feedback")"""
+                        success = sd_api.post_comment(jira_id, feedback, "feedback")
                         if success:
                             self.store_feedback(jira_id, feedback)
                             print(f">>> {current_time}: Processed command '{actual_command}' successfully and gave feedback in Ticket '{jira_key}'.")
