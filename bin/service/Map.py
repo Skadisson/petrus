@@ -161,20 +161,23 @@ class Map:
 
     def format_comments(self, mapped_ticket):
         persons = []
+        commands = []
         if mapped_ticket['Comments'] is not None:
             formatted_comments = []
             if 'values' in mapped_ticket['Comments']:
                 for comment in mapped_ticket['Comments']['values']:
                     if comment['body'] is not None:
                         comment_text = self.regex.mask_text(comment['body'])
-                        if comment_text.find('Petrus') == -1:
+                        if comment_text.find('Petrus: ') == 0:
+                            commands.append(comment_text)
+                        elif comment_text.find('Petrus') == -1:
                             formatted_comments.append(comment_text)
                             if comment['author']['name'] not in persons:
                                 persons.append(comment['author']['name'])
                 mapped_ticket['Comments'] = formatted_comments
         else:
             mapped_ticket['Comments'] = []
-        return mapped_ticket, persons
+        return mapped_ticket, persons, commands
 
     def format_text(self, mapped_ticket):
         if 'Text' in mapped_ticket and mapped_ticket['Text'] is not None:

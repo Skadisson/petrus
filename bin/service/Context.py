@@ -13,6 +13,11 @@ class Context:
         self.mapper = Map.Map()
         self.cache = Cache.Cache()
         self.scikit = SciKitLearn.SciKitLearn()
+        self.possible_commands = {
+            'keywords': ['keyword', 'keywords', 'stichwort', 'stichwörter'],
+            'search': ['search', 'such', 'suche', 'find', 'finde'],
+            'forget': ['forget', 'vergiss', 'vergiß', 'vergesse', 'lösch', 'lösche', 'delete', 'remove', 'entfern', 'entferne']
+        }
 
     def calculate_relevancy_for_tickets(self, tickets, mapped_ticket):
         keywords = mapped_ticket['Keywords']
@@ -155,3 +160,25 @@ class Context:
                 if comment.find('Petrus') == -1:
                     filtered_comments.append(comment)
         return filtered_comments
+
+    def process_command(self, given_command):
+        feedback = None
+
+        for command in self.possible_commands:
+            for sub_command in self.possible_commands[command]:
+                if sub_command in given_command.lower():
+                    feedback = self.execute_command(command, given_command)
+                    return feedback
+
+        return feedback
+
+    def execute_command(self, functional_command, given_command):
+        feedback = None
+
+        if functional_command == 'search':
+            tickets = self.cache.load_cached_tickets()
+            keywords = given_command.split(" ")
+            phoenix_suggestions, suggested_keys = self.calculate_relevancy_for_tickets(tickets, {'Keywords': keywords, 'Related': []})
+            feedback = f"Phoenix hat zu einer Suchanfrage aus einem vorherigen Kommentar folgende Tickets finden können: {', '.join(suggested_keys)}"
+
+        return feedback

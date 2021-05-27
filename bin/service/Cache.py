@@ -22,6 +22,7 @@ class Cache:
         self.table_jira_keys = self.database.jira_keys
         self.table_score = self.database.high_score
         self.table_comments = self.database.comments
+        self.table_feedback = self.database.feedback
         self.add_text_indices()
 
     def add_text_indices(self):
@@ -56,21 +57,21 @@ class Cache:
         return list(self.table_cache.distinct('Key'))
 
     def load_jira_id_for_key(self, jira_key):
-        stored_relation = self.table_jira_keys.find_one({'key': jira_key})
+        stored_relation = self.table_jira_keys.find_one({'key': str(jira_key)})
         if stored_relation is not None:
             return stored_relation['id']
 
         return None
 
     def load_jira_key_for_id(self, jira_id):
-        stored_relation = self.table_jira_keys.find_one({'id': jira_id})
+        stored_relation = self.table_jira_keys.find_one({'id': str(jira_id)})
         if stored_relation is not None:
             return stored_relation['key']
 
         return None
 
     def store_jira_key_and_id(self, jira_key, jira_id, frequency="high"):
-        relation = {'id': jira_id, 'key': jira_key}
+        relation = {'id': str(jira_id), 'key': str(jira_key)}
         stored_relation = self.table_jira_keys.find_one(relation)
         if stored_relation is None:
             stored_relation = relation
@@ -126,50 +127,78 @@ class Cache:
         pickle.dump(content, file)
 
     def remove_jira_key(self, jira_key):
-        self.table_jira_keys.delete_one({'key': jira_key})
+        self.table_jira_keys.delete_one({'key': str(jira_key)})
 
-    def parallel_sync(self, sd_api, max_tickets=20):
+    def parallel_sync(self, sd_api, context, max_tickets=20):
         while True:
-            if int(time.time()) % (5*60) == 0:
-                clean_cache = {}
-                failed_jira_keys = []
-
-                current_time = self.get_current_time()
-                print(f">>> {current_time}: Starting Parallel Sync Run")
-
-                i = 0
-                high_pairs = list(self.get_jira_id_pairs_for_frequency("high", "SERVICE"))
-                low_pairs = list(self.get_jira_id_pairs_for_frequency("low", "SERVICE"))
-                processed_jira_keys = []
-                while i < max_tickets:
-                    high_pair = random.choice(high_pairs)
-                    low_pair = random.choice(low_pairs)
-                    if high_pair['key'] not in processed_jira_keys:
-                        processed_jira_keys.append(high_pair['key'])
-                        jira_id = int(high_pair['id'])
-                        jira_key = str(high_pair['key'])
-                        success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache)
-                        i += 1
-                    if low_pair['key'] not in processed_jira_keys:
-                        processed_jira_keys.append(low_pair['key'])
-                        jira_id = int(low_pair['id'])
-                        jira_key = str(low_pair['key'])
-                        success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache)
-                        i += 1
-                self.update_cache_diff(clean_cache)
-                time.sleep(1)
-
-                current_time = self.get_current_time()
-                print(f">>> {current_time}: Completed Parallel Sync Run with {len(processed_jira_keys)} Tickets: {', '.join(processed_jira_keys)}")
+            every_five_minutes = int(time.time()) % (5*60) == 0
+            if every_five_minutes:
+                self.sync_updated_content(sd_api, context, max_tickets)
             else:
                 time.sleep(1)
 
-    def update_jira_ticket_in_cache(self, sd_api, jira_key, jira_id, failed_jira_keys=[], clean_cache={}):
+    def sync_updated_content(self, sd_api, context, max_tickets=20):
+        clean_cache = {}
+        failed_jira_keys = []
+
+        current_time = self.get_current_time()
+        print(f">>> {current_time}: Starting Parallel Sync Run")
+
+        i = 0
+        high_pairs = list(self.get_jira_id_pairs_for_frequency("high", "SERVICE"))
+        low_pairs = list(self.get_jira_id_pairs_for_frequency("low", "SERVICE"))
+        processed_jira_keys = []
+        while i < max_tickets:
+            high_pair = random.choice(high_pairs)
+            low_pair = random.choice(low_pairs)
+            if high_pair['key'] not in processed_jira_keys:
+                processed_jira_keys.append(high_pair['key'])
+                jira_id = int(high_pair['id'])
+                jira_key = str(high_pair['key'])
+                success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, context, jira_key, jira_id, failed_jira_keys, clean_cache)
+                i += 1
+            if low_pair['key'] not in processed_jira_keys:
+                processed_jira_keys.append(low_pair['key'])
+                jira_id = int(low_pair['id'])
+                jira_key = str(low_pair['key'])
+                success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, context, jira_key, jira_id, failed_jira_keys, clean_cache)
+                i += 1
+        self.update_cache_diff(clean_cache)
+        time.sleep(1)
+
+        current_time = self.get_current_time()
+        print(f">>> {current_time}: Completed Parallel Sync Run with {len(processed_jira_keys)} Tickets: {', '.join(processed_jira_keys)}")
+
+    def process_commands(self, sd_api, context, jira_id, jira_key, commands):
+        for command in commands:
+            print(command)
+            if command.find('Petrus: ') == 0:
+                current_time = self.get_current_time()
+                actual_command = command.replace('Petrus: ', '')
+                feedback = context.process_command(actual_command)
+                if feedback is not None:
+                    feedback_exists = self.feedback_exists(jira_id, feedback)
+                    if feedback_exists is False:
+                        success = True
+                        print(f"Test Feedback >>> {feedback}")
+                        """success = sd_api.post_comment(jira_id, feedback, "feedback")"""
+                        if success:
+                            self.store_feedback(jira_id, feedback)
+                            print(f">>> {current_time}: Processed command '{actual_command}' successfully and gave feedback in Ticket '{jira_key}'.")
+                        else:
+                            print(f">>> {current_time}: Command '{actual_command}' was not processed for Ticket '{jira_key}'.")
+                    else:
+                        print(f">>> {current_time}: Command '{actual_command}' feedback already posted in Ticket '{jira_key}'.")
+                else:
+                    print(f">>> {current_time}: Command '{actual_command}' was invalid for Ticket '{jira_key}'.")
+
+    def update_jira_ticket_in_cache(self, sd_api, context, jira_key, jira_id, failed_jira_keys=[], clean_cache={}):
         success = False
 
         try:
             success, clean_cache, failed_jira_keys = self.add_to_clean_cache(
                 sd_api,
+                context,
                 jira_key,
                 failed_jira_keys,
                 clean_cache,
@@ -182,7 +211,7 @@ class Cache:
 
         return success, failed_jira_keys, clean_cache
 
-    def sync(self, sd_api):
+    def sync(self, sd_api, context):
         clean_cache = {}
         failed_jira_keys = []
         jira_keys = {}
@@ -226,7 +255,7 @@ class Cache:
                     jira_id = list(jira_keys.keys())[jira_key_values.index(jira_key)]
                     self.store_jira_key_and_id(jira_key, jira_id, "zero")
 
-        self.parallel_sync(sd_api)
+        self.parallel_sync(sd_api, context)
 
     def update_cache_diff(self, clean_cache):
         for jira_id in clean_cache:
@@ -235,7 +264,7 @@ class Cache:
             if stored is False:
                 print('>>> ticket with id {} couldnt be stored'.format(jira_id))
 
-    def add_to_clean_cache(self, sd_api, jira_key, failed_jira_keys, clean_cache, jira_id):
+    def add_to_clean_cache(self, sd_api, context, jira_key, failed_jira_keys, clean_cache, jira_id):
         success = True
         try:
             last_updated = None
@@ -256,7 +285,8 @@ class Cache:
             mapped_ticket = sd_api.request_ticket_sla(mapped_ticket)
             mapped_ticket = self.mapper.format_sla(mapped_ticket)
             mapped_ticket = sd_api.request_ticket_comments(mapped_ticket)
-            mapped_ticket, comment_persons = self.mapper.format_comments(mapped_ticket)
+            mapped_ticket, comment_persons, commands = self.mapper.format_comments(mapped_ticket)
+            self.process_commands(sd_api, context, jira_id, jira_key, commands)
             mapped_ticket = self.mapper.format_text(mapped_ticket)
             mapped_ticket = self.mapper.format_reporter(mapped_ticket)
             mapped_ticket = self.mapper.add_persons(mapped_ticket, (worklog_persons + comment_persons))
@@ -344,9 +374,16 @@ class Cache:
 
         return max(monthly_score), monthly_score
 
-    def comment_exists(self, jira_id):
-        comment = self.table_comments.find_one({'jira_id': jira_id})
+    def comment_exists(self, jira_id, comment_type="estimation"):
+        comment = self.table_comments.find_one({'jira_id': jira_id, 'comment_type': comment_type})
         return comment is not None
 
-    def store_comment(self, jira_id, comment):
-        self.table_comments.insert_one({'jira_id': jira_id, 'comment': comment})
+    def store_comment(self, jira_id, comment, comment_type="estimation"):
+        self.table_comments.insert_one({'jira_id': jira_id, 'comment': comment, 'comment_type': comment_type})
+
+    def feedback_exists(self, jira_id, feedback):
+        comment = self.table_feedback.find_one({'jira_id': jira_id, 'feedback': feedback})
+        return comment is not None
+
+    def store_feedback(self, jira_id, feedback):
+        self.table_feedback.insert_one({'jira_id': jira_id, 'feedback': feedback})

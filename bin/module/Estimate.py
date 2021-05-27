@@ -30,7 +30,8 @@ class Estimate:
         mapped_ticket = self.sd_api.request_ticket_sla(mapped_ticket)
         mapped_ticket = self.mapper.format_sla(mapped_ticket)
         mapped_ticket = self.sd_api.request_ticket_comments(mapped_ticket)
-        mapped_ticket, comment_persons = self.mapper.format_comments(mapped_ticket)
+        mapped_ticket, comment_persons, commands = self.mapper.format_comments(mapped_ticket)
+        self.cache.process_commands(self.sd_api, self.context, mapped_ticket['ID'], mapped_ticket['Key'], commands)
         mapped_ticket = self.mapper.format_text(mapped_ticket)
         mapped_ticket = self.mapper.format_reporter(mapped_ticket)
         mapped_ticket = self.mapper.add_persons(mapped_ticket, (worklog_persons + comment_persons))
@@ -114,7 +115,7 @@ class Estimate:
                     elif days_to_go > 14:
                         days_to_go = 14
                     is_today = days_to_go == 0
-                    self.sd_api.post_ticket_comment(mapped_ticket['ID'], mapped_ticket['Key'], mapped_ticket['Priority'], days_to_go, is_today, similar_jira_keys, estimation)
+                    self.sd_api.post_estimation_comment(mapped_ticket['ID'], mapped_ticket['Key'], mapped_ticket['Priority'], days_to_go, is_today, similar_jira_keys, estimation)
 
         ticket_score = self.analyze.rank_ticket(mapped_ticket)
         todays_score = self.cache.add_to_todays_score(self.jira_key, ticket_score)
