@@ -172,7 +172,7 @@ class Cache:
         print(f">>> {current_time}: Completed Parallel Sync Run with {len(processed_jira_keys)} Tickets: {', '.join(processed_jira_keys)}")
 
     def process_commands(self, sd_api, context, jira_id, jira_key, commands):
-        for command in commands:
+        """for command in commands:
             if command.find('Petrus: ') == 0:
                 current_time = self.get_current_time()
                 actual_command = command.replace('Petrus: ', '')
@@ -189,7 +189,7 @@ class Cache:
                     else:
                         print(f">>> {current_time}: Command '{actual_command}' feedback already posted in Ticket '{jira_key}'.")
                 else:
-                    print(f">>> {current_time}: Command '{actual_command}' was invalid for Ticket '{jira_key}'.")
+                    print(f">>> {current_time}: Command '{actual_command}' was invalid for Ticket '{jira_key}'.")"""
 
     def update_jira_ticket_in_cache(self, sd_api, context, jira_key, jira_id, failed_jira_keys=[], clean_cache={}):
         success = False
@@ -236,7 +236,7 @@ class Cache:
                         self.store_jira_key_and_id(jira_key, jira_id, "low")
                     else:
                         new_keys.append(jira_key)
-                        success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, jira_key, jira_id, failed_jira_keys, clean_cache)
+                        success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, context, jira_key, jira_id, failed_jira_keys, clean_cache)
                 synced_current = len(clean_cache)
                 self.update_cache_diff(clean_cache)
                 print('>>> successfully synced {} new tickets out of {} total in project "{}"'.format(synced_current, ticket_total, project))
