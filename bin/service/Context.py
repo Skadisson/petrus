@@ -141,6 +141,7 @@ class Context:
                 if key in suggested_keys:
                     rel_index = suggested_keys.index(key)
                     suggested_tickets.append({
+                        'key': key,
                         'jira_id': ticket['ID'],
                         'percentage': min(100, round(relevancies[rel_index] * 10000)),
                         'hits': [],
@@ -179,6 +180,7 @@ class Context:
             tickets = self.cache.load_cached_tickets()
             keywords = given_command.split(" ")
             phoenix_suggestions, suggested_keys = self.calculate_relevancy_for_tickets(tickets, {'Keywords': keywords, 'Related': []})
-            feedback = f"Petrus hat zu einer Suchanfrage aus einem vorherigen Kommentar folgende Tickets finden können: {', '.join(suggested_keys)}"
+            if len(phoenix_suggestions) > 0:
+                feedback = f"Petrus hat zu einer Suchanfrage aus einem vorherigen Kommentar folgendes Ticket finden können: {phoenix_suggestions[0]['key']} - {phoenix_suggestions[0]['title']}"
 
         return feedback
