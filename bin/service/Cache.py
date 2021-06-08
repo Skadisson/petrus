@@ -58,6 +58,9 @@ class Cache:
     def get_all_jira_keys(self):
         return list(self.table_cache.distinct('Key'))
 
+    def get_all_jira_key_pairs(self):
+        return self.table_jira_keys.find()
+
     def load_jira_id_for_key(self, jira_key):
         stored_relation = self.table_jira_keys.find_one({'key': str(jira_key)})
         if stored_relation is not None:
@@ -224,6 +227,8 @@ class Cache:
 
         max_results = 100
 
+        self.clear_cache_redundancy()
+
         leftover_keys = self.get_all_jira_keys()
         new_keys = []
         start = time.time()
@@ -261,6 +266,44 @@ class Cache:
                     self.store_jira_key_and_id(jira_key, jira_id, "zero")
 
         self.parallel_sync(sd_api, context)
+
+    def clear_cache_redundancy(self):
+        redundancy_aggregates = self.table_cache.aggregate([
+            {
+                '$group': {
+                    '_id': {
+                        'Key': '$Key'
+                    },
+                    'uniqueIDs': {
+                        '$addToSet': '_id'
+                    },
+                    'count': {
+                        '$sum': 1
+                    }
+                }
+            }, {
+                '$match': {
+                    'count': {
+                        '$gt': 1
+                    }
+                }
+            }
+        ])
+
+        cleared_count = {}
+        clear_count = 0
+        for aggregate in redundancy_aggregates:
+            tickets = self.table_cache.find({'Key': aggregate['_id']['Key']})
+            redundant_tickets = tickets[1:]
+            for ticket in redundant_tickets:
+                clear_count += 1
+                if ticket['Key'] not in cleared_count:
+                    cleared_count[ticket['Key']] = 1
+                else:
+                    cleared_count[ticket['Key']] += 1
+                self.table_cache.delete_one({'Key': ticket['Key']})
+
+        print(f">>> completed removing {clear_count} redundant tickets: {str(cleared_count)}")
 
     def update_cache_diff(self, clean_cache):
         for jira_id in clean_cache:
