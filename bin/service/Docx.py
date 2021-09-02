@@ -258,12 +258,32 @@ class Docx:
 
         return support_relation, bugfix_relation
 
+    @staticmethod
+    def calculate_hours_per_keyword_relation(hours_per_keyword):
+        values = []
+        labels = []
+        i = 5
+        for keyword_set in hours_per_keyword:
+            values.append(keyword_set['hours'])
+            labels.append(f"{keyword_set['keyword']} ({round(keyword_set['hours'])}h)")
+            i -= 1
+            if i == 0:
+                break
+        return values, labels
+
     def place_type_pie_chart(self, hours_per_type):
 
         support_relation, bugfix_relation = self.calculate_type_relation(hours_per_type)
 
         values = [support_relation, bugfix_relation]
         labels = [f"Support [{support_relation}%]", f"Fehler [{bugfix_relation}%]"]
+        self.place_pie_chart(values, labels)
+
+    def place_keyword_pie_chart(self, hours_per_keyword, months):
+        days = self.months_to_days(months)
+        self.document.add_heading('Keywords', level=1)
+        self.document.add_paragraph('Top 5 Keywords der letzten {} Tage, nach Aufwand berechnet, ohne System- und Jira-Keywords wie "bb50" oder "Produktentwicklung".'.format(days))
+        values, labels = self.calculate_hours_per_keyword_relation(hours_per_keyword)
         self.place_pie_chart(values, labels)
 
     def place_pie_chart(self, values, labels):
@@ -273,7 +293,7 @@ class Docx:
 
         plt.figure(self.figure_number)
         self.figure_number += 1
-        plt.pie(values, labels=labels, colors=['#00FFAE', '#FD5A2F', '#16BAE7'])
+        plt.pie(values, labels=labels, colors=['#00FFAE', '#FD5A2F', '#16BAE7', '#D2F50D', '#DC63FF'])
         plt.savefig(sub_plot_path)
 
         self.document.add_picture(sub_plot_path, width=Inches(6))
