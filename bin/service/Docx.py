@@ -293,7 +293,10 @@ class Docx:
 
         plt.figure(self.figure_number)
         self.figure_number += 1
-        plt.pie(values, labels=labels, colors=['#00FFAE', '#FD5A2F', '#16BAE7', '#D2F50D', '#DC63FF'])
+        colors = ['#00FFAE', '#FD5A2F', '#16BAE7']
+        if len(values) > 3:
+            colors = ['#16BAE7', '#4DCEF1', '#93E2F7', '#BFEEFB', '#E9FAFF']
+        plt.pie(values, labels=labels, colors=colors)
         plt.savefig(sub_plot_path)
 
         self.document.add_picture(sub_plot_path, width=Inches(6))
