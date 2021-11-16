@@ -33,6 +33,7 @@ class Estimate:
         mapped_ticket, comment_persons, commands = self.mapper.format_comments(mapped_ticket)
         self.cache.process_commands(self.sd_api, self.context, mapped_ticket['ID'], mapped_ticket['Key'], commands)
         mapped_ticket = self.mapper.format_text(mapped_ticket)
+        mapped_ticket = self.mapper.format_notes(mapped_ticket)
         mapped_ticket = self.mapper.format_reporter(mapped_ticket)
         mapped_ticket = self.mapper.add_persons(mapped_ticket, (worklog_persons + comment_persons))
         mapped_ticket = self.mapper.format_versions(mapped_ticket)

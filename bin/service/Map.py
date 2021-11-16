@@ -184,6 +184,11 @@ class Map:
             mapped_ticket['Text'] = self.regex.mask_text(mapped_ticket['Text'])
         return mapped_ticket
 
+    def format_notes(self, mapped_ticket):
+        if 'Notes' in mapped_ticket and mapped_ticket['Notes'] is not None:
+            mapped_ticket['Notes'] = self.regex.mask_text(mapped_ticket['Notes'])
+        return mapped_ticket
+
     @staticmethod
     def format_reporter(mapped_ticket):
         regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'

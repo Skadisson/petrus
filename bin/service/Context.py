@@ -112,6 +112,9 @@ class Context:
             title = str(ticket['Title'])
             description = str(ticket['Text'])
             description += " || " + str(title)
+            if 'Notes' in ticket:
+                notes = str(ticket['Notes'])
+                description += " || " + str(notes)
             comments = self.filter_petrus_comments(ticket['Comments'])
             if len(comments) > 0:
                 description += " || " + (" || ".join(comments))
