@@ -115,7 +115,9 @@ class Estimate:
                     elif days_to_go > 14:
                         days_to_go = 14
                     is_today = days_to_go == 0
-                    self.sd_api.post_estimation_comment(mapped_ticket['ID'], mapped_ticket['Key'], mapped_ticket['Priority'], days_to_go, is_today, similar_jira_keys, estimation)
+                    comment_success = self.sd_api.post_estimation_comment(mapped_ticket['ID'], mapped_ticket['Key'], mapped_ticket['Priority'], days_to_go, is_today, similar_jira_keys, estimation)
+                    if comment_success is False:
+                        self.cache.add_log_entry(self.__class__.__name__, f"Could not comment on ticket {mapped_ticket['Key']}")
 
         ticket_score = self.analyze.rank_ticket(mapped_ticket)
         todays_score = self.cache.add_to_todays_score(self.jira_key, ticket_score)

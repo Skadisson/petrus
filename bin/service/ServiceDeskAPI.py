@@ -4,6 +4,8 @@ from bin.service import Cache
 import oauth2 as oauth
 from urllib import parse
 import json
+import datetime
+import time
 
 
 class ServiceDeskAPI:
@@ -171,20 +173,20 @@ class ServiceDeskAPI:
 
     def post_estimation_comment(self, jira_id, jira_key, priority, days_to_go, today=False, similar_jira_keys=None, estimation=None):
 
-        comment = f"Mit der aktuellen Priorität '{priority}' wird das Ticket voraussichtlich"
         if today:
-            comment += f" heute bearbeitet werden."
+            date = f"heute"
         else:
-            comment += f" innerhalb der nächsten {days_to_go} Arbeitstage bearbeitet werden."
+            end_date = datetime.date.today() + datetime.timedelta(days=days_to_go)
+            date = f"{end_date.strftime('%Y/%m/%d')}"
+        comment = f"Bearbeitung voraussichtlich bis {date}"
         if estimation > 0:
             hours = round(estimation / 60 / 60, 2)
-            comment += f" In der Vergangenheit dauerte die aktive Bearbeitung ähnlicher Tickets in etwa {hours} Stunden."
+            comment += f"\nKalkulierte Bearbeitungsdauer: {str(hours).replace('.', ',')} h"
         if similar_jira_keys is not None and len(similar_jira_keys) > 0:
             if jira_key in similar_jira_keys:
                 same_id = similar_jira_keys.index(jira_key)
                 del(similar_jira_keys[same_id])
-            comment += f" Ein ähnliches Ticket könnte sein: {similar_jira_keys[0]}."
-        comment += f" - Automatisierte Nachricht von Petrus"
+            comment += f"\nÄhnliches Ticket: {similar_jira_keys[0]}"
 
         success = self.post_comment(jira_id, comment, "estimation")
 
@@ -192,15 +194,16 @@ class ServiceDeskAPI:
 
     def post_comment(self, jira_id, comment, comment_type="estimation"):
 
-        ticket_endpoint = self.environment.get_endpoint_comment().format(jira_id)
+        ticket_endpoint = self.environment.get_endpoint_ticket().format(jira_id)
         request_content = {
-            'body': comment,
-            'public': False
+            "fields": {
+                "customfield_12300": comment
+            }
         }
         request_body = json.dumps(request_content)
         body = request_body.encode('utf-8')
         headers = {'Content-Type': 'application/json'}
-        resp, content = self.client.request(ticket_endpoint, headers=headers, method="POST", body=body)
+        resp, content = self.client.request(ticket_endpoint, headers=headers, method="PUT", body=body)
         state = int(resp.get('status'))
         success = state in [201, 204]
 
