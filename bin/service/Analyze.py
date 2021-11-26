@@ -160,7 +160,7 @@ class Analyze:
             if is_in_range is True and 'Keywords' in ticket and 'Time_Spent' in ticket \
                     and ticket['Time_Spent'] is not None and ticket['Keywords'] is not None:
                 for keyword in ticket['Keywords']:
-                    if 'bb' in keyword or keyword in ['Produktentwicklung', 'Ressourcenplanung', 'project', 'projekt', 'Projektleitung', 'analysis']:
+                    if 'bb' in keyword or keyword in ['Produktentwicklung', 'Ressourcenplanung', 'projekt', 'Projekt', 'Projektleitung', 'analysis']:
                         continue
                     if keyword not in hours_per_keyword:
                         hours_per_keyword[keyword] = {
