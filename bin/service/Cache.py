@@ -439,3 +439,7 @@ class Cache:
 
     def store_feedback(self, jira_id, feedback):
         self.table_feedback.insert_one({'jira_id': jira_id, 'feedback': feedback})
+
+    def get_open_tickets(self, project="SERVICE"):
+        rgx = re.compile(f"^{project}.*", re.IGNORECASE)
+        return self.table_cache.find({'Closed': None, 'Key': {'$regex': rgx}})

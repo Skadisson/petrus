@@ -18,7 +18,7 @@ def petrus(request):
         jira_key = request.args.get('jira_key', None)
         if jira_key is not None:
             estimator = Estimate.Estimate(jira_key)
-            items, success = estimator.run()
+            items, success = estimator.run(True)
     elif function == 'Search':
         keywords = request.args.get('keywords', None)
         if keywords is not None:

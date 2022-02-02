@@ -49,7 +49,7 @@ class Estimate:
         )
         return normalized_ticket, similar_tickets, hits, similar_jira_keys
 
-    def run(self):
+    def run(self, post_to_jira=True):
         mapped_ticket = None
         success = False
         estimation = None
@@ -76,14 +76,15 @@ class Estimate:
                             'Time_Spent',
                             ['Rank', 'Relevancy', 'Key', 'Priority', 'State_Changes', 'Type', 'Organization']
                         )
-                    success = self.sd_api.update_ticket_times(jira_id, estimation, mapped_ticket)
+                    if post_to_jira:
+                        success = self.sd_api.update_ticket_times(jira_id, estimation, mapped_ticket)
         except Exception as e:
             self.cache.add_log_entry(self.__class__.__name__, e)
 
         if estimation is not None:
             estimation = float(estimation)
 
-        if normalized_ticket is not None and jira_id is not None and mapped_ticket is not None:
+        if post_to_jira and normalized_ticket is not None and jira_id is not None and mapped_ticket is not None:
             comment_exists = self.cache.comment_exists(jira_id)
             if comment_exists is False:
                 normalized_ticket['Diff'] = 0.0
@@ -120,18 +121,20 @@ class Estimate:
                     if comment_success is False:
                         self.cache.add_log_entry(self.__class__.__name__, f"Could not comment on ticket {mapped_ticket['Key']}")
 
-        ticket_score = self.analyze.rank_ticket(mapped_ticket)
-        todays_score = self.cache.add_to_todays_score(self.jira_key, ticket_score)
-        top_month_score, monthly_score = self.cache.get_monthly_top_score()
-        highest_day, highest_score = self.cache.get_high_score()
-        score = {
-            'ticket': str(ticket_score),
-            'today': str(todays_score),
-            'monthly_score': monthly_score,
-            'top_month_score': top_month_score,
-            'highest_score': str(highest_score),
-            'highest_day': str(highest_day)
-        }
+        score = {}
+        if post_to_jira:
+            ticket_score = self.analyze.rank_ticket(mapped_ticket)
+            todays_score = self.cache.add_to_todays_score(self.jira_key, ticket_score)
+            top_month_score, monthly_score = self.cache.get_monthly_top_score()
+            highest_day, highest_score = self.cache.get_high_score()
+            score = {
+                'ticket': str(ticket_score),
+                'today': str(todays_score),
+                'monthly_score': monthly_score,
+                'top_month_score': top_month_score,
+                'highest_score': str(highest_score),
+                'highest_day': str(highest_day)
+            }
         if '_id' in mapped_ticket:
             del(mapped_ticket['_id'])
         items = [{
