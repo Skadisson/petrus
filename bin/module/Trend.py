@@ -8,7 +8,8 @@ import json
 class Trend:
     """Trend calculator"""
 
-    def __init__(self, months=0, year="", week_numbers=""):
+    def __init__(self, months=0, year="", week_numbers="", start=0):
+        self.start = int(start)
         self.months = float(months)
         self.year = str(year)
         self.week_numbers = str(week_numbers)
@@ -18,27 +19,27 @@ class Trend:
     def analyze_trend(self):
         analyze = Analyze.Analyze()
         days = self.months * 30
-        hours_per_project, project_ticket_count, project_tickets = analyze.hours_per_project(days, self.year, self.week_numbers)
-        hours_per_system, system_ticket_count, system_tickets, system_versions = analyze.hours_per_system(days, self.year, self.week_numbers)
-        hours_per_keyword = analyze.hours_per_keyword(days, self.year, self.week_numbers)
-        plot_data = analyze.plot_data(days, self.year, self.week_numbers)
+        hours_per_project, project_ticket_count, project_tickets = analyze.hours_per_project(days, self.year, self.week_numbers, self.start)
+        hours_per_system, system_ticket_count, system_tickets, system_versions = analyze.hours_per_system(days, self.year, self.week_numbers, self.start)
+        hours_per_keyword = analyze.hours_per_keyword(days, self.year, self.week_numbers, self.start)
+        plot_data = analyze.plot_data(days, self.year, self.week_numbers, self.start)
         project_scores = analyze.score_labeled_tickets(project_tickets)
         system_scores = analyze.score_labeled_tickets(system_tickets)
-        hours_per_type = analyze.hours_per_type(days, self.year, self.week_numbers)
-        hours_per_version, projects_per_version = analyze.hours_per_version(days, self.year, self.week_numbers)
-        hours_total = analyze.hours_total(days, self.year, self.week_numbers)
-        bb5_hours_total = analyze.bb5_hours_total(days, self.year, self.week_numbers)
-        ticket_count, internal_count, external_count = analyze.ticket_count(days, self.year, self.week_numbers)
-        pe_ticket_count = analyze.pe_ticket_count(days, self.year, self.week_numbers)
-        is_ticket_count = analyze.is_ticket_count(days, self.year, self.week_numbers)
-        bb5_ticket_count = analyze.bb5_ticket_count(days, self.year, self.week_numbers)
-        hours_per_ticket = analyze.hours_per_ticket(days, self.year, self.week_numbers)
-        lifetime_per_ticket = analyze.lifetime_per_ticket(days, self.year, self.week_numbers)
-        top_5_ticket_ranks, bottom_5_ticket_ranks = analyze.top_and_bottom_tickets(days, self.year, self.week_numbers)
-        qs_tickets_and_relations, cs_to_qs = analyze.qs_tickets_and_relations(days, self.year, self.week_numbers)
-        devops_tickets_and_relations, cs_to_devops = analyze.devops_tickets_and_relations(days, self.year, self.week_numbers)
-        bb5_tickets_and_relations = analyze.bb5_tickets_and_relations(days, self.year, self.week_numbers)
-        problematic_tickets = analyze.problematic_tickets(days, self.year, self.week_numbers)
+        hours_per_type = analyze.hours_per_type(days, self.year, self.week_numbers, self.start)
+        hours_per_version, projects_per_version = analyze.hours_per_version(days, self.year, self.week_numbers, self.start)
+        hours_total = analyze.hours_total(days, self.year, self.week_numbers, self.start)
+        bb5_hours_total = analyze.bb5_hours_total(days, self.year, self.week_numbers, self.start)
+        ticket_count, internal_count, external_count = analyze.ticket_count(days, self.year, self.week_numbers, self.start)
+        pe_ticket_count = analyze.pe_ticket_count(days, self.year, self.week_numbers, self.start)
+        is_ticket_count = analyze.is_ticket_count(days, self.year, self.week_numbers, self.start)
+        bb5_ticket_count = analyze.bb5_ticket_count(days, self.year, self.week_numbers, self.start)
+        hours_per_ticket = analyze.hours_per_ticket(days, self.year, self.week_numbers, self.start)
+        lifetime_per_ticket = analyze.lifetime_per_ticket(days, self.year, self.week_numbers, self.start)
+        top_5_ticket_ranks, bottom_5_ticket_ranks = analyze.top_and_bottom_tickets(days, self.year, self.week_numbers, 5, self.start)
+        qs_tickets_and_relations, cs_to_qs = analyze.qs_tickets_and_relations(days, self.year, self.week_numbers, self.start)
+        devops_tickets_and_relations, cs_to_devops = analyze.devops_tickets_and_relations(days, self.year, self.week_numbers, self.start)
+        bb5_tickets_and_relations = analyze.bb5_tickets_and_relations(days, self.year, self.week_numbers, self.start)
+        problematic_tickets = analyze.problematic_tickets(days, self.year, self.week_numbers, self.start)
         self.output_trend_json(ticket_count, internal_count, external_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, hours_per_keyword)
         return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, hours_per_keyword
 

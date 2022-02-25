@@ -3,7 +3,7 @@ if __name__ == '__main__':
     from datetime import date
     import time
     year = date.fromtimestamp(time.time()).strftime("%Y")
-    trend = Trend.Trend(months=1, year=year)
+    trend = Trend.Trend(months=1, year=year, week_numbers="", start=-1)
     items, success = trend.run()
     print(success)
 

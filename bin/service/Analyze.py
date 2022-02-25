@@ -21,13 +21,13 @@ class Analyze:
         self.environment = Environment.Environment()
         self.ranking = Ranking.Ranking()
 
-    def ticket_count(self, for_days=0, year="", week_numbers=""):
+    def ticket_count(self, for_days=0, year="", week_numbers="", start=0):
         ticket_count = 0
         external_count = 0
         internal_count = 0
         tickets = self.cache.load_cached_tickets()
         for ticket in tickets:
-            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True:
                 ticket_count += 1
                 if 'Reporter' in ticket:
@@ -38,11 +38,11 @@ class Analyze:
 
         return ticket_count, internal_count, external_count
 
-    def top_and_bottom_tickets(self, for_days=0, year="", week_numbers="", top_count=5):
+    def top_and_bottom_tickets(self, for_days=0, year="", week_numbers="", top_count=5, start=0):
         ranked_tickets = []
         tickets = self.cache.load_cached_tickets()
         for ticket in tickets:
-            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             concluded = len(ticket['Status']) > 0 and 'type' in ticket['Status'][0] and ticket['Status'][0]['type'] == 'Fertig'
             actually_needed_effort = 'Time_Spent' in ticket and ticket['Time_Spent'] is not None and ticket['Time_Spent'] > 0
             if actually_needed_effort is True and is_in_range is True and concluded is True:
@@ -66,75 +66,75 @@ class Analyze:
 
         return top_ticket_ranks, bottom_ticket_ranks
 
-    def pe_ticket_count(self, for_days=0, year="", week_numbers=""):
+    def pe_ticket_count(self, for_days=0, year="", week_numbers="", start=0):
         ticket_count = 0
         tickets = self.cache.load_cached_tickets()
         for ticket in tickets:
-            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True:
                 if 'Produktentwicklung' in ticket['Keywords']:
                     ticket_count += 1
 
         return ticket_count
 
-    def is_ticket_count(self, for_days=0, year="", week_numbers=""):
+    def is_ticket_count(self, for_days=0, year="", week_numbers="", start=0):
         ticket_count = 0
         tickets = self.cache.load_cached_tickets()
         for ticket in tickets:
-            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True:
                 if 'ressourcenplanung' in ticket['Keywords'] or 'ressourcenplanung' in ticket['Keywords']:
                     ticket_count += 1
 
         return ticket_count
 
-    def bb5_ticket_count(self, for_days=0, year="", week_numbers=""):
+    def bb5_ticket_count(self, for_days=0, year="", week_numbers="", start=0):
         ticket_count = 0
         bb5_tickets = self.cache.load_cached_tickets('BRANDBOX5')
         for bb5_ticket in bb5_tickets:
-            is_in_range = self.ticket_is_in_range(bb5_ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(bb5_ticket, for_days, year, week_numbers, start)
             if is_in_range is True:
                 ticket_count += 1
         bb5_tickets = self.cache.load_cached_tickets('BRANDBOX_SERVICE')
         for bb5_ticket in bb5_tickets:
-            is_in_range = self.ticket_is_in_range(bb5_ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(bb5_ticket, for_days, year, week_numbers, start)
             if is_in_range is True:
                 ticket_count += 1
 
         return ticket_count
 
-    def hours_total(self, for_days=0, year="", week_numbers=""):
+    def hours_total(self, for_days=0, year="", week_numbers="", start=0):
         total = 0.0
         tickets = self.cache.load_cached_tickets()
         for ticket in tickets:
-            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True and ticket['Time_Spent'] is not None and ticket['Time_Spent'] > 0:
                 total += ticket['Time_Spent'] / 60 / 60
 
         return total
 
-    def bb5_hours_total(self, for_days=0, year="", week_numbers=""):
+    def bb5_hours_total(self, for_days=0, year="", week_numbers="", start=0):
         total = 0.0
         bb5_tickets = self.cache.load_cached_tickets('BRANDBOX5')
         for bb5_ticket in bb5_tickets:
-            is_in_range = self.ticket_is_in_range(bb5_ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(bb5_ticket, for_days, year, week_numbers, start)
             if is_in_range is True and bb5_ticket['Time_Spent'] is not None and bb5_ticket['Time_Spent'] > 0:
                 total += bb5_ticket['Time_Spent'] / 60 / 60
         bb5_tickets = self.cache.load_cached_tickets('BRANDBOX_SERVICE')
         for bb5_ticket in bb5_tickets:
-            is_in_range = self.ticket_is_in_range(bb5_ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(bb5_ticket, for_days, year, week_numbers, start)
             if is_in_range is True and bb5_ticket['Time_Spent'] is not None and bb5_ticket['Time_Spent'] > 0:
                 total += bb5_ticket['Time_Spent'] / 60 / 60
 
         return total
 
-    def hours_per_project(self, for_days=0, year="", week_numbers=""):
+    def hours_per_project(self, for_days=0, year="", week_numbers="", start=0):
         projects = {}
         ticket_count = {}
         project_tickets = {}
         tickets = self.cache.load_cached_tickets()
         for ticket in tickets:
-            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True and 'Project' in ticket:
                 project_name = ticket['Project']
                 if project_name is not None:
@@ -152,11 +152,11 @@ class Analyze:
         projects = self.sort_tickets_and_seconds_to_hours(projects)
         return projects, ticket_count, project_tickets
 
-    def hours_per_keyword(self, for_days=0, year="", week_numbers=""):
+    def hours_per_keyword(self, for_days=0, year="", week_numbers="", start=0):
         hours_per_keyword = {}
         tickets = self.cache.load_cached_tickets()
         for ticket in tickets:
-            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True and 'Keywords' in ticket and 'Time_Spent' in ticket \
                     and ticket['Time_Spent'] is not None and ticket['Keywords'] is not None:
                 for keyword in ticket['Keywords']:
@@ -183,7 +183,7 @@ class Analyze:
 
         return hpk_sorted
 
-    def hours_per_system(self, for_days=0, year="", week_numbers=""):
+    def hours_per_system(self, for_days=0, year="", week_numbers="", start=0):
 
         domain_regex = r'^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)'
 
@@ -193,7 +193,7 @@ class Analyze:
         system_versions = {}
         tickets = self.cache.load_cached_tickets()
         for ticket in tickets:
-            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True and 'System' in ticket:
                 system_url = ticket['System']
                 if system_url is not None and system_url != '':
@@ -224,11 +224,11 @@ class Analyze:
         systems = self.sort_tickets_and_seconds_to_hours(domains)
         return systems, ticket_count, system_tickets, system_versions
 
-    def hours_per_type(self, for_days=0, year="", week_numbers=""):
+    def hours_per_type(self, for_days=0, year="", week_numbers="", start=0):
         types = {}
         tickets = self.cache.load_cached_tickets()
         for ticket in tickets:
-            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True and 'Type' in ticket:
                 if ticket['Type'] not in types:
                     types[ticket['Type']] = []
@@ -238,12 +238,12 @@ class Analyze:
         types = self.sort_tickets_and_seconds_to_hours(types)
         return types
 
-    def hours_per_version(self, for_days=0, year="", week_numbers=""):
+    def hours_per_version(self, for_days=0, year="", week_numbers="", start=0):
         versions = {}
         projects = {}
         tickets = self.cache.load_cached_tickets()
         for ticket in tickets:
-            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True and 'Keywords' in ticket:
                 version = None
                 for keyword in ticket['Keywords']:
@@ -262,12 +262,12 @@ class Analyze:
         versions = self.sort_tickets_and_seconds_to_hours(versions)
         return versions, projects
 
-    def hours_per_ticket(self, for_days=0, year="", week_numbers=""):
+    def hours_per_ticket(self, for_days=0, year="", week_numbers="", start=0):
         tickets = {}
         stored_tickets = self.cache.load_cached_tickets()
         for ticket in stored_tickets:
             jira_key = self.cache.load_jira_key_for_id(ticket['ID'])
-            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if jira_key is not None and is_in_range is True:
                 if jira_key not in tickets:
                     tickets[jira_key] = []
@@ -277,14 +277,14 @@ class Analyze:
         tickets = self.sort_tickets_and_seconds_to_hours(tickets)
         return tickets
 
-    def lifetime_per_ticket(self, for_days=0, year="", week_numbers=""):
+    def lifetime_per_ticket(self, for_days=0, year="", week_numbers="", start=0):
         tickets = {}
         stored_tickets = self.cache.load_cached_tickets()
         for ticket in stored_tickets:
             if 'Versions' in ticket and len(ticket['Versions']) > 0:
                 continue
             jira_key = self.cache.load_jira_key_for_id(ticket['ID'])
-            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if jira_key is not None and is_in_range is True:
                 if len(ticket['Status']) > 0 and 'type' in ticket['Status'][0] and ticket['Status'][0]['type'] in ["Fertig"] \
                         and ticket['Created'] is not None and ticket['Closed'] is not None:
@@ -299,13 +299,13 @@ class Analyze:
         tickets = self.sort_tickets_and_seconds_to_hours(tickets)
         return tickets
 
-    def qs_tickets_and_relations(self, for_days=0, year="", week_numbers=""):
+    def qs_tickets_and_relations(self, for_days=0, year="", week_numbers="", start=0):
         tickets = {}
         cs_to_qs = 0
         qs_tickets = self.cache.load_cached_tickets('QS')
         for qs_ticket in qs_tickets:
             jira_key = self.cache.load_jira_key_for_id(qs_ticket['ID'])
-            is_in_range = self.ticket_is_in_range(qs_ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(qs_ticket, for_days, year, week_numbers, start)
             if jira_key is not None and is_in_range is True:
                 if jira_key not in tickets:
                     tickets[jira_key] = []
@@ -318,13 +318,13 @@ class Analyze:
 
         return tickets, cs_to_qs
 
-    def devops_tickets_and_relations(self, for_days=0, year="", week_numbers=""):
+    def devops_tickets_and_relations(self, for_days=0, year="", week_numbers="", start=0):
         tickets = {}
         cs_to_devops = 0
         devops_tickets = self.cache.load_cached_tickets('DEVOPS')
         for devops_ticket in devops_tickets:
             jira_key = self.cache.load_jira_key_for_id(devops_ticket['ID'])
-            is_in_range = self.ticket_is_in_range(devops_ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(devops_ticket, for_days, year, week_numbers, start)
             if jira_key is not None and is_in_range is True:
                 if jira_key not in tickets:
                     tickets[jira_key] = []
@@ -337,12 +337,12 @@ class Analyze:
 
         return tickets, cs_to_devops
 
-    def bb5_tickets_and_relations(self, for_days=0, year="", week_numbers=""):
+    def bb5_tickets_and_relations(self, for_days=0, year="", week_numbers="", start=0):
         tickets = {}
         bb5_tickets = self.cache.load_cached_tickets('BRANDBOX5')
         for bb5_ticket in bb5_tickets:
             jira_key = self.cache.load_jira_key_for_id(bb5_ticket['ID'])
-            is_in_range = self.ticket_is_in_range(bb5_ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(bb5_ticket, for_days, year, week_numbers, start)
             if jira_key is not None and is_in_range is True:
                 if jira_key not in tickets:
                     tickets[jira_key] = []
@@ -354,7 +354,7 @@ class Analyze:
         bb5_tickets = self.cache.load_cached_tickets('BRANDBOX_SERVICE')
         for bb5_ticket in bb5_tickets:
             jira_key = self.cache.load_jira_key_for_id(bb5_ticket['ID'])
-            is_in_range = self.ticket_is_in_range(bb5_ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(bb5_ticket, for_days, year, week_numbers, start)
             if jira_key is not None and is_in_range is True:
                 if jira_key not in tickets:
                     tickets[jira_key] = []
@@ -381,22 +381,22 @@ class Analyze:
     def seconds_to_hours(seconds):
         return seconds / 60 / 60
 
-    def problematic_tickets(self, for_days=0, year="", week_numbers=""):
+    def problematic_tickets(self, for_days=0, year="", week_numbers="", start=0):
         problematic_tickets = {}
         tickets = self.cache.load_cached_tickets()
         for ticket in tickets:
-            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True:
                 problematic_tickets = self.add_to_problematic_tickets(ticket, problematic_tickets)
 
         problematic_tickets = self.sort_tickets_and_seconds_to_hours(problematic_tickets)
         return problematic_tickets
 
-    def plot_data(self, for_days=0, year="", week_numbers=""):
+    def plot_data(self, for_days=0, year="", week_numbers="", start=0):
         tickets = self.cache.load_cached_tickets()
         relevant_tickets = []
         for ticket in tickets:
-            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers)
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True:
                 ticket = self.mapper.normalize_ticket(ticket)
                 relevant_tickets.append(ticket)
@@ -474,10 +474,12 @@ class Analyze:
         ]
         return top_tickets
 
-    def ticket_is_in_range(self, ticket, for_days=0, year="", week_numbers=""):
+    def ticket_is_in_range(self, ticket, for_days=0, year="", week_numbers="", start=0):
         is_in_range = False
         time_updated = self.timestamp_from_ticket_time(ticket['Created'])
         current_time_stamp = datetime.datetime.now().timestamp()
+        if start < 0:
+            current_time_stamp += (start * for_days * 24 * 60 * 60)
         if for_days > 0:
             max_gap = for_days * 24 * 60 * 60
             is_in_range = time_updated >= (current_time_stamp - max_gap)
