@@ -482,7 +482,7 @@ class Analyze:
             current_time_stamp += (start * for_days * 24 * 60 * 60)
         if for_days > 0:
             max_gap = for_days * 24 * 60 * 60
-            is_in_range = time_updated >= (current_time_stamp - max_gap)
+            is_in_range = current_time_stamp >= time_updated >= (current_time_stamp - max_gap)
             if is_in_range and year != "":
                 ticket_year = str(datetime.datetime.fromtimestamp(time_updated).strftime("%Y"))
                 is_in_range = ticket_year == year
