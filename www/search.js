@@ -254,6 +254,10 @@ PS = (function(window, document, $) {
           .attr("transform", "translate(0," + height + ")")
           .call(d3.axisBottom(x));
 
+        if(y_max > 200) {
+            y_max = 200;
+        }
+
         // Add Y axis
         var y = d3.scaleLinear()
           .domain([0, y_max])
