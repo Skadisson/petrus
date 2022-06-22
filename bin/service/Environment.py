@@ -113,6 +113,10 @@ class Environment:
         service_yaml = self.load_yaml('map')
         return service_yaml['Relation']
 
+    def get_map_dates_of_horror(self):
+        service_yaml = self.load_yaml('map')
+        return service_yaml['DatesOfHorror']
+
     def get_endpoint_ticket_link(self):
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['ticket_link']

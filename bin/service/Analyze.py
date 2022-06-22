@@ -25,7 +25,7 @@ class Analyze:
         ticket_count = 0
         external_count = 0
         internal_count = 0
-        tickets = self.cache.load_cached_tickets()
+        tickets = self.get_yer_tickets()
         for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True:
@@ -38,9 +38,14 @@ class Analyze:
 
         return ticket_count, internal_count, external_count
 
+    def get_yer_tickets(self):
+        tickets = self.cache.load_cached_tickets()
+        filtered_tickets = self.filter_dates_of_horror(tickets)
+        return filtered_tickets
+
     def top_and_bottom_tickets(self, for_days=0, year="", week_numbers="", top_count=5, start=0):
         ranked_tickets = []
-        tickets = self.cache.load_cached_tickets()
+        tickets = self.get_yer_tickets()
         for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             concluded = len(ticket['Status']) > 0 and 'type' in ticket['Status'][0] and ticket['Status'][0]['type'] == 'Fertig'
@@ -68,7 +73,7 @@ class Analyze:
 
     def pe_ticket_count(self, for_days=0, year="", week_numbers="", start=0):
         ticket_count = 0
-        tickets = self.cache.load_cached_tickets()
+        tickets = self.get_yer_tickets()
         for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True:
@@ -79,7 +84,7 @@ class Analyze:
 
     def is_ticket_count(self, for_days=0, year="", week_numbers="", start=0):
         ticket_count = 0
-        tickets = self.cache.load_cached_tickets()
+        tickets = self.get_yer_tickets()
         for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True:
@@ -105,7 +110,7 @@ class Analyze:
 
     def hours_total(self, for_days=0, year="", week_numbers="", start=0):
         total = 0.0
-        tickets = self.cache.load_cached_tickets()
+        tickets = self.get_yer_tickets()
         for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True and ticket['Time_Spent'] is not None and ticket['Time_Spent'] > 0:
@@ -132,7 +137,7 @@ class Analyze:
         projects = {}
         ticket_count = {}
         project_tickets = {}
-        tickets = self.cache.load_cached_tickets()
+        tickets = self.get_yer_tickets()
         for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True and 'Project' in ticket:
@@ -154,7 +159,7 @@ class Analyze:
 
     def hours_per_keyword(self, for_days=0, year="", week_numbers="", start=0):
         hours_per_keyword = {}
-        tickets = self.cache.load_cached_tickets()
+        tickets = self.get_yer_tickets()
         for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True and 'Keywords' in ticket and 'Time_Spent' in ticket \
@@ -191,7 +196,7 @@ class Analyze:
         ticket_count = {}
         system_tickets = {}
         system_versions = {}
-        tickets = self.cache.load_cached_tickets()
+        tickets = self.get_yer_tickets()
         for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True and 'System' in ticket:
@@ -226,7 +231,7 @@ class Analyze:
 
     def hours_per_type(self, for_days=0, year="", week_numbers="", start=0):
         types = {}
-        tickets = self.cache.load_cached_tickets()
+        tickets = self.get_yer_tickets()
         for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True and 'Type' in ticket:
@@ -241,7 +246,7 @@ class Analyze:
     def hours_per_version(self, for_days=0, year="", week_numbers="", start=0):
         versions = {}
         projects = {}
-        tickets = self.cache.load_cached_tickets()
+        tickets = self.get_yer_tickets()
         for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True and 'Keywords' in ticket:
@@ -264,7 +269,7 @@ class Analyze:
 
     def hours_per_ticket(self, for_days=0, year="", week_numbers="", start=0):
         tickets = {}
-        stored_tickets = self.cache.load_cached_tickets()
+        stored_tickets = self.get_yer_tickets()
         for ticket in stored_tickets:
             jira_key = self.cache.load_jira_key_for_id(ticket['ID'])
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
@@ -279,7 +284,7 @@ class Analyze:
 
     def lifetime_per_ticket(self, for_days=0, year="", week_numbers="", start=0):
         tickets = {}
-        stored_tickets = self.cache.load_cached_tickets()
+        stored_tickets = self.get_yer_tickets()
         for ticket in stored_tickets:
             if 'Versions' in ticket and len(ticket['Versions']) > 0:
                 continue
@@ -368,7 +373,7 @@ class Analyze:
 
     def load_tickets_for_days(self, for_days=0):
         tickets = []
-        stored_tickets = self.cache.load_cached_tickets()
+        stored_tickets = self.get_yer_tickets()
         for ticket in stored_tickets:
             jira_key = self.cache.load_jira_key_for_id(ticket['ID'])
             is_in_range = self.ticket_is_in_range(ticket, for_days)
@@ -383,7 +388,7 @@ class Analyze:
 
     def problematic_tickets(self, for_days=0, year="", week_numbers="", start=0):
         problematic_tickets = {}
-        tickets = self.cache.load_cached_tickets()
+        tickets = self.get_yer_tickets()
         for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
             if is_in_range is True:
@@ -393,7 +398,7 @@ class Analyze:
         return problematic_tickets
 
     def plot_data(self, for_days=0, year="", week_numbers="", start=0):
-        tickets = self.cache.load_cached_tickets()
+        tickets = self.get_yer_tickets()
         relevant_tickets = []
         for ticket in tickets:
             is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
@@ -509,7 +514,7 @@ class Analyze:
     def word_count_and_relations(self):
         words = []
         word_relations = {}
-        tickets = self.cache.load_cached_tickets()
+        tickets = self.get_yer_tickets()
         for ticket in tickets:
             for keyword in ticket['Keywords']:
                 words.append(keyword)
@@ -568,7 +573,6 @@ class Analyze:
                             if ticket_type not in ticket_effort_calendar[label]:
                                 ticket_effort_calendar[label][ticket_type] = 0
                             ticket_effort_calendar[label][ticket_type] += self.seconds_to_hours(int(worklog['timeSpentSeconds']))
-        tickets.rewind()
         ordered_labels = sorted(labels)
         ordered_effort_calendar = {}
         for label in ordered_labels:
@@ -598,7 +602,6 @@ class Analyze:
                 if ticket_type not in ticket_opened_calendar[label]:
                     ticket_opened_calendar[label][ticket_type] = 0
                 ticket_opened_calendar[label][ticket_type] += 1
-        tickets.rewind()
         ordered_labels = sorted(labels)
         ordered_opened_calendar = {}
         for label in ordered_labels:
@@ -651,3 +654,17 @@ class Analyze:
             'support': int(support)
         }
         return normalized_ticket
+
+    def filter_dates_of_horror(self, _tickets):
+        filtered_tickets = []
+        dates_of_horror = self.environment.get_map_dates_of_horror()
+        for ticket in _tickets:
+            if "Created" in ticket and ticket["Created"] is not None:
+                ticket_date = self.get_year_month_day(ticket['Created'])
+                if ticket_date not in dates_of_horror:
+                    filtered_tickets.append(ticket)
+
+        return filtered_tickets
+
+    def get_year_month_day(self, _timestamp):
+        return datetime.datetime.fromtimestamp(self.timestamp_from_ticket_time(_timestamp)).strftime("%Y/%m/%d")

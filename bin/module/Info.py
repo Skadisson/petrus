@@ -8,13 +8,12 @@ class Info:
     @staticmethod
     def run():
         success = True
-        cache = Cache.Cache()
         analyze = Analyze.Analyze()
-        tickets = cache.load_cached_tickets()
+        tickets = analyze.get_yer_tickets()
         ticket_opened_calendar = analyze.ticket_opened_calendar(tickets)
         ticket_closed_calendar = analyze.ticket_closed_calendar(tickets)
         ticket_effort_calendar = analyze.ticket_effort_calendar(tickets)
-        ticket_count = cache.count_tickets()
+        ticket_count = len(tickets)
 
         items = [{
             'ticket_count': ticket_count,

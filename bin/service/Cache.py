@@ -109,9 +109,6 @@ class Cache:
         rgx = re.compile(f"{project}.*", re.IGNORECASE)
         return self.table_cache.find({'Key': {'$regex': rgx, '$ne': ticket_key}, 'Time_Spent': {'$gt': 0}})
 
-    def count_tickets(self):
-        return self.table_cache.count()
-
     def load_cached_ticket(self, jira_id):
         return self.table_cache.find_one({'ID': str(jira_id)})
 
