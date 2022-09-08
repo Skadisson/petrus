@@ -12,12 +12,12 @@ class Search:
         self.keywords = keywords
 
     def run(self):
-        tickets = self.cache.load_cached_tickets()
         formatted_keywords = self.format_keywords()
         if len(formatted_keywords) == 1:
             mod_estimate = Estimate.Estimate(formatted_keywords[0])
             items, success = mod_estimate.run()
         elif len(formatted_keywords) > 1:
+            tickets = self.cache.load_cached_tickets('SERVICE', True)
             relevancy, suggested_keys = self.context.calculate_relevancy_for_tickets(tickets, {'Keywords': formatted_keywords, 'Related': []})
             items = [{
                 'relevancy': relevancy,

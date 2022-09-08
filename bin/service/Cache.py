@@ -101,9 +101,12 @@ class Cache:
                 return True
         return False
 
-    def load_cached_tickets(self, project='SERVICE'):
+    def load_cached_tickets(self, project='SERVICE', only_worked_on=False):
         rgx = re.compile(f"{project}.*", re.IGNORECASE)
-        return self.table_cache.find({'Key': {'$regex': rgx}})
+        if only_worked_on:
+            return self.table_cache.find({'Key': {'$regex': rgx}, 'Time_Spent': {'$gt': 0}})
+        else:
+            return self.table_cache.find({'Key': {'$regex': rgx}})
 
     def load_cached_tickets_except(self, ticket_key, project='SERVICE'):
         rgx = re.compile(f"{project}.*", re.IGNORECASE)
