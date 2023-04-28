@@ -9,6 +9,7 @@ from collections import Counter
 import collections
 import re
 import numpy
+import math
 
 
 class Analyze:
@@ -20,6 +21,8 @@ class Analyze:
         self.mapper = Map.Map()
         self.environment = Environment.Environment()
         self.ranking = Ranking.Ranking()
+        self.filtered_tickets = None
+        self.in_range = {}
 
     def ticket_count(self, for_days=0, year="", week_numbers="", start=0):
         ticket_count = 0
@@ -39,9 +42,10 @@ class Analyze:
         return ticket_count, internal_count, external_count
 
     def get_yer_tickets(self):
-        tickets = self.cache.load_cached_tickets()
-        filtered_tickets = self.filter_dates_of_horror(tickets)
-        return filtered_tickets
+        if self.filtered_tickets is None:
+            tickets = self.cache.load_cached_tickets()
+            self.filtered_tickets = self.filter_dates_of_horror(tickets)
+        return self.filtered_tickets
 
     def top_and_bottom_tickets(self, for_days=0, year="", week_numbers="", top_count=5, start=0):
         ranked_tickets = []
@@ -187,6 +191,33 @@ class Analyze:
         hpk_sorted = sorted(hpk_list, key=lambda hpk: hpk['hours'], reverse=True)
 
         return hpk_sorted
+
+    def payed_unpayed(self, for_days=0, year="", week_numbers="", start=0):
+        payed_unpayed = {
+            'payed': {
+                'value': 0.0,
+                'label': 'potenziell abrechenbar'
+            },
+            'unpayed': {
+                'value': 0.0,
+                'label': 'nicht abrechenbar'
+            }
+        }
+        tickets = self.get_yer_tickets()
+        for ticket in tickets:
+            is_in_range = self.ticket_is_in_range(ticket, for_days, year, week_numbers, start)
+            if is_in_range is True and 'Time_Spent' in ticket and ticket['Time_Spent'] is not None and 'CostLocation' in ticket and ticket['CostLocation'] is not None and 'id' in ticket['CostLocation']:
+                hours = ticket['Time_Spent'] / 60 / 60
+                if int(ticket['CostLocation']['id']) in [10500, 11200, 10402]:
+                    payed_unpayed['payed']['value'] += hours
+                else:
+                    payed_unpayed['unpayed']['value'] += hours
+
+        total = payed_unpayed['payed']['value'] + payed_unpayed['unpayed']['value']
+        payed_unpayed['payed']['label'] = f"{math.floor(payed_unpayed['payed']['value'])}h {payed_unpayed['payed']['label']} ({math.floor(payed_unpayed['payed']['value'] / total * 100)} %)"
+        payed_unpayed['unpayed']['label'] = f"{math.floor(payed_unpayed['unpayed']['value'])}h {payed_unpayed['unpayed']['label']} ({math.floor(payed_unpayed['unpayed']['value'] / total * 100)} %)"
+
+        return payed_unpayed
 
     def hours_per_system(self, for_days=0, year="", week_numbers="", start=0):
 
@@ -480,6 +511,8 @@ class Analyze:
         return top_tickets
 
     def ticket_is_in_range(self, ticket, for_days=0, year="", week_numbers="", start=0):
+        if ticket['ID'] in self.in_range:
+            return self.in_range[ticket['ID']]
         is_in_range = False
         time_updated = self.timestamp_from_ticket_time(ticket['Created'])
         current_time_stamp = datetime.datetime.now().timestamp()
@@ -503,6 +536,7 @@ class Analyze:
             ticket_year = datetime.datetime.fromtimestamp(time_updated).strftime("%Y")
             is_in_range = year == ticket_year
 
+        self.in_range[ticket['ID']] = is_in_range
         return is_in_range
 
     @staticmethod

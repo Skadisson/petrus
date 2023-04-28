@@ -22,6 +22,7 @@ class Trend:
         hours_per_project, project_ticket_count, project_tickets = analyze.hours_per_project(days, self.year, self.week_numbers, self.start)
         hours_per_system, system_ticket_count, system_tickets, system_versions = analyze.hours_per_system(days, self.year, self.week_numbers, self.start)
         hours_per_keyword = analyze.hours_per_keyword(days, self.year, self.week_numbers, self.start)
+        payed_unpayed = analyze.payed_unpayed(days, self.year, self.week_numbers, self.start)
         plot_data = analyze.plot_data(days, self.year, self.week_numbers, self.start)
         project_scores = analyze.score_labeled_tickets(project_tickets)
         system_scores = analyze.score_labeled_tickets(system_tickets)
@@ -40,8 +41,8 @@ class Trend:
         devops_tickets_and_relations, cs_to_devops = analyze.devops_tickets_and_relations(days, self.year, self.week_numbers, self.start)
         bb5_tickets_and_relations = analyze.bb5_tickets_and_relations(days, self.year, self.week_numbers, self.start)
         problematic_tickets = analyze.problematic_tickets(days, self.year, self.week_numbers, self.start)
-        self.output_trend_json(ticket_count, internal_count, external_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, hours_per_keyword)
-        return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, hours_per_keyword
+        self.output_trend_json(ticket_count, internal_count, external_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, hours_per_keyword, payed_unpayed)
+        return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, hours_per_keyword, payed_unpayed
 
     def run(self):
         success = True
@@ -64,9 +65,9 @@ class Trend:
         system_versions = None
 
         try:
-            hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, hours_per_keyword = \
+            hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, hours_per_keyword, payed_unpayed = \
                 self.analyze_trend()
-            docx_path = self.output_docx(hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, hours_per_keyword)
+            docx_path = self.output_docx(hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, hours_per_keyword, payed_unpayed)
         except Exception as e:
             self.cache.add_log_entry(self.__class__.__name__, e)
             success = False
@@ -92,7 +93,7 @@ class Trend:
         }]
         return items, success
 
-    def output_trend_json(self, ticket_count, internal_count, external_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, hours_per_keyword):
+    def output_trend_json(self, ticket_count, internal_count, external_count, hours_total, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_per_type, hours_per_version, projects_per_version, problematic_tickets, project_scores, system_scores, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, hours_per_keyword, payed_unpayed):
 
         trend_file = self.environment.get_path_trend()
         categories = self.environment.get_map_categories()
@@ -139,7 +140,8 @@ class Trend:
             "top_5_ticket_ranks": top_5_ticket_ranks,
             "bottom_5_ticket_ranks": bottom_5_ticket_ranks,
             "plot_data": plot_data,
-            "hours_per_keyword": hours_per_keyword
+            "hours_per_keyword": hours_per_keyword,
+            "payed_unpayed": payed_unpayed
         }
 
         file = open(trend_file, "w+")
@@ -160,7 +162,7 @@ class Trend:
         json.dump(obj=word_cloud_output, fp=file)
         file.close()
 
-    def output_docx(self, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, hours_per_keyword):
+    def output_docx(self, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, qs_tickets_and_relations, devops_tickets_and_relations, bb5_tickets_and_relations, bb5_hours_total, bb5_ticket_count, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, hours_per_keyword, payed_unpayed):
         docx_generator = Docx.Docx()
         docx_generator.place_headline()
         docx_generator.place_type_pie_chart(hours_per_type)
@@ -171,6 +173,7 @@ class Trend:
         docx_generator.place_versions(hours_per_version, self.months)
         docx_generator.place_page_break()
         docx_generator.place_keyword_pie_chart(hours_per_keyword, self.months)
+        docx_generator.place_payed_unpayed_pie_chart(payed_unpayed, self.months)
         docx_generator.place_projects(hours_per_project, project_ticket_count, self.months)
         docx_generator.place_systems(hours_per_system, system_ticket_count, system_versions, self.months)
         docx_generator.place_qs_tickets(qs_tickets_and_relations, self.months)

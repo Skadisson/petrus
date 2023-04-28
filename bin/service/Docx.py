@@ -5,6 +5,7 @@ from datetime import datetime
 from bin.service import Environment
 import matplotlib.pyplot as plt
 import numpy
+import math
 
 
 class Docx:
@@ -271,6 +272,15 @@ class Docx:
                 break
         return values, labels
 
+    @staticmethod
+    def calculate_payed_unpayed_relation(payed_unpayed):
+        values = []
+        labels = []
+        for label in payed_unpayed:
+            values.append(payed_unpayed[label]['value'])
+            labels.append(payed_unpayed[label]['label'])
+        return values, labels
+
     def place_type_pie_chart(self, hours_per_type):
 
         support_relation, bugfix_relation = self.calculate_type_relation(hours_per_type)
@@ -286,6 +296,14 @@ class Docx:
         values, labels = self.calculate_hours_per_keyword_relation(hours_per_keyword)
         self.place_pie_chart(values, labels)
 
+    def place_payed_unpayed_pie_chart(self, payed_unpayed, months):
+        days = self.months_to_days(months)
+        self.document.add_heading('Abrechnungspotenzial', level=1)
+        total = math.ceil(payed_unpayed['payed']['value'] + payed_unpayed['unpayed']['value'])
+        self.document.add_paragraph('Abrechenbare (Kostenübernahme = Kunde, Projekt, Abgerechnet) und nicht abrechenbare (Kostenübernahme = Konmedia, Leer) Aufwände der letzten {} Tage auf {} Stunden.'.format(days, total))
+        values, labels = self.calculate_payed_unpayed_relation(payed_unpayed)
+        self.place_pie_chart(values, labels)
+
     def place_pie_chart(self, values, labels):
 
         plot_path = self.environment.get_path_plot()
@@ -299,7 +317,7 @@ class Docx:
         plt.pie(values, labels=labels, colors=colors)
         plt.savefig(sub_plot_path)
 
-        self.document.add_picture(sub_plot_path, width=Inches(6))
+        self.document.add_picture(sub_plot_path, width=Inches(5))
 
     def place_page_break(self):
         paragraph = self.document.add_paragraph()
