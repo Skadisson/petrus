@@ -103,7 +103,7 @@ class SciKitLearn:
         top_index = keys.index(top_suggestion[0])
         probability_list[top_index] = 100
 
-        for i in range(0, 9):
+        for i in range(0, 3):
             max_probability = max(probability_list)
             max_index = list(probability_list).index(max_probability)
             text_ids += [keys[max_index]]
