@@ -1,5 +1,7 @@
 from pandas import DataFrame
 from sklearn import linear_model, gaussian_process, tree, neural_network, naive_bayes, feature_extraction, pipeline
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 from bin.service import Cache
 from bin.service import Environment
 import numpy
@@ -113,3 +115,18 @@ class SciKitLearn:
             del(probability_list[max_index])
 
         return text_ids, ticket_relevancies
+
+    @staticmethod
+    def get_cosine_suggestion(texts, keys, query):
+        vectorizer = TfidfVectorizer()
+        tfidf_matrix = vectorizer.fit_transform(texts)
+        query_vector = vectorizer.transform([query])
+        cosine_similarities = cosine_similarity(query_vector, tfidf_matrix).flatten()
+        most_similar_docs_indices = cosine_similarities.argsort()[::-1]
+
+        similar_keys = []
+        top_k = 3
+        for idx in most_similar_docs_indices[:top_k]:
+            similar_keys.append(keys[idx])
+
+        return similar_keys

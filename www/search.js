@@ -115,7 +115,7 @@ PS = (function(window, document, $) {
                             self.info();
                         } else {
                             $('#keywords').attr('placeholder', result.items[0].relevancy.length + " Results");
-                            $('#search').css({'top': '0%', 'margin-top': '0px'});
+                            $('#search').css({'top': '30%', 'margin-top': '0px'});
                         }
                         for(var index in result.items[0].relevancy) {
                             var item = result.items[0].relevancy[index];

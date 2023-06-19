@@ -129,7 +129,7 @@ class Context:
                 keys.append(key)
                 texts.append(str(description))
         if len(texts) > 0:
-            suggested_keys, relevancies = self.scikit.get_phoenix_suggestion(texts, keys, query)
+            suggested_keys = self.scikit.get_cosine_suggestion(texts, keys, query)
             for ticket in check_tickets:
                 key = ticket['Key']
                 creation = self.timestamp_from_ticket_time(ticket['Created'])
@@ -142,11 +142,10 @@ class Context:
                 else:
                     title = ''
                 if key in suggested_keys:
-                    rel_index = suggested_keys.index(key)
                     suggested_tickets.append({
                         'key': key,
                         'jira_id': ticket['ID'],
-                        'percentage': min(100, round(relevancies[rel_index] * 10000)),
+                        'percentage': 100,
                         'hits': [],
                         'link': self.environment.get_endpoint_ticket_link().format(key),
                         'project': ticket['Project'],
