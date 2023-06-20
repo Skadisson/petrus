@@ -124,8 +124,8 @@ PS = (function(window, document, $) {
                             var $p = $('<p data-jira-id="' + item.jira_id + '">');
                             $p.append('<span class="date">' + date.getFullYear() + '/' + date.getMonth() + '/' + date.getUTCDay() + '</span>');
                             $p.append('<span class="title">' + item.title + '</span>');
-                            $p.append('<span class="relevancy">' + Math.round(item.percentage) + '%</span>');
-                            $p.append('<span class="time_spent">' + item.time_spent + ' Stunden</span>');
+                            //$p.append('<span class="relevancy">' + Math.round(item.percentage) + '%</span>');
+                            $p.append('<span class="time_spent">' + Math.round(item.time_spent) + ' Stunden</span>');
                             $p.append('<span class="keywords">' + item.hits.join(', ') + '</span>')
                             $a.append($p);
                             $('#link-list').append($a);
