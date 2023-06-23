@@ -164,7 +164,7 @@ class Docx:
 
     def place_top_tickets(self, tickets, months):
         days = self.months_to_days(months)
-        self.document.add_heading('Abgeschlossene Top Tickets in den letzten {} Tagen'.format(days), level=1)
+        self.document.add_heading('Abgeschlossene Worst Tickets in den letzten {} Tagen'.format(days), level=1)
         for ticket_key in tickets:
             paragraph = self.document.add_paragraph('')
             paragraph.add_run("{}".format(ticket_key)).bold = True
@@ -172,7 +172,7 @@ class Docx:
 
     def place_bottom_tickets(self, tickets, months):
         days = self.months_to_days(months)
-        self.document.add_heading('Abeschlossene Worst Tickets in den letzten {} Tagen'.format(days), level=1)
+        self.document.add_heading('Abeschlossene Top Tickets in den letzten {} Tagen'.format(days), level=1)
         for ticket_key in tickets:
             paragraph = self.document.add_paragraph('')
             paragraph.add_run("{}".format(ticket_key)).bold = True

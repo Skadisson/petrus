@@ -22,13 +22,17 @@ class Ranking:
         persons = 0
         if 'Persons' in ticket and ticket['Persons'] is not None:
             persons = int(ticket['Persons'])
+        time_spent = 0
+        if 'Time_Spent' in ticket and ticket['Time_Spent'] is not None:
+            time_spent = int(ticket['Time_Spent'])
         normalized_ticket = {
             'comments': len(ticket['Comments']),
             'breached': int(breached),
             'persons': persons,
             'relations': len(ticket['Related']),
             'closed': closed_count,
-            'support': int(support)
+            'support': int(support),
+            'time_spent': time_spent
         }
         return normalized_ticket
 
@@ -39,26 +43,22 @@ class Ranking:
 
     def score_ticket(self, ticket):
         normalized_ticket = self.normalize_ticket_for_ranks(ticket)
-        scoring = {
-            'comments': 200,
-            'breached': 200,
-            'persons': 125,
-            'relations': 125,
-            'closed': 300,
-            'support': 50
-        }
         ticket_score = 0
-        if normalized_ticket['comments'] < 10:
-            ticket_score += scoring['comments']
+        if normalized_ticket['comments'] < 5:
+            ticket_score += 50
+        threshold = 10
+        while normalized_ticket['comments'] > threshold:
+            ticket_score += 100
+            threshold += 10
         if normalized_ticket['breached'] == 0:
-            ticket_score += scoring['breached']
-        if normalized_ticket['persons'] < 3:
-            ticket_score += scoring['persons']
-        if normalized_ticket['relations'] < 2:
-            ticket_score += scoring['relations']
-        if normalized_ticket['closed'] == 1:
-            ticket_score += scoring['closed']
-        if normalized_ticket['support'] == 1:
-            ticket_score += scoring['support']
+            ticket_score += 200
+        threshold = 1
+        while normalized_ticket['persons'] > threshold:
+            ticket_score += threshold * 100
+            threshold += 1
+        hours = 1
+        while int(normalized_ticket['time_spent']) > hours * 60 * 60:
+            ticket_score += hours * 100
+            hours += 1
 
         return ticket_score
