@@ -387,6 +387,8 @@ class Docx:
                 headline = "Neue Tickets am Tag"
             elif axis == "closed tickets/day":
                 headline = "Geschlossene Tickets am Tag"
+            elif axis == "open tickets/day":
+                headline = "Offene Tickets am Tag"
             elif axis == "average days/priority":
                 headline = "Durchschnittliche Lebensdauer pro Priorität\nfür nicht versionierte Tickets"
             self.document.add_heading(headline, level=1)
