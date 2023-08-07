@@ -108,7 +108,7 @@ class Estimate:
                         'Diff',
                         ['Priority', 'Organization']
                     )
-                if diff_estimation > 0:
+                if diff_estimation > 0 and ('Notes' not in normalized_ticket or normalized_ticket['Notes'] is None or str(normalized_ticket['Notes'] == '')):
                     days_to_go = int(round(diff_estimation / 60 / 60 / 24))
                     if 'Diff' in normalized_ticket and 0 < normalized_ticket['Diff']:
                         days_to_go -= int(round(normalized_ticket['Diff'] / 60 / 60 / 24))
