@@ -96,6 +96,10 @@ class Map:
             normalized_ticket['Closed'] = self.timestamp_from_ticket_time(ticket['Closed'])
         else:
             normalized_ticket['Closed'] = 0
+        if 'Notes' in ticket and ticket['Notes'] is not None:
+            normalized_ticket['Notes'] = str(ticket['Notes'])
+        else:
+            normalized_ticket['Notes'] = ''
         normalized_ticket['Key'] = 0
         if 'Key' in ticket and ticket['Key'] is not None:
             normalized_ticket['Key'] = 0
