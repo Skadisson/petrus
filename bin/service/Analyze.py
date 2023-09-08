@@ -441,9 +441,8 @@ class Analyze:
                     closed_tickets_per_day[date] = 1
 
         open_tickets_per_day = {}
-        open_tickets = 0
         for new_date in new_tickets_per_day:
-            open_tickets += int(new_tickets_per_day[new_date])
+            open_tickets = int(new_tickets_per_day[new_date])
             if new_date in closed_tickets_per_day:
                 open_tickets -= int(closed_tickets_per_day[new_date])
             open_tickets_per_day[new_date] = open_tickets
