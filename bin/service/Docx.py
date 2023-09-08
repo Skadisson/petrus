@@ -151,11 +151,10 @@ class Docx:
 
     def place_tickets(self, hours_per_ticket, months):
         days = self.months_to_days(months)
-        self.document.add_heading('SERVICE Tickets', level=1)
-        self.document.add_paragraph('Eine Liste aller {} SERVICE Tickets der letzten {} Tage und deren bisherige Aufwände.'.format(len(hours_per_ticket), days))
+        self.document.add_heading('Bearbeitete SERVICE Tickets der letzten {} Tage mit Aufwänden'.format(days), level=1)
         for ticket_hours in hours_per_ticket:
-            paragraph = self.document.add_paragraph('')
             if ticket_hours[1] > 0.0:
+                paragraph = self.document.add_paragraph('')
                 paragraph.add_run("{}".format(ticket_hours[0])).bold = True
                 paragraph.add_run(" - {} Stunden".format(round(ticket_hours[1], ndigits=2)))
 
@@ -225,13 +224,6 @@ class Docx:
 
         values = [support_relation, bugfix_relation]
         labels = [f"Support [{support_relation}%]", f"Fehler [{bugfix_relation}%]"]
-        self.place_pie_chart(values, labels)
-
-    def place_keyword_pie_chart(self, hours_per_keyword, months):
-        days = self.months_to_days(months)
-        self.document.add_heading('Keywords', level=1)
-        self.document.add_paragraph('Top 5 Keywords der letzten {} Tage, nach Aufwand berechnet, ohne System- und Jira-Keywords wie "bb50" oder "Produktentwicklung".'.format(days))
-        values, labels = self.calculate_hours_per_keyword_relation(hours_per_keyword)
         self.place_pie_chart(values, labels)
 
     def place_payed_unpayed_pie_chart(self, payed_unpayed, months):

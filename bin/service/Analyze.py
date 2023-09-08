@@ -107,35 +107,6 @@ class Analyze:
         projects = self.sort_tickets_and_seconds_to_hours(projects)
         return projects, ticket_count, project_tickets
 
-    def hours_per_keyword(self, tickets):
-        hours_per_keyword = {}
-        for ticket in tickets:
-            if 'Keywords' in ticket and 'Time_Spent' in ticket \
-                    and ticket['Time_Spent'] is not None and ticket['Keywords'] is not None:
-                for keyword in ticket['Keywords']:
-                    if 'bb' in keyword or keyword in ['Produktentwicklung', 'Ressourcenplanung', 'projekt', 'Projekt', 'Projektleitung', 'analysis']:
-                        continue
-                    if keyword not in hours_per_keyword:
-                        hours_per_keyword[keyword] = {
-                            'keyword': keyword,
-                            'hours': ticket['Time_Spent'] / 60 / 60,
-                            'weeks': [],
-                            'projects': []
-                        }
-                    else:
-                        hours_per_keyword[keyword]['hours'] += ticket['Time_Spent'] / 60 / 60
-                    if 'Updated' in ticket and ticket['Updated'] is not None:
-                        week = self.get_calendar_week(ticket['Updated'])
-                        if week not in hours_per_keyword[keyword]['weeks']:
-                            hours_per_keyword[keyword]['weeks'].append(week)
-                    if 'Project' in ticket and ticket['Project'] is not None and \
-                            ticket['Project'] not in hours_per_keyword[keyword]['projects']:
-                        hours_per_keyword[keyword]['projects'].append(ticket['Project'])
-        hpk_list = list(hours_per_keyword.values())
-        hpk_sorted = sorted(hpk_list, key=lambda hpk: hpk['hours'], reverse=True)
-
-        return hpk_sorted
-
     def payed_unpayed(self, tickets):
         payed_unpayed = {
             'payed': {
