@@ -21,7 +21,7 @@ class Docx:
         date = datetime.strftime(now, "%Y/%m/%d")
         self.document.add_heading("Support Report {}".format(date), 0)
 
-    def place_stats(self, ticket_count, internal_count, external_count, hours_total, lifetime_per_ticket, hours_per_type, months, pe_ticket_count, is_ticket_count, cs_to_qs, cs_to_devops):
+    def place_stats(self, ticket_count, internal_count, external_count, hours_total, lifetime_per_ticket, hours_per_type, months):
 
         self.document.add_paragraph("").add_run("Durch Petrus automatisiert erstellt.").italic = True
         self.document.add_paragraph("").add_run("Petrus kennt und berechnet keine personen bezogenen Daten, alle angegebenen Rechnungen und Werte betreffen den gesamten Service Desk, das heißt reine CS-Tickets so wie auch auf Produkt-, QS-, DevOps- oder Projekt-Bords gesyncte Tickets.").italic = True
@@ -71,7 +71,6 @@ class Docx:
         paragraph.add_run("{} Stunden".format(hours_average)).bold = True
         paragraph.add_run(".")
         self.document.add_paragraph(f"Die durchschnittliche Wartezeit bis zur Lösung war {lifetime_average_days} Tage, die längste Wartezeit war {lifetime_max_days} Tage in Ticket {max_days_key}.")
-        self.document.add_paragraph(f"Es wurden {pe_ticket_count} Tickets an die Produktentwicklung übertragen, {is_ticket_count} Tickets wurden an Individual Service übergeben. Für {cs_to_qs} Tickets wurden QA Tickets erstellt. Zu {cs_to_devops} Tickets war ein DevOps Ticket erstellt worden.")
 
     @staticmethod
     def months_to_days(months):
@@ -159,8 +158,6 @@ class Docx:
             paragraph.add_run("{}".format(ticket_hours[0])).bold = True
             if ticket_hours[1] > 0.0:
                 paragraph.add_run(" - {} Stunden".format(round(ticket_hours[1], ndigits=2)))
-            else:
-                paragraph.add_run(" - n/a")
 
     def place_top_tickets(self, tickets, months):
         days = self.months_to_days(months)
@@ -177,65 +174,6 @@ class Docx:
             paragraph = self.document.add_paragraph('')
             paragraph.add_run("{}".format(ticket_key)).bold = True
             paragraph.add_run(" - Punktezahl: {}".format(tickets[ticket_key]))
-
-    def place_qs_tickets(self, qs_tickets_and_relations, months):
-        days = self.months_to_days(months)
-        self.document.add_heading('QS Tickets', level=1)
-        count_qs = len(qs_tickets_and_relations)
-        count_qs_service = 0
-        service_tickets = []
-        for qs_ticket in qs_tickets_and_relations:
-            if len(qs_tickets_and_relations[qs_ticket]) > 0:
-                count_qs_service += 1
-                service_tickets += qs_tickets_and_relations[qs_ticket]
-        if count_qs_service > 0:
-            self.document.add_paragraph('Es wurden {} QS Tickets in den letzten {} Tagen erstellt, {} davon in Verbindung mit folgenden SERVICE Tickets:'.format(count_qs, days, count_qs_service))
-            for service_ticket in service_tickets:
-                paragraph = self.document.add_paragraph('')
-                paragraph.add_run("{}".format(service_ticket)).bold = True
-        else:
-            self.document.add_paragraph('Es wurden {} QS Tickets in den letzten {} Tagen erstellt, keines davon in Verbindung mit SERVICE Tickets.'.format(count_qs, days))
-
-    def place_devops_tickets(self, devops_tickets_and_relations, months):
-        days = self.months_to_days(months)
-        self.document.add_heading('DevOps Tickets', level=1)
-        count_devops = len(devops_tickets_and_relations)
-        count_devops_service = 0
-        service_tickets = []
-        for devops_ticket in devops_tickets_and_relations:
-            if len(devops_tickets_and_relations[devops_ticket]) > 0:
-                count_devops_service += 1
-                service_tickets += devops_tickets_and_relations[devops_ticket]
-        if count_devops_service > 0:
-            self.document.add_paragraph('Es wurden {} DevOps Tickets in den letzten {} Tagen erstellt, {} davon in Verbindung mit folgenden SERVICE Tickets:'.format(count_devops, days, count_devops_service))
-            for service_ticket in service_tickets:
-                paragraph = self.document.add_paragraph('')
-                paragraph.add_run("{}".format(service_ticket)).bold = True
-        else:
-            self.document.add_paragraph('Es wurden {} DevOps Tickets in den letzten {} Tagen erstellt, keines davon in Verbindung mit SERVICE Tickets.'.format(count_devops, days))
-
-    def place_bb5_tickets(self, bb5_tickets_and_relations, months, bb5_hours_total, bb5_ticket_count):
-        days = self.months_to_days(months)
-        self.document.add_heading('BRANDBOX5 Tickets', level=1)
-        count_bb5_service = 0
-        if bb5_ticket_count > 0:
-            average = bb5_hours_total/bb5_ticket_count
-        else:
-            average = 0
-        service_tickets = []
-        for bb5_ticket in bb5_tickets_and_relations:
-            if len(bb5_tickets_and_relations[bb5_ticket]) > 0:
-                count_bb5_service += 1
-                service_tickets += bb5_tickets_and_relations[bb5_ticket]
-        if count_bb5_service > 0:
-            self.document.add_paragraph('Es wurden {} BRANDBOX5 Tickets in den letzten {} Tagen erstellt, {} davon in Verbindung mit SERVICE Tickets:'.format(bb5_ticket_count, days, count_bb5_service))
-            for service_ticket in service_tickets:
-                paragraph = self.document.add_paragraph('')
-                paragraph.add_run("{}".format(service_ticket)).bold = True
-        else:
-            self.document.add_paragraph('Es wurden {} BRANDBOX5 Tickets in den letzten {} Tagen erstellt.'.format(bb5_ticket_count, days))
-        if average > 0:
-            self.document.add_paragraph(f"Insgesamt mit einem Aufwand von {bb5_hours_total} Stunden, also durchschnittlich {average} Stunden pro Ticket.")
 
     @staticmethod
     def calculate_type_relation(hours_per_type):
@@ -384,11 +322,7 @@ class Docx:
 
             headline = axis
             if axis == "new tickets/day":
-                headline = "Neue Tickets am Tag"
-            elif axis == "closed tickets/day":
-                headline = "Geschlossene Tickets am Tag"
-            elif axis == "open tickets/day":
-                headline = "Offene Tickets am Tag"
+                headline = "Neue minus geschlossene Tickets am Tag"
             elif axis == "average days/priority":
                 headline = "Durchschnittliche Lebensdauer pro Priorität\nfür nicht versionierte Tickets"
             self.document.add_heading(headline, level=1)
