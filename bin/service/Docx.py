@@ -155,8 +155,8 @@ class Docx:
         self.document.add_paragraph('Eine Liste aller {} SERVICE Tickets der letzten {} Tage und deren bisherige Aufwände.'.format(len(hours_per_ticket), days))
         for ticket_hours in hours_per_ticket:
             paragraph = self.document.add_paragraph('')
-            paragraph.add_run("{}".format(ticket_hours[0])).bold = True
             if ticket_hours[1] > 0.0:
+                paragraph.add_run("{}".format(ticket_hours[0])).bold = True
                 paragraph.add_run(" - {} Stunden".format(round(ticket_hours[1], ndigits=2)))
 
     def place_top_tickets(self, tickets, months):
