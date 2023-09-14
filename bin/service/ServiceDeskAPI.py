@@ -172,6 +172,8 @@ class ServiceDeskAPI:
         return response, content
 
     def post_estimation_comment(self, jira_id, jira_key, priority, days_to_go, today=False, similar_jira_keys=None, estimation=None):
+        if estimation is None:
+            return False
 
         if today:
             date = f"heute"
