@@ -21,7 +21,7 @@ class Docx:
         date = datetime.strftime(now, "%Y/%m/%d")
         self.document.add_heading("Support Report {}".format(date), 0)
 
-    def place_stats(self, ticket_count, internal_count, external_count, hours_total, lifetime_per_ticket, hours_per_type, months):
+    def place_stats(self, ticket_count, internal_count, external_count, hours_total, lifetime_per_ticket, hours_per_type, total_score, top_5_ticket_ranks, bottom_5_ticket_ranks, months):
 
         self.document.add_paragraph("").add_run("Durch Petrus automatisiert erstellt.").italic = True
         self.document.add_paragraph("").add_run("Petrus kennt und berechnet keine personen bezogenen Daten, alle angegebenen Rechnungen und Werte betreffen den gesamten Service Desk, das heißt reine CS-Tickets so wie auch auf Produkt-, QS-, DevOps- oder Projekt-Bords gesyncte Tickets.").italic = True
@@ -71,6 +71,14 @@ class Docx:
         paragraph.add_run("{} Stunden".format(hours_average)).bold = True
         paragraph.add_run(".")
         self.document.add_paragraph(f"Die durchschnittliche Wartezeit bis zur Lösung war {lifetime_average_days} Tage, die längste Wartezeit war {lifetime_max_days} Tage in Ticket {max_days_key}.")
+        self.document.add_paragraph(f"Die {ticket_count} Tickets haben eine Gesamt Straf-Punktezahl von {total_score} erhalten.")
+        paragraph = self.document.add_paragraph("Davon sind die 5 Tickets, die am schlechtesten abgeschnitten haben:")
+        for ticket_key in top_5_ticket_ranks:
+            paragraph.add_run(f" {ticket_key} ({top_5_ticket_ranks[ticket_key]})")
+        paragraph.add_run("; und die 5 Tickets, die am besten abgeschnitten haben:")
+        for ticket_key in bottom_5_ticket_ranks:
+            paragraph.add_run(f" {ticket_key} ({bottom_5_ticket_ranks[ticket_key]})")
+        paragraph.add_run(".")
 
     @staticmethod
     def months_to_days(months):
@@ -81,26 +89,29 @@ class Docx:
 
         return days
 
-    def place_projects(self, hours_per_project, project_ticket_count, months):
+    def place_projects(self, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, months):
         days = self.months_to_days(months)
-        self.document.add_heading('Projekte', level=1)
+        self.document.add_heading('Projekte und Systeme', level=1)
         self.document.add_paragraph('Im folgenden getrackte Aufwände der letzten {} Tage pro Projekt.'.format(days))
         for project_hours in hours_per_project:
             paragraph = self.document.add_paragraph('')
-            paragraph.add_run("{}".format(project_hours[0])).bold = True
-            paragraph.add_run(" - {} Stunden auf {} Tickets".format(round(project_hours[1], ndigits=2), project_ticket_count[project_hours[0]]))
-
-    def place_systems(self, hours_per_system, system_ticket_count, system_versions, months):
-        days = self.months_to_days(months)
-        self.document.add_heading('Systeme', level=1)
-        self.document.add_paragraph('Im folgenden getrackte Aufwände der letzten {} Tage pro System von insgesamt {} Systemen.'.format(days, len(hours_per_system)))
-        for system_hours in hours_per_system:
-            paragraph = self.document.add_paragraph('')
-            paragraph.add_run("{}".format(system_hours[0])).bold = True
-            if system_hours[0] in system_versions and len(system_versions[system_hours[0]]) > 0:
-                paragraph.add_run(" - {} Stunden auf {} Tickets in {}".format(round(system_hours[1], ndigits=2), system_ticket_count[system_hours[0]], ", ".join(system_versions[system_hours[0]])))
-            else:
-                paragraph.add_run(" - {} Stunden auf {} Tickets".format(round(system_hours[1], ndigits=2), system_ticket_count[system_hours[0]]))
+            project_name = project_hours[0]
+            hours = project_hours[1]
+            paragraph.add_run("{}".format(project_name)).bold = True
+            paragraph.add_run(" - {} Stunden auf {} Tickets".format(round(hours, ndigits=2), project_ticket_count[project_name]))
+            if project_name in hours_per_system:
+                for system_name in hours_per_system[project_name]:
+                    paragraph = self.document.add_paragraph('')
+                    system_hour_count = sum(hours_per_system[project_name][system_name])
+                    paragraph.add_run("-> {}".format(system_name))
+                    if project_name in system_versions and system_name in system_versions[project_name] and len(system_versions[project_name][system_name]) > 0:
+                        paragraph.add_run(" - {} Stunden auf {} Tickets in {}".format(round(system_hour_count, ndigits=2),
+                                                                                      system_ticket_count[project_name][system_name],
+                                                                                      ", ".join(system_versions[project_name][
+                                                                                                    system_name])))
+                    else:
+                        paragraph.add_run(" - {} Stunden auf {} Tickets".format(round(system_hour_count, ndigits=2),
+                                                                                system_ticket_count[project_name][system_name]))
 
     def place_type_weight(self, hours_per_version, projects_per_version, months):
         bb_versions = self.environment.get_bb_versions()
@@ -157,22 +168,6 @@ class Docx:
                 paragraph = self.document.add_paragraph('')
                 paragraph.add_run("{}".format(ticket_hours[0])).bold = True
                 paragraph.add_run(" - {} Stunden".format(round(ticket_hours[1], ndigits=2)))
-
-    def place_top_tickets(self, tickets, months):
-        days = self.months_to_days(months)
-        self.document.add_heading('Abgeschlossene Worst Tickets in den letzten {} Tagen'.format(days), level=1)
-        for ticket_key in tickets:
-            paragraph = self.document.add_paragraph('')
-            paragraph.add_run("{}".format(ticket_key)).bold = True
-            paragraph.add_run(" - Punktezahl: {}".format(tickets[ticket_key]))
-
-    def place_bottom_tickets(self, tickets, months):
-        days = self.months_to_days(months)
-        self.document.add_heading('Abeschlossene Top Tickets in den letzten {} Tagen'.format(days), level=1)
-        for ticket_key in tickets:
-            paragraph = self.document.add_paragraph('')
-            paragraph.add_run("{}".format(ticket_key)).bold = True
-            paragraph.add_run(" - Punktezahl: {}".format(tickets[ticket_key]))
 
     @staticmethod
     def calculate_type_relation(hours_per_type):

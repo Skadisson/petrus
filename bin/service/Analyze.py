@@ -89,7 +89,6 @@ class Analyze:
     def hours_per_project(self, tickets):
         projects = {}
         ticket_count = {}
-        project_tickets = {}
         for ticket in tickets:
             project_name = ticket['Project']
             if project_name is not None:
@@ -97,15 +96,12 @@ class Analyze:
                     projects[project_name] = []
                 if project_name not in ticket_count:
                     ticket_count[project_name] = 0
-                if project_name not in project_tickets:
-                    project_tickets[project_name] = {}
                 if ticket['Time_Spent'] is not None:
                     projects[project_name].append(ticket['Time_Spent'])
                     ticket_count[project_name] += 1
-                project_tickets[project_name][ticket['ID']] = ticket
 
         projects = self.sort_tickets_and_seconds_to_hours(projects)
-        return projects, ticket_count, project_tickets
+        return projects, ticket_count
 
     def payed_unpayed(self, tickets):
         payed_unpayed = {
@@ -138,38 +134,40 @@ class Analyze:
 
         domains = {}
         ticket_count = {}
-        system_tickets = {}
         system_versions = {}
         for ticket in tickets:
             if 'System' in ticket:
                 system_url = ticket['System']
+                project_name = ticket['Project']
                 if system_url is not None and system_url != '':
                     domain_reg = re.compile(domain_regex)
                     domain_matches = domain_reg.search(system_url)
                     domain = domain_matches[1]
                     if domain is not None:
-                        if domain not in domains:
-                            domains[domain] = []
-                        if domain not in ticket_count:
-                            ticket_count[domain] = 0
-                        if domain not in system_tickets:
-                            system_tickets[domain] = {}
-                        if ticket['Time_Spent'] is not None:
-                            domains[domain].append(ticket['Time_Spent'])
-                            ticket_count[domain] += 1
-                        system_tickets[domain][ticket['ID']] = ticket
+                        if project_name not in domains:
+                            domains[project_name] = {}
+                        if domain not in domains[project_name]:
+                            domains[project_name][domain] = []
+                        if project_name not in ticket_count:
+                            ticket_count[project_name] = {}
+                        if domain not in ticket_count[project_name]:
+                            ticket_count[project_name][domain] = 0
+                        if ticket['Time_Spent'] is not None and ticket['Time_Spent'] >= 0.0:
+                            domains[project_name][domain].append(round(float(ticket['Time_Spent']) / 60 / 60, 2))
+                            ticket_count[project_name][domain] += 1
                         version = None
                         for keyword in ticket['Keywords']:
                             if re.match(r"bb[0-9.]", keyword):
                                 version = keyword
                         if version is not None:
-                            if domain not in system_versions:
-                                system_versions[domain] = []
-                            if version not in system_versions[domain]:
-                                system_versions[domain].append(version)
+                            if project_name not in system_versions:
+                                system_versions[project_name] = {}
+                            if domain not in system_versions[project_name]:
+                                system_versions[project_name][domain] = []
+                            if version not in system_versions[project_name][domain]:
+                                system_versions[project_name][domain].append(version)
 
-        systems = self.sort_tickets_and_seconds_to_hours(domains)
-        return systems, ticket_count, system_tickets, system_versions
+        return domains, ticket_count, system_versions
 
     def hours_per_type(self, tickets):
         types = {}
@@ -481,6 +479,13 @@ class Analyze:
 
     def score_ticket(self, ticket):
         return self.ranking.score_ticket(ticket)
+
+    def score_tickets(self, tickets):
+        total_score = 0
+        for ticket in tickets:
+            total_score += self.score_ticket(ticket)
+
+        return total_score
 
     def normalize_ticket_for_ranks(self, ticket):
         closed_count = 0

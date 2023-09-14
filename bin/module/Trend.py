@@ -21,12 +21,10 @@ class Trend:
         days = self.months * 30
         tickets = analyze.get_yer_tickets()
         filtered_tickets = analyze.filter_tickets_for_range(tickets, days, self.year, self.week_numbers, self.start)
-        hours_per_project, project_ticket_count, project_tickets = analyze.hours_per_project(filtered_tickets)
-        hours_per_system, system_ticket_count, system_tickets, system_versions = analyze.hours_per_system(filtered_tickets)
+        hours_per_project, project_ticket_count = analyze.hours_per_project(filtered_tickets)
+        hours_per_system, system_ticket_count, system_versions = analyze.hours_per_system(filtered_tickets)
         payed_unpayed = analyze.payed_unpayed(filtered_tickets)
         plot_data = analyze.plot_data(filtered_tickets)
-        project_scores = analyze.score_labeled_tickets(project_tickets)
-        system_scores = analyze.score_labeled_tickets(system_tickets)
         hours_per_type = analyze.hours_per_type(filtered_tickets)
         hours_per_version, projects_per_version = analyze.hours_per_version(filtered_tickets)
         hours_total = analyze.hours_total(filtered_tickets)
@@ -34,8 +32,9 @@ class Trend:
         hours_per_ticket = analyze.hours_per_ticket(filtered_tickets)
         lifetime_per_ticket = analyze.lifetime_per_ticket(filtered_tickets)
         top_5_ticket_ranks, bottom_5_ticket_ranks = analyze.top_and_bottom_tickets(filtered_tickets, 5)
+        total_score = analyze.score_tickets(filtered_tickets)
 
-        return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, project_scores, system_scores, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed
+        return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed, total_score
 
     def run(self):
         success = True
@@ -53,14 +52,13 @@ class Trend:
         projects_per_version = None
         internal_count = None
         external_count = None
-        project_scores = None
-        system_scores = None
         system_versions = None
+        total_score = 0
 
         try:
-            hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, project_scores, system_scores, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed = \
+            hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed, total_score = \
                 self.analyze_trend()
-            docx_path = self.output_docx(hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed)
+            docx_path = self.output_docx(hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed, total_score)
         except Exception as e:
             self.cache.add_log_entry(self.__class__.__name__, e)
             success = False
@@ -80,9 +78,8 @@ class Trend:
             'hours_per_ticket': hours_per_ticket,
             'lifetime_per_ticket': lifetime_per_ticket,
             'docx_path': docx_path,
-            'project_scores': project_scores,
             "system_versions": system_versions,
-            'system_scores': system_scores
+            "total_score": total_score
         }]
         return items, success
 
@@ -100,21 +97,18 @@ class Trend:
         json.dump(obj=word_cloud_output, fp=file)
         file.close()
 
-    def output_docx(self, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed):
+    def output_docx(self, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed, total_score):
         docx_generator = Docx.Docx()
         docx_generator.place_headline()
         docx_generator.place_type_pie_chart(hours_per_type)
-        docx_generator.place_stats(ticket_count, internal_count, external_count, hours_total, lifetime_per_ticket, hours_per_type, self.months)
+        docx_generator.place_stats(ticket_count, internal_count, external_count, hours_total, lifetime_per_ticket, hours_per_type, total_score, top_5_ticket_ranks, bottom_5_ticket_ranks, self.months)
         docx_generator.place_page_break()
         docx_generator.place_plot(plot_data)
         docx_generator.place_type_weight(hours_per_version, projects_per_version, self.months)
         docx_generator.place_versions(hours_per_version, self.months)
         docx_generator.place_page_break()
         docx_generator.place_payed_unpayed_pie_chart(payed_unpayed, self.months)
-        docx_generator.place_projects(hours_per_project, project_ticket_count, self.months)
-        docx_generator.place_systems(hours_per_system, system_ticket_count, system_versions, self.months)
-        docx_generator.place_top_tickets(top_5_ticket_ranks, self.months)
-        docx_generator.place_bottom_tickets(bottom_5_ticket_ranks, self.months)
+        docx_generator.place_projects(hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, self.months)
         docx_generator.place_tickets(hours_per_ticket, self.months)
         docx_path = docx_generator.save()
 
