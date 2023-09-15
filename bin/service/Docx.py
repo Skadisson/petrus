@@ -71,13 +71,17 @@ class Docx:
         paragraph.add_run("{} Stunden".format(hours_average)).bold = True
         paragraph.add_run(".")
         self.document.add_paragraph(f"Die durchschnittliche Wartezeit bis zur Lösung war {lifetime_average_days} Tage, die längste Wartezeit war {lifetime_max_days} Tage in Ticket {max_days_key}.")
-        self.document.add_paragraph(f"Die {ticket_count} Tickets haben eine Gesamt Straf-Punktezahl von {total_score} erhalten.")
+        paragraph = self.document.add_paragraph(f"Die {ticket_count} Tickets haben eine Gesamt Straf-Punktezahl von ")
+        paragraph.add_run(f"{total_score}").bold = True
+        paragraph.add_run(" erhalten.")
         paragraph = self.document.add_paragraph("Davon sind die 5 Tickets, die am schlechtesten abgeschnitten haben:")
         for ticket_key in top_5_ticket_ranks:
-            paragraph.add_run(f" {ticket_key} ({top_5_ticket_ranks[ticket_key]})")
+            paragraph.add_run(f" {ticket_key}").bold = True
+            paragraph.add_run(f" ({top_5_ticket_ranks[ticket_key]})")
         paragraph.add_run("; und die 5 Tickets, die am besten abgeschnitten haben:")
         for ticket_key in bottom_5_ticket_ranks:
-            paragraph.add_run(f" {ticket_key} ({bottom_5_ticket_ranks[ticket_key]})")
+            paragraph.add_run(f" {ticket_key}").bold = True
+            paragraph.add_run(f" ({bottom_5_ticket_ranks[ticket_key]})")
         paragraph.add_run(".")
 
     @staticmethod
