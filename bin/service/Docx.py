@@ -3,6 +3,7 @@ from docx.shared import Inches
 from docx.enum.text import WD_BREAK
 from datetime import datetime
 from bin.service import Environment
+from bin.service import Cache
 import matplotlib.pyplot as plt
 import numpy
 import math
@@ -15,6 +16,7 @@ class Docx:
         self.document = Document()
         self.environment = Environment.Environment()
         self.figure_number = 1
+        self.cache = Cache.Cache()
 
     def place_headline(self):
         now = datetime.now()
@@ -169,8 +171,14 @@ class Docx:
         self.document.add_heading('Bearbeitete SERVICE Tickets der letzten {} Tage mit Aufwänden'.format(days), level=1)
         for ticket_hours in hours_per_ticket:
             if ticket_hours[1] > 0.0:
+                title = self.cache.get_ticket_title_by_key(ticket_hours[0])
+                get_project_name_by_key = self.cache.get_project_name_by_key(ticket_hours[0])
                 paragraph = self.document.add_paragraph('')
                 paragraph.add_run("{}".format(ticket_hours[0])).bold = True
+                if get_project_name_by_key != '':
+                    paragraph.add_run(" - {} ".format(get_project_name_by_key))
+                if title != '':
+                    paragraph.add_run(" - {} ".format(title))
                 paragraph.add_run(" - {} Stunden".format(round(ticket_hours[1], ndigits=2)))
 
     @staticmethod

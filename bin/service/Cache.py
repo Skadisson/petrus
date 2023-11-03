@@ -443,3 +443,19 @@ class Cache:
     def get_open_tickets(self, project="SERVICE"):
         rgx = re.compile(f"^{project}-[0-9]*", re.IGNORECASE)
         return self.table_cache.find({'Closed': None, 'Key': {'$regex': rgx}})
+
+    def get_ticket_title_by_key(self, jira_key):
+        title = ''
+        stored_relation = self.table_cache.find_one({'Key': str(jira_key)})
+        if 'Title' in stored_relation and stored_relation['Title'] is not None:
+            title = stored_relation['Title']
+
+        return title
+
+    def get_project_name_by_key(self, jira_key):
+        project_name = ''
+        stored_relation = self.table_cache.find_one({'Key': str(jira_key)})
+        if 'Project' in stored_relation and stored_relation['Project'] is not None:
+            project_name = stored_relation['Project']
+
+        return project_name
