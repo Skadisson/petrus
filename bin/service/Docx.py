@@ -179,7 +179,8 @@ class Docx:
                     paragraph.add_run(" - {} ".format(get_project_name_by_key))
                 if title != '':
                     paragraph.add_run(" - {} ".format(title))
-                paragraph.add_run(" - {} Stunden".format(round(ticket_hours[1], ndigits=2)))
+                paragraph.add_run(" - ")
+                paragraph.add_run("{} Stunden".format(round(ticket_hours[1], ndigits=2))).bold = True
 
     @staticmethod
     def calculate_type_relation(hours_per_type):
