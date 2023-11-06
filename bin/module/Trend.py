@@ -105,7 +105,6 @@ class Trend:
         docx_generator.place_page_break()
         docx_generator.place_plot(plot_data)
         docx_generator.place_type_weight(hours_per_version, projects_per_version, self.months)
-        docx_generator.place_versions(hours_per_version, self.months)
         docx_generator.place_page_break()
         docx_generator.place_payed_unpayed_pie_chart(payed_unpayed, self.months)
         docx_generator.place_projects(hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, self.months)

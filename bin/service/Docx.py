@@ -162,11 +162,6 @@ class Docx:
                 sub_total = 0
             labels.append(f"{label} [{str(round(sub_total))}%]")
         self.place_pie_chart(list(weights.values()), labels)
-
-    def place_versions(self, hours_per_version, months):
-        days = self.months_to_days(months)
-        self.document.add_heading('Versionen', level=1)
-        self.document.add_paragraph('Folgende brandbox Versionen haben in den letzten {} Tagen getrackte Aufwände erzeugt.'.format(days))
         for version_hours in hours_per_version:
             label = version_hours[0]
             hours = version_hours[1]
