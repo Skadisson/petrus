@@ -143,9 +143,15 @@ class Docx:
                                 projects[bb_type].append(project)
         for bb_type in weights:
             if bb_type in projects:
+                label = bb_type
+                if label == 'n/a':
+                    label = 'nicht angegeben'
                 bb_type_versions = bb_versions[bb_type].split(" ")
                 paragraph = self.document.add_paragraph('')
-                paragraph.add_run("{} ({})".format(bb_type, bb_type_versions[0] + ' - ' + bb_type_versions[-1])).bold = True
+                if bb_type_versions[0] != bb_type_versions[-1]:
+                    paragraph.add_run("{} ({})".format(label, bb_type_versions[0] + ' - ' + bb_type_versions[-1])).bold = True
+                else:
+                    paragraph.add_run("{}".format(label)).bold = True
                 paragraph.add_run(" - {} Stunden auf {} Projekte".format(weights[bb_type], len(projects[bb_type])))
         total = sum(list(weights.values()))
         labels = []
@@ -162,9 +168,13 @@ class Docx:
         self.document.add_heading('Versionen', level=1)
         self.document.add_paragraph('Folgende brandbox Versionen haben in den letzten {} Tagen getrackte Aufwände erzeugt.'.format(days))
         for version_hours in hours_per_version:
+            label = version_hours[0]
+            hours = version_hours[1]
+            if label == 'n/a':
+                label = 'nicht angegeben'
             paragraph = self.document.add_paragraph('')
-            paragraph.add_run("{}".format(version_hours[0])).bold = True
-            paragraph.add_run(" - {} Stunden".format(round(version_hours[1], ndigits=2)))
+            paragraph.add_run("{}".format(label)).bold = True
+            paragraph.add_run(" - {} Stunden".format(round(hours, ndigits=2)))
 
     def place_tickets(self, hours_per_ticket, months):
         days = self.months_to_days(months)
