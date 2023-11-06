@@ -186,19 +186,18 @@ class Analyze:
         projects = {}
         for ticket in tickets:
             if 'Keywords' in ticket:
-                version = None
+                version = 'n/a'
                 for keyword in ticket['Keywords']:
                     if re.match(r"bb[0-9.]", keyword):
                         version = keyword
-                if version is not None:
-                    if version not in versions:
-                        versions[version] = []
-                    if version not in projects:
-                        projects[version] = []
-                    if ticket['Time_Spent'] is not None:
-                        versions[version].append(ticket['Time_Spent'])
-                        if ticket['Project'] is not None and ticket['Project'] not in projects[version]:
-                            projects[version].append(ticket['Project'])
+                if version not in versions:
+                    versions[version] = []
+                if version not in projects:
+                    projects[version] = []
+                if ticket['Time_Spent'] is not None:
+                    versions[version].append(ticket['Time_Spent'])
+                    if ticket['Project'] is not None and ticket['Project'] not in projects[version]:
+                        projects[version].append(ticket['Project'])
 
         versions = self.sort_tickets_and_seconds_to_hours(versions)
         return versions, projects
