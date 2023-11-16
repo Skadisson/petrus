@@ -58,12 +58,12 @@ class SciKitLearn:
             naive_bayes.GaussianNB().fit(x, y),
             neural_network.MLPRegressor(
                 hidden_layer_sizes=(10,), activation='relu', solver='adam', alpha=0.001, batch_size='auto',
-                learning_rate='constant', learning_rate_init=0.01, power_t=0.5, max_iter=1000, shuffle=True,
+                learning_rate='constant', learning_rate_init=0.01, power_t=0.5, max_iter=4000, shuffle=True,
                 random_state=9, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True,
                 early_stopping=False, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08
             ).fit(x, y),
-            linear_model.Lasso(alpha=0.1, copy_X=True, fit_intercept=True, max_iter=1000,
-                               normalize=False, positive=False, precompute=False, random_state=None,
+            linear_model.Lasso(alpha=0.1, copy_X=True, fit_intercept=True, max_iter=4000,
+                               positive=False, precompute=False, random_state=None,
                                selection='cyclic', tol=0.0001, warm_start=False).fit(x, y),
             linear_model.ElasticNet().fit(x, y),
             linear_model.SGDRegressor().fit(x, y),
