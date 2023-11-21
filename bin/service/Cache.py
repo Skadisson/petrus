@@ -447,7 +447,7 @@ class Cache:
     def get_ticket_title_by_key(self, jira_key):
         title = ''
         stored_relation = self.table_cache.find_one({'Key': str(jira_key)})
-        if 'Title' in stored_relation and stored_relation['Title'] is not None:
+        if stored_relation is not None and 'Title' in stored_relation and stored_relation['Title'] is not None:
             title = stored_relation['Title']
 
         return title
@@ -455,7 +455,7 @@ class Cache:
     def get_project_name_by_key(self, jira_key):
         project_name = ''
         stored_relation = self.table_cache.find_one({'Key': str(jira_key)})
-        if 'Project' in stored_relation and stored_relation['Project'] is not None:
+        if stored_relation is not None and 'Project' in stored_relation and stored_relation['Project'] is not None:
             project_name = stored_relation['Project']
 
         return project_name
