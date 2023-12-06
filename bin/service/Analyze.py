@@ -3,6 +3,7 @@ from bin.service import Context
 from bin.service import Map
 from bin.service import Environment
 from bin.service import Ranking
+from bin.service import SciKitLearn
 import time
 import datetime
 from collections import Counter
@@ -20,6 +21,7 @@ class Analyze:
         self.context = Context.Context()
         self.mapper = Map.Map()
         self.environment = Environment.Environment()
+        self.scikit = SciKitLearn.SciKitLearn()
         self.ranking = Ranking.Ranking()
         self.filtered_tickets = None
         self.in_range = {}
@@ -524,3 +526,7 @@ class Analyze:
 
     def get_year_month_day(self, _timestamp):
         return datetime.datetime.fromtimestamp(self.timestamp_from_ticket_time(_timestamp)).strftime("%Y/%m/%d")
+
+    def summarize_tickets(self, _tickets):
+        texts = self.context.get_notes_for_tickets(_tickets)
+        return self.scikit.summarize_texts(texts)

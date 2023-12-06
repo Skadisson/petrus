@@ -2,7 +2,8 @@ from bin.service import Environment
 from bin.service import Map
 from bin.service import Cache
 from bin.service import SciKitLearn
-import time, datetime, sys
+import time
+import datetime
 
 
 class Context:
@@ -101,13 +102,11 @@ class Context:
 
         return similar_tickets, hits
 
-    def get_phoenix_ticket_suggestion(self, tickets, query):
+    def get_texts_for_tickets(self, _tickets):
         texts = []
         keys = []
         check_tickets = []
-        suggested_keys = []
-        suggested_tickets = []
-        for ticket in tickets:
+        for ticket in _tickets:
             check_tickets.append(ticket)
             title = str(ticket['Title'])
             description = str(ticket['Text'])
@@ -128,6 +127,46 @@ class Context:
             if description is not None and key is not None and description != '':
                 keys.append(key)
                 texts.append(str(description))
+
+        return texts, keys, check_tickets
+
+    def get_notes_for_tickets(self, _tickets):
+        texts = []
+        for ticket in _tickets:
+            if 'Notes' in ticket:
+                note = str(ticket['Notes'])
+                lines = note.split("\r\n")
+                indices = []
+                if "Aufgabe:" in lines:
+                    indices.append(lines.index("Aufgabe:"))
+                if "Lösung:" in lines:
+                    indices.append(lines.index("Lösung:"))
+                if "Grund:" in lines:
+                    indices.append(lines.index("Grund:"))
+                if "Problem:" in lines:
+                    indices.append(lines.index("Problem:"))
+                info = ""
+                while len(indices) > 0:
+                    i = min(indices)
+                    while i < len(lines):
+                        line = str(lines[i])
+                        if line != "":
+                            info += line + "\r\n"
+                        else:
+                            info += "\r\n"
+                            break
+                        i += 1
+                    indices.remove(min(indices))
+                if info != "":
+                    texts.append(info)
+
+        return texts
+
+    def get_phoenix_ticket_suggestion(self, tickets, query):
+        suggested_keys = []
+        suggested_tickets = []
+
+        texts, keys, check_tickets = self.get_texts_for_tickets(tickets)
         if len(texts) > 0:
             suggested_keys = self.scikit.get_cosine_suggestion(texts, keys, query)
             for ticket in check_tickets:

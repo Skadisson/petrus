@@ -95,6 +95,12 @@ class Docx:
 
         return days
 
+    def place_summary(self, _summary, _months):
+        days = self.months_to_days(_months)
+        paragraph = self.document.add_paragraph('')
+        paragraph.add_run(f"Zusammengefasst wurden in den letzten {days} Tagen in Tickets folgende 'Problem', 'Lösung', 'Aufgabe' und 'Grund' Notizen hinterlegt:").bold = True
+        self.document.add_paragraph(_summary)
+
     def place_projects(self, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, months):
         days = self.months_to_days(months)
         self.document.add_heading('Projekte und Systeme', level=1)
