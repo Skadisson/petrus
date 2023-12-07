@@ -4,6 +4,7 @@ from bin.service import Cache
 from bin.service import SciKitLearn
 import time
 import datetime
+import re
 
 
 class Context:
@@ -135,6 +136,8 @@ class Context:
         for ticket in _tickets:
             if 'Notes' in ticket:
                 note = str(ticket['Notes'])
+                """if note != "":
+                    texts.append(re.sub(pattern=r"\{code.*\{code\}", repl="[Codebeispiel]", string=note, flags=re.DOTALL))"""
                 lines = note.split("\r\n")
                 indices = []
                 if "Aufgabe:" in lines:
