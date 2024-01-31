@@ -39,12 +39,15 @@ class JiraRestAPI:
             data_url,
             headers=self.get_headers
         )
-        response_json = json.loads(response.text)
-
         jira_keys = {}
-        for issue in response_json['issues']:
-            if issue['key'] not in jira_keys:
-                jira_keys[int(issue['id'])] = issue['key']
+
+        try:
+            response_json = json.loads(response.text)
+            for issue in response_json['issues']:
+                if issue['key'] not in jira_keys:
+                    jira_keys[int(issue['id'])] = issue['key']
+        except Exception as e:
+            self.cache.add_log_entry(self.__class__.__name__, str(e))
 
         return jira_keys
 
@@ -59,15 +62,19 @@ class JiraRestAPI:
             data_url,
             headers=self.get_headers
         )
-        response_json = json.loads(response.text)
 
         board_id = 0
-        for board in response_json['values']:
-            if 'id' in board:
-                board_id = board['id']
-                break
+        try:
+            response_json = json.loads(response.text)
+            for board in response_json['values']:
+                if 'id' in board:
+                    board_id = board['id']
+                    break
 
-        self.board_id_cache[board_name] = board_id
+            self.board_id_cache[board_name] = board_id
+        except Exception as e:
+            self.cache.add_log_entry(self.__class__.__name__, str(e))
+
         return board_id
 
     def request_ticket_status(self, mapped_ticket):
