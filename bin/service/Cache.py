@@ -233,10 +233,10 @@ class Cache:
         new_keys = []
         start = time.time()
 
-        projects = self.environment.get_service_projects()
-        for project in projects:
+        boards = self.environment.get_service_boards()
+        for board in boards:
             offset = 0
-            jira_keys = sd_api.request_service_jira_keys(offset, max_results, project)
+            jira_keys = sd_api.request_service_jira_keys(offset, max_results, board)
             while len(jira_keys) > 0:
                 ticket_total += len(jira_keys)
                 for jira_id in jira_keys:
@@ -250,9 +250,9 @@ class Cache:
                         success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, context, jira_key, jira_id, failed_jira_keys, clean_cache)
                 synced_current = len(clean_cache)
                 self.update_cache_diff(clean_cache)
-                print('>>> successfully synced {} new tickets out of {} total in project "{}"'.format(synced_current, ticket_total, project))
+                print('>>> successfully synced {} new tickets out of {} total in board "{}"'.format(synced_current, ticket_total, board))
                 offset += max_results
-                jira_keys = sd_api.request_service_jira_keys(offset, max_results, project)
+                jira_keys = sd_api.request_service_jira_keys(offset, max_results, board)
         synced_current = len(clean_cache)
         hours = round((time.time() - start) / 60 / 60, 2)
         print('>>> completed syncing {} new tickets out of {} total after {} hours'.format(synced_current, ticket_total, hours))
@@ -330,8 +330,6 @@ class Cache:
             mapped_ticket = self.mapper.format_status_history(mapped_ticket)
             mapped_ticket = sd_api.request_ticket_worklog(mapped_ticket)
             mapped_ticket, worklog_persons = self.mapper.format_worklog(mapped_ticket)
-            mapped_ticket = sd_api.request_ticket_sla(mapped_ticket)
-            mapped_ticket = self.mapper.format_sla(mapped_ticket)
             mapped_ticket = sd_api.request_ticket_comments(mapped_ticket)
             mapped_ticket, comment_persons, commands = self.mapper.format_comments(mapped_ticket)
             self.process_commands(sd_api, context, jira_id, jira_key, commands)

@@ -1,5 +1,5 @@
 from bin.service import Cache
-from bin.service import ServiceDeskAPI
+from bin.service import JiraRestAPI
 from bin.service import Context
 import _thread
 import threading
@@ -10,7 +10,7 @@ class Sync:
 
     def __init__(self):
         self.cache = Cache.Cache()
-        self.sd_api = ServiceDeskAPI.ServiceDeskAPI()
+        self.sd_api = JiraRestAPI.JiraRestAPI()
         self.context = Context.Context()
 
     def run(self):

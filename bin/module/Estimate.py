@@ -1,4 +1,4 @@
-from bin.service import ServiceDeskAPI
+from bin.service import JiraRestAPI
 from bin.service import Map
 from bin.service import Cache
 from bin.service import Context
@@ -12,7 +12,7 @@ class Estimate:
 
     def __init__(self, jira_key):
         self.jira_key = jira_key
-        self.sd_api = ServiceDeskAPI.ServiceDeskAPI()
+        self.sd_api = JiraRestAPI.JiraRestAPI()
         self.mapper = Map.Map()
         self.cache = Cache.Cache()
         self.context = Context.Context()
@@ -27,8 +27,6 @@ class Estimate:
         mapped_ticket = self.mapper.format_status_history(mapped_ticket)
         mapped_ticket = self.sd_api.request_ticket_worklog(mapped_ticket)
         mapped_ticket, worklog_persons = self.mapper.format_worklog(mapped_ticket)
-        mapped_ticket = self.sd_api.request_ticket_sla(mapped_ticket)
-        mapped_ticket = self.mapper.format_sla(mapped_ticket)
         mapped_ticket = self.sd_api.request_ticket_comments(mapped_ticket)
         mapped_ticket, comment_persons, commands = self.mapper.format_comments(mapped_ticket)
         self.cache.process_commands(self.sd_api, self.context, mapped_ticket['ID'], mapped_ticket['Key'], commands)
@@ -77,7 +75,7 @@ class Estimate:
                             ['Rank', 'Relevancy', 'Key', 'Priority', 'State_Changes', 'Type', 'Organization']
                         )
                     if post_to_jira:
-                        success = self.sd_api.update_ticket_times(jira_id, estimation, mapped_ticket)
+                        success = self.sd_api.update_ticket_times(jira_id, estimation)
         except Exception as e:
             self.cache.add_log_entry(self.__class__.__name__, e)
 
@@ -117,7 +115,7 @@ class Estimate:
                     elif days_to_go > 14:
                         days_to_go = 14
                     is_today = days_to_go == 0
-                    comment_success = self.sd_api.post_estimation_comment(mapped_ticket['ID'], mapped_ticket['Key'], mapped_ticket['Priority'], days_to_go, is_today, similar_jira_keys, estimation)
+                    comment_success = self.sd_api.post_estimation_comment(mapped_ticket['ID'], mapped_ticket['Key'], days_to_go, is_today, similar_jira_keys, estimation)
                     if comment_success is False:
                         self.cache.add_log_entry(self.__class__.__name__, f"Could not comment on ticket {mapped_ticket['Key']}")
 

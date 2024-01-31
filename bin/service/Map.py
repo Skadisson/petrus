@@ -15,9 +15,8 @@ class Map:
         self.regex = RegEx.RegEx()
         self.ranking = Ranking.Ranking()
 
-    def get_mapped_ticket(self, ticket_data_json):
+    def get_mapped_ticket(self, ticket_data):
         converted_data = {}
-        ticket_data = json.loads(ticket_data_json)
         mapping = self.environment.get_map_ticket()
         for map_to_label in mapping:
             map_from_key = mapping[map_to_label]
@@ -149,19 +148,6 @@ class Map:
         else:
             mapped_ticket['Worklog'] = []
         return mapped_ticket, persons
-
-    @staticmethod
-    def format_sla(mapped_ticket):
-        formatted_sla = {}
-        if mapped_ticket['SLA'] is not None:
-            if 'ongoingCycle' in mapped_ticket['SLA']:
-                formatted_sla = {
-                    'start': mapped_ticket['SLA']['ongoingCycle']['startTime']['iso8601'],
-                    'end': mapped_ticket['SLA']['ongoingCycle']['breachTime']['iso8601'],
-                    'breached': mapped_ticket['SLA']['ongoingCycle']['breached']
-                }
-        mapped_ticket['SLA'] = formatted_sla
-        return mapped_ticket
 
     def format_comments(self, mapped_ticket):
         persons = []

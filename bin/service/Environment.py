@@ -25,17 +25,9 @@ class Environment:
         service_yaml = self.load_yaml('service')
         return service_yaml['port']
 
-    def get_service_projects(self):
+    def get_service_boards(self):
         service_yaml = self.load_yaml('service')
-        return service_yaml['projects']
-
-    def get_endpoint_consumer_key(self):
-        service_yaml = self.load_yaml('endpoint')
-        return service_yaml['consumer_key']
-
-    def get_endpoint_consumer_secret(self):
-        service_yaml = self.load_yaml('endpoint')
-        return service_yaml['consumer_secret']
+        return service_yaml['boards']
 
     def get_path_private_key(self):
         service_yaml = self.load_yaml('path')
@@ -49,45 +41,29 @@ class Environment:
         service_yaml = self.load_yaml('path')
         return service_yaml['token']
 
-    def get_endpoint_request_token(self):
-        service_yaml = self.load_yaml('endpoint')
-        return service_yaml['request_token']
-
-    def get_endpoint_access_token(self):
-        service_yaml = self.load_yaml('endpoint')
-        return service_yaml['access_token']
-
-    def get_endpoint_authorize(self):
-        service_yaml = self.load_yaml('endpoint')
-        return service_yaml['authorize']
-
     def get_endpoint_ticket(self):
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['ticket']
+
+    def get_endpoint_field(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['field']
+
+    def get_endpoint_board(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['board']
 
     def get_endpoint_tickets(self):
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['tickets']
 
-    def get_endpoint_status(self):
+    def get_endpoint_app_key(self):
         service_yaml = self.load_yaml('endpoint')
-        return service_yaml['status']
+        return service_yaml['app_key']
 
-    def get_endpoint_info(self):
+    def get_endpoint_basic_token(self):
         service_yaml = self.load_yaml('endpoint')
-        return service_yaml['info']
-
-    def get_endpoint_worklog(self):
-        service_yaml = self.load_yaml('endpoint')
-        return service_yaml['worklog']
-
-    def get_endpoint_sla(self):
-        service_yaml = self.load_yaml('endpoint')
-        return service_yaml['sla']
-
-    def get_endpoint_comment(self):
-        service_yaml = self.load_yaml('endpoint')
-        return service_yaml['comment']
+        return service_yaml['basic_token']
 
     def get_map_ticket(self):
         service_yaml = self.load_yaml('map')
