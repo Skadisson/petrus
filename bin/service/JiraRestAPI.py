@@ -18,7 +18,6 @@ class JiraRestAPI:
             "Content-Type": "application/json",
             "Authorization": f"Basic {self.environment.get_endpoint_basic_token()}"
         }
-        self.board_id_cache = {}
 
     def request_ticket_data(self, jira_key):
         ticket_endpoint = self.environment.get_endpoint_ticket()
@@ -30,10 +29,9 @@ class JiraRestAPI:
         )
         return json.loads(response.text)
 
-    def request_service_jira_keys(self, offset=0, max_results=100, board='Service Board'):
-        board_id = self.get_board_id_for_board(board)
+    def request_service_jira_keys(self, offset=0, max_results=100, project='SERVICE'):
         tickets_endpoint = self.environment.get_endpoint_tickets()
-        data_url = tickets_endpoint.format(board_id, max_results, offset)
+        data_url = tickets_endpoint.format(project, max_results, offset)
         response = requests.request(
             "GET",
             data_url,
@@ -50,32 +48,6 @@ class JiraRestAPI:
             self.cache.add_log_entry(self.__class__.__name__, str(e))
 
         return jira_keys
-
-    def get_board_id_for_board(self, board_name):
-        if board_name in self.board_id_cache:
-            return self.board_id_cache
-
-        board_endpoint = self.environment.get_endpoint_board()
-        data_url = board_endpoint.format(board_name)
-        response = requests.request(
-            "GET",
-            data_url,
-            headers=self.get_headers
-        )
-
-        board_id = 0
-        try:
-            response_json = json.loads(response.text)
-            for board in response_json['values']:
-                if 'id' in board:
-                    board_id = board['id']
-                    break
-
-            self.board_id_cache[board_name] = board_id
-        except Exception as e:
-            self.cache.add_log_entry(self.__class__.__name__, str(e))
-
-        return board_id
 
     def request_ticket_status(self, mapped_ticket):
         ticket_content = self.request_ticket_data(mapped_ticket['ID'])

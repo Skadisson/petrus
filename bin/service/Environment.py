@@ -25,9 +25,9 @@ class Environment:
         service_yaml = self.load_yaml('service')
         return service_yaml['port']
 
-    def get_service_boards(self):
+    def get_service_projects(self):
         service_yaml = self.load_yaml('service')
-        return service_yaml['boards']
+        return service_yaml['projects']
 
     def get_path_private_key(self):
         service_yaml = self.load_yaml('path')

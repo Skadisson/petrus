@@ -233,10 +233,11 @@ class Cache:
         new_keys = []
         start = time.time()
 
-        boards = self.environment.get_service_boards()
-        for board in boards:
+        projects = self.environment.get_service_projects()
+        for project in projects:
             offset = 0
-            jira_keys = sd_api.request_service_jira_keys(offset, max_results, board)
+            jira_keys = sd_api.request_service_jira_keys(offset, max_results, project)
+            print(f"{project}: {len(jira_keys)} Tickets")
             while len(jira_keys) > 0:
                 ticket_total += len(jira_keys)
                 for jira_id in jira_keys:
@@ -250,9 +251,9 @@ class Cache:
                         success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, context, jira_key, jira_id, failed_jira_keys, clean_cache)
                 synced_current = len(clean_cache)
                 self.update_cache_diff(clean_cache)
-                print('>>> successfully synced {} new tickets out of {} total in board "{}"'.format(synced_current, ticket_total, board))
+                print('>>> successfully synced {} new tickets out of {} total in project "{}"'.format(synced_current, ticket_total, project))
                 offset += max_results
-                jira_keys = sd_api.request_service_jira_keys(offset, max_results, board)
+                jira_keys = sd_api.request_service_jira_keys(offset, max_results, project)
         synced_current = len(clean_cache)
         hours = round((time.time() - start) / 60 / 60, 2)
         print('>>> completed syncing {} new tickets out of {} total after {} hours'.format(synced_current, ticket_total, hours))
