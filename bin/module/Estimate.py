@@ -79,7 +79,7 @@ class Estimate:
                     """if post_to_jira:
                         success = self.sd_api.update_ticket_times(jira_id, estimation)"""
                 if similar_jira_keys is not None:
-                    self.cache.add_log_entry(self.__class__.__name__, 'Found ' + similar_jira_keys + ' similar tickets for Ticket "' + self.jira_key + '"')
+                    self.cache.add_log_entry(self.__class__.__name__, 'Found ' + len(similar_jira_keys) + ' similar tickets for Ticket "' + self.jira_key + '"')
                 else:
                     self.cache.add_log_entry(self.__class__.__name__, 'Found no similar tickets for Ticket "' + self.jira_key + '"')
         except Exception as e:
