@@ -152,5 +152,5 @@ class Estimate:
         }]
 
         time_diff = time.time() - start_time
-        self.cache.add_log_entry(self.__class__.__name__, f'Estimation concluded after {time_diff} seconds ({(round(time_diff / 60, 2))} minutes)')
+        self.cache.add_log_entry(self.__class__.__name__, f'Estimation concluded after {round(time_diff)} seconds ({(round(time_diff / 60, 2))} minutes)')
         return items, success
