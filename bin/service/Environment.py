@@ -65,6 +65,14 @@ class Environment:
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['basic_token']
 
+    def get_endpoint_time(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['time']
+
+    def get_endpoint_comment(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['comment']
+
     def get_map_ticket(self):
         service_yaml = self.load_yaml('map')
         return service_yaml['Ticket']

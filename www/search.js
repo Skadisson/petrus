@@ -163,9 +163,14 @@ PS = (function(window, document, $) {
                         $('#high-score').text(highest_day + ':' + high_score.padStart(10, '0'));
                         var cssClass = hours <= 2 ? 'green' : (hours <= 4 ? 'yellow' : 'red');
                         if(days_to_go > 0) {
-                            $('#link-list').append('<p id="single">Ticket "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h and might take up to ' + days_to_go + ' days till completion <span class="corner ' + cssClass + '">&nbsp;</span></p>');
+                            $('#link-list').append('<p id="single">Ticket '+result.items[0].ticket.Key+' "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h and might take up to ' + days_to_go + ' days till completion <span class="corner ' + cssClass + '">&nbsp;</span></p>');
                         } else {
-                            $('#link-list').append('<p id="single">Ticket "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h <span class="corner ' + cssClass + '">&nbsp;</span></p>');
+                            $('#link-list').append('<p id="single">Ticket '+result.items[0].ticket.Key+' "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h <span class="corner ' + cssClass + '">&nbsp;</span></p>');
+                        }
+                        if(typeof result.items[0].similar_keys != 'undefined' && result.items[0].similar_keys.length > 0) {
+                            for(i = 0; i < result.items[0].similar_keys.length; i++) {
+                                $('#link-list').append('<p>' + result.items[0].similar_keys[i] + '</p>');
+                            }
                         }
                         self.info();
                     }

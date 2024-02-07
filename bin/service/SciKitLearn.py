@@ -1,10 +1,7 @@
 from pandas import DataFrame
-from sklearn import linear_model, gaussian_process, tree, neural_network, naive_bayes, feature_extraction, pipeline
+from sklearn import linear_model, tree, naive_bayes, feature_extraction, pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.decomposition import TruncatedSVD
-from sklearn.preprocessing import Normalizer
-from sklearn.pipeline import make_pipeline
 from bin.service import Cache
 from bin.service import Environment
 import nltk
@@ -23,8 +20,7 @@ class SciKitLearn:
     def estimate(self, target_data, source_data, target_attribute, source_attributes):
 
         x, y = self.frame_data(source_data, target_attribute, source_attributes)
-        models = self.shotgun_models(x, y)
-        model = self.get_highest_scoring_model(models, x, y)
+        model = self.init_model(x, y)
         target_x, target_y = self.frame_data([target_data], target_attribute, source_attributes)
         estimations = model.predict(target_x)
         if estimations is not None and len(estimations) > 0:
@@ -39,45 +35,14 @@ class SciKitLearn:
         return estimation
 
     @staticmethod
-    def get_highest_scoring_model(models, x, y):
+    def init_model(x, y):
 
-        highest_score = 0
-        highest_scoring_model = None
-        for model in models:
-            score = model.score(x, y)
-            if score > highest_score:
-                highest_score = score
-                highest_scoring_model = model
+        if len(x) > 10:
+            model = tree.DecisionTreeClassifier().fit(x, y)
+        else:
+            model = linear_model.LinearRegression(n_jobs=2).fit(x, y)
 
-        return highest_scoring_model
-
-    @staticmethod
-    def shotgun_models(x, y):
-
-        kernel = gaussian_process.kernels.DotProduct() + gaussian_process.kernels.WhiteKernel()
-        models = [
-            gaussian_process.GaussianProcessRegressor(kernel=kernel, random_state=1337).fit(x, y),
-            linear_model.LinearRegression(n_jobs=2).fit(x, y),
-            tree.DecisionTreeClassifier().fit(x, y),
-            tree.DecisionTreeRegressor().fit(x, y),
-            tree.ExtraTreeRegressor().fit(x, y),
-            naive_bayes.GaussianNB().fit(x, y),
-            neural_network.MLPRegressor(
-                hidden_layer_sizes=(10,), activation='relu', solver='adam', alpha=0.001, batch_size='auto',
-                learning_rate='constant', learning_rate_init=0.01, power_t=0.5, max_iter=4000, shuffle=True,
-                random_state=9, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True,
-                early_stopping=False, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08
-            ).fit(x, y),
-            linear_model.Lasso(alpha=0.1, copy_X=True, fit_intercept=True, max_iter=4000,
-                               positive=False, precompute=False, random_state=None,
-                               selection='cyclic', tol=0.0001, warm_start=False).fit(x, y),
-            linear_model.ElasticNet().fit(x, y),
-            linear_model.SGDRegressor().fit(x, y),
-            linear_model.Ridge().fit(x, y),
-            linear_model.PassiveAggressiveRegressor().fit(x, y)
-        ]
-
-        return models
+        return model
 
     @staticmethod
     def frame_data(data, target_attribute, source_attributes):

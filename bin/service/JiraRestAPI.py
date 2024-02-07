@@ -97,7 +97,25 @@ class JiraRestAPI:
         return success
 
     def post_comment(self, jira_id, comment, comment_type="estimation"):
-        success = self.update_ticket_field(jira_id, comment, "customfield_12300")
+        endpoint_comment = self.environment.get_endpoint_comment()
+        data_url = endpoint_comment.format(jira_id)
+        payload = json.dumps({
+            "body": comment
+        })
+        response = requests.request(
+            "PUT",
+            data_url,
+            data=payload,
+            headers=self.put_headers
+        )
+        if response.text is not None:
+            response_data = json.loads(response.text)
+            print(f"comment on {jira_id}")
+            print(response_data)
+        else:
+            print(f"comment error on {jira_id}")
+            print(response)
+        success = False
         if success:
             self.cache.store_comment(jira_id, comment, comment_type)
         return success
@@ -105,7 +123,26 @@ class JiraRestAPI:
     def update_ticket_times(self, jira_id, estimation):
         estimation = float(estimation)
         estimation_hours = self.seconds_to_hours(estimation)
-        success = self.update_ticket_field(jira_id, str(estimation_hours), "estimation")
+        endpoint_time = self.environment.get_endpoint_time()
+        data_url = endpoint_time.format(jira_id)
+        payload = json.dumps({
+            "adjustEstimate": "new",
+            "newEstimate": str(estimation_hours)
+        })
+        response = requests.request(
+            "PUT",
+            data_url,
+            data=payload,
+            headers=self.put_headers
+        )
+        if response.text is not None:
+            response_data = json.loads(response.text)
+            print(f"time on {jira_id}")
+            print(response_data)
+        else:
+            print(f"time error on {jira_id}")
+            print(response)
+        success = True
         return success
 
     def update_ticket_field(self, jira_id, value, field):

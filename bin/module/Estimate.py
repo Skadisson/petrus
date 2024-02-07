@@ -56,6 +56,8 @@ class Estimate:
         days_to_go = None
         jira_id = None
         similar_jira_keys = None
+        start_time = time.time()
+        self.cache.add_log_entry(self.__class__.__name__, 'Estimation started')
 
         try:
             if self.jira_key is not None:
@@ -74,8 +76,12 @@ class Estimate:
                             'Time_Spent',
                             ['Rank', 'Relevancy', 'Key', 'Priority', 'State_Changes', 'Type', 'Organization']
                         )
-                    if post_to_jira:
-                        success = self.sd_api.update_ticket_times(jira_id, estimation)
+                    """if post_to_jira:
+                        success = self.sd_api.update_ticket_times(jira_id, estimation)"""
+                if similar_jira_keys is not None:
+                    self.cache.add_log_entry(self.__class__.__name__, 'Found ' + similar_jira_keys + ' similar tickets for Ticket "' + self.jira_key + '"')
+                else:
+                    self.cache.add_log_entry(self.__class__.__name__, 'Found no similar tickets for Ticket "' + self.jira_key + '"')
         except Exception as e:
             self.cache.add_log_entry(self.__class__.__name__, e)
 
@@ -115,9 +121,9 @@ class Estimate:
                     elif days_to_go > 14:
                         days_to_go = 14
                     is_today = days_to_go == 0
-                    comment_success = self.sd_api.post_estimation_comment(mapped_ticket['ID'], mapped_ticket['Key'], days_to_go, is_today, similar_jira_keys, estimation)
+                    """comment_success = self.sd_api.post_estimation_comment(mapped_ticket['ID'], mapped_ticket['Key'], days_to_go, is_today, similar_jira_keys, estimation)
                     if comment_success is False:
-                        self.cache.add_log_entry(self.__class__.__name__, f"Could not comment on ticket {mapped_ticket['Key']}")
+                        self.cache.add_log_entry(self.__class__.__name__, f"Could not comment on ticket {mapped_ticket['Key']}")"""
 
         score = {}
         if post_to_jira:
@@ -141,6 +147,10 @@ class Estimate:
             'days_to_go': days_to_go,
             'hits': hits,
             'normal_ticket': normalized_ticket,
-            'score': score
+            'score': score,
+            'similar_keys': similar_jira_keys
         }]
+
+        time_diff = time.time() - start_time
+        self.cache.add_log_entry(self.__class__.__name__, f'Estimation concluded after {time_diff} seconds ({(round(time_diff / 60, 2))} minutes)')
         return items, success
