@@ -251,6 +251,13 @@ body.dark #image-copyright-dark {
 body.dark #image-copyright {
     display:none;
 }
+#network {
+    position:relative;
+    width:800px;
+    overflow:hidden;
+    height:400px;
+    margin-top: -400px;
+}
 #graph {
     opacity:0.25;
     position:relative;

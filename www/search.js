@@ -12,7 +12,7 @@ PS = (function(window, document, $) {
 
     'use strict';
 
-    var self, weeks, mode;
+    var self, weeks, mode, networkNodes, networkLinks;
 
     var construct = function() {
         self = this;
@@ -23,6 +23,8 @@ PS = (function(window, document, $) {
             'month': 4
         };
         mode = 'opened';
+        networkNodes = [];
+        networkLinks = [];
         self.init();
     };
 
@@ -167,11 +169,7 @@ PS = (function(window, document, $) {
                         } else {
                             $('#link-list').append('<p id="single">Ticket '+result.items[0].ticket.Key+' "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h <span class="corner ' + cssClass + '">&nbsp;</span></p>');
                         }
-                        if(typeof result.items[0].similar_keys != 'undefined' && result.items[0].similar_keys.length > 0) {
-                            for(i = 0; i < result.items[0].similar_keys.length; i++) {
-                                $('#link-list').append('<p>' + result.items[0].similar_keys[i] + '</p>');
-                            }
-                        }
+                        self.updateNetworkGraph(result.items[0].ticket.Key, result.items[0].similar_keys);
                         self.info();
                     }
                 }
@@ -388,6 +386,136 @@ PS = (function(window, document, $) {
         }
     };
 
+    function updateNetworkGraph(source_label, target_labels) {
+        if(typeof source_label != 'undefined') {
+            var labels = target_labels;
+            labels.push(source_label);
+            self.updateNetworkNodes(labels);
+            self.updateNetworkLinks(source_label, target_labels);
+            self.renderNetwork();
+        }
+    };
+
+    function updateNetworkNodes(labels) {
+        for(var i = 0; i < labels.length; i++) {
+            var label = labels[i];
+            var foundID, maxID;
+            [foundID, maxID] = self.searchNetworkNodeID(label);
+            if(foundID == 0) {
+                networkNodes.push({
+                    "id": maxID+1,
+                    "name": label
+                });
+            }
+        }
+    };
+
+    function updateNetworkLinks(source_label, target_labels) {
+        var sourceID, maxID;
+        [sourceID, maxID] = self.searchNetworkNodeID(source_label);
+        for(var i = 0; i < target_labels.length; i++) {
+            var target_label = target_labels[i];
+            var targetID, maxID;
+            [targetID, maxID] = self.searchNetworkNodeID(target_label);
+            self.updateNetworkLink(sourceID, targetID);
+        }
+    };
+
+    function searchNetworkNodeID(label) {
+        var foundID = 0;
+        var maxID = 0;
+        for(var j = 0; j < networkNodes.length; j++) {
+            var networkNode = networkNodes[j];
+            if(networkNode.id > maxID) {
+                maxID = networkNode.id;
+            }
+            if(networkNode.name == label) {
+                foundID = networkNode.id;
+            }
+        }
+
+        return [foundID, maxID];
+    };
+
+    function updateNetworkLink(sourceID, targetID) {
+        var found = false;
+        for(var i = 0; i < networkLinks.length; i++) {
+            var networkLink = networkLinks[i];
+            if(sourceID == networkLink.source && targetID == networkLink.target) {
+                found = true;
+            }
+        }
+        if(!found) {
+            networkLinks.push({
+                "source": sourceID,
+                "target": targetID
+            });
+        }
+    };
+
+    function renderNetwork() {
+        // https://d3-graph-gallery.com/graph/network_basic.html
+
+        // set the dimensions and margins of the graph
+        var margin = {top: 10, right: 30, bottom: 30, left: 40},
+          width = 800 - margin.left - margin.right,
+          height = 400 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        var svg = d3.select("#network")
+        .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+          .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+
+        if(networkNodes.length > 0) {
+
+          // Initialize the links
+          var link = svg
+            .selectAll("line")
+            .data(networkLinks)
+            .enter()
+            .append("line")
+              .style("stroke", "#aaa")
+
+          // Initialize the nodes
+          var node = svg
+            .selectAll("circle")
+            .data(networkNodes)
+            .enter()
+            .append("circle")
+              .attr("r", 20)
+              .style("fill", "#69b3a2")
+
+          // Let's list the force we wanna apply on the network
+          var simulation = d3.forceSimulation(networkNodes)                 // Force algorithm is applied to data.nodes
+              .force("link", d3.forceLink()                               // This force provides links between nodes
+                    .id(function(d) { return d.id; })                     // This provide  the id of a node
+                    .links(networkLinks)                                    // and this the list of links
+              )
+              .force("charge", d3.forceManyBody().strength(-400))         // This adds repulsion between nodes. Play with the -400 for the repulsion strength
+              .force("center", d3.forceCenter(width / 2, height / 2))     // This force attracts nodes to the center of the svg area
+              .on("end", ticked);
+
+          // This function is run at each iteration of the force algorithm, updating the nodes position.
+          function ticked() {
+            link
+                .attr("x1", function(d) { return d.source.x; })
+                .attr("y1", function(d) { return d.source.y; })
+                .attr("x2", function(d) { return d.target.x; })
+                .attr("y2", function(d) { return d.target.y; });
+
+            node
+                 .attr("cx", function (d) { return d.x+6; })
+                 .attr("cy", function(d) { return d.y-6; });
+          }
+
+
+        }
+    };
+
     construct.prototype = {
         init: init,
         search: search,
@@ -397,7 +525,13 @@ PS = (function(window, document, $) {
         renderPieChart: renderPieChart,
         toggleWeekFunction: toggleWeekFunction,
         toggleGraphMode: toggleGraphMode,
-        downloadPNG: downloadPNG
+        downloadPNG: downloadPNG,
+        updateNetworkGraph: updateNetworkGraph,
+        updateNetworkNodes: updateNetworkNodes,
+        updateNetworkLinks: updateNetworkLinks,
+        searchNetworkNodeID: searchNetworkNodeID,
+        updateNetworkLink: updateNetworkLink,
+        renderNetwork: renderNetwork
     };
 
     return construct;
