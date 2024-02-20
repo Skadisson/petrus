@@ -457,11 +457,12 @@ PS = (function(window, document, $) {
         // https://d3-graph-gallery.com/graph/network_basic.html
 
         // set the dimensions and margins of the graph
-        var margin = {top: 10, right: 30, bottom: 30, left: 40},
-          width = 800 - margin.left - margin.right,
-          height = 400 - margin.top - margin.bottom;
+        var margin = {top: 30, right: 30, bottom: 30, left: 30},
+          width = window.innerWidth - margin.left - margin.right,
+          height = parseInt(window.innerHeight / 2) - margin.top - margin.bottom;
 
         // append the svg object to the body of the page
+        $('#network svg').remove();
         var svg = d3.select("#network")
         .append("svg")
           .attr("width", width + margin.left + margin.right)
@@ -478,16 +479,20 @@ PS = (function(window, document, $) {
             .data(networkLinks)
             .enter()
             .append("line")
-              .style("stroke", "#aaa")
+              .style("stroke", "white");
 
           // Initialize the nodes
           var node = svg
-            .selectAll("circle")
+            .selectAll("text")
             .data(networkNodes)
             .enter()
-            .append("circle")
-              .attr("r", 20)
-              .style("fill", "#69b3a2")
+            .append("text")
+              .attr("width", 120)
+              .attr("height", 40)
+              .attr("font-family", "Courier New")
+              .attr("font-weight", "bold")
+              .attr("font-size", "14px")
+              .style("fill", "black");
 
           // Let's list the force we wanna apply on the network
           var simulation = d3.forceSimulation(networkNodes)                 // Force algorithm is applied to data.nodes
@@ -508,8 +513,9 @@ PS = (function(window, document, $) {
                 .attr("y2", function(d) { return d.target.y; });
 
             node
-                 .attr("cx", function (d) { return d.x+6; })
-                 .attr("cy", function(d) { return d.y-6; });
+                 .attr("x", function (d) { return d.x-60; })
+                 .attr("y", function(d) { return d.y; })
+                 .text(function(d) { return d.name; });
           }
 
 

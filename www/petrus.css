@@ -252,11 +252,14 @@ body.dark #image-copyright {
     display:none;
 }
 #network {
-    position:relative;
-    width:800px;
+    position:absolute;
+    width:100%;
     overflow:hidden;
-    height:400px;
-    margin-top: -400px;
+    height:100%;
+    top:0;
+    left:0;
+    pointer-events: none;
+    opacity: 0.66;
 }
 #graph {
     opacity:0.25;
