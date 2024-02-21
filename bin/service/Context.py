@@ -23,6 +23,12 @@ class Context:
 
     def calculate_relevancy_for_tickets(self, tickets, mapped_ticket):
         keywords = mapped_ticket['Keywords']
+        if 'Title' in mapped_ticket and mapped_ticket['Title'] != '':
+            keywords += [mapped_ticket['Title']]
+        if 'Text' in mapped_ticket and mapped_ticket['Text'] != '':
+            keywords += [mapped_ticket['Text']]
+        if 'Comments' in mapped_ticket and len(mapped_ticket['Comments']) > 0:
+            keywords += mapped_ticket['Comments']
 
         suggested_keys = []
         phoenix_suggestions = []

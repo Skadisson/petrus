@@ -169,7 +169,7 @@ PS = (function(window, document, $) {
                         } else {
                             $('#link-list').append('<p id="single">Ticket '+result.items[0].ticket.Key+' "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h <span class="corner ' + cssClass + '">&nbsp;</span></p>');
                         }
-                        self.updateNetworkGraph(result.items[0].ticket.Key, result.items[0].similar_keys);
+                        self.updateNetworkGraph(result.items[0].ticket.Key, result.items[0].similar_keys, hours, cssClass);
                         self.info();
                     }
                 }
@@ -386,13 +386,13 @@ PS = (function(window, document, $) {
         }
     };
 
-    function updateNetworkGraph(source_label, target_labels) {
+    function updateNetworkGraph(source_label, target_labels, hours, cssClass) {
         if(typeof source_label != 'undefined') {
             var labels = target_labels;
             labels.push(source_label);
             self.updateNetworkNodes(labels);
             self.updateNetworkLinks(source_label, target_labels);
-            self.renderNetwork();
+            self.renderNetwork(hours, cssClass);
         }
     };
 
@@ -453,7 +453,7 @@ PS = (function(window, document, $) {
         }
     };
 
-    function renderNetwork() {
+    function renderNetwork(hours, cssClass) {
         $('#network p').remove();
         for(var i = 0; i < networkNodes.length; i++) {
             var node = networkNodes[i];
@@ -469,9 +469,9 @@ PS = (function(window, document, $) {
                     }
                 }
             }
-            console.log([node, linkNames]);
             if(linkNames.length > 0) {
-                $('#network').append('<p>' + node.name + ' > ' + linkNames.join(', ') + '</p>');
+                $('#network').append('<p>' + node.name + ' (' + hours + 'h)  >>  ' + linkNames.join('  ') + ' <span class="corner ' + cssClass + '">&nbsp;</span></p>');
+                $('#network').animate({ scrollTop: '100%' }, 100);
             }
         }
     };

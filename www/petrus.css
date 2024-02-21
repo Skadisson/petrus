@@ -222,6 +222,7 @@ body.dark #link-list p:hover {
 body.dark #link-list p a, body.dark #link-list p a:link, body.dark #link-list p a:visited, body.dark #link-list p a:hover, body.dark #link-list p a:active {
     color: #FCF7E0;
 }
+#network p span.corner,
 #link-list p span.corner {
     position: absolute;
     right: 5px;
@@ -255,7 +256,7 @@ body.dark #image-copyright {
     position: absolute;
     width: 90%;
     overflow: hidden;
-    height: 30%;
+    height: 20%;
     top: 0;
     left: 0;
     pointer-events: none;
@@ -263,12 +264,14 @@ body.dark #image-copyright {
     padding: 10% 5%;
 }
 #network p {
+    display: block;
     margin: 10px;
     background: black;
     border-radius: 5px;
     padding: 5px;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: bold;
+    position:relative;
 }
 #graph {
     opacity:0.25;
