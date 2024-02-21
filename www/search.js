@@ -454,71 +454,25 @@ PS = (function(window, document, $) {
     };
 
     function renderNetwork() {
-        // https://d3-graph-gallery.com/graph/network_basic.html
-
-        // set the dimensions and margins of the graph
-        var margin = {top: 30, right: 30, bottom: 30, left: 30},
-          width = window.innerWidth - margin.left - margin.right,
-          height = parseInt(window.innerHeight / 2) - margin.top - margin.bottom;
-
-        // append the svg object to the body of the page
-        $('#network svg').remove();
-        var svg = d3.select("#network")
-        .append("svg")
-          .attr("width", width + margin.left + margin.right)
-          .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-          .attr("transform",
-                "translate(" + margin.left + "," + margin.top + ")");
-
-        if(networkNodes.length > 0) {
-
-          // Initialize the links
-          var link = svg
-            .selectAll("line")
-            .data(networkLinks)
-            .enter()
-            .append("line")
-              .style("stroke", "white");
-
-          // Initialize the nodes
-          var node = svg
-            .selectAll("text")
-            .data(networkNodes)
-            .enter()
-            .append("text")
-              .attr("width", 120)
-              .attr("height", 40)
-              .attr("font-family", "Courier New")
-              .attr("font-weight", "bold")
-              .attr("font-size", "14px")
-              .style("fill", "black");
-
-          // Let's list the force we wanna apply on the network
-          var simulation = d3.forceSimulation(networkNodes)                 // Force algorithm is applied to data.nodes
-              .force("link", d3.forceLink()                               // This force provides links between nodes
-                    .id(function(d) { return d.id; })                     // This provide  the id of a node
-                    .links(networkLinks)                                    // and this the list of links
-              )
-              .force("charge", d3.forceManyBody().strength(-400))         // This adds repulsion between nodes. Play with the -400 for the repulsion strength
-              .force("center", d3.forceCenter(width / 2, height / 2))     // This force attracts nodes to the center of the svg area
-              .on("end", ticked);
-
-          // This function is run at each iteration of the force algorithm, updating the nodes position.
-          function ticked() {
-            link
-                .attr("x1", function(d) { return d.source.x; })
-                .attr("y1", function(d) { return d.source.y; })
-                .attr("x2", function(d) { return d.target.x; })
-                .attr("y2", function(d) { return d.target.y; });
-
-            node
-                 .attr("x", function (d) { return d.x-60; })
-                 .attr("y", function(d) { return d.y; })
-                 .text(function(d) { return d.name; });
-          }
-
-
+        $('#network p').remove();
+        for(var i = 0; i < networkNodes.length; i++) {
+            var node = networkNodes[i];
+            var linkNames = [];
+            for(var j = 0; j < networkLinks.length; j++) {
+                var link = networkLinks[j];
+                if(link.source == node.id) {
+                    for(var k = 0; k < networkNodes.length; k++) {
+                        var linkNode = networkNodes[k];
+                        if(linkNode.id != node.id && linkNode.id == link.target) {
+                            linkNames.push(linkNode.name);
+                        }
+                    }
+                }
+            }
+            console.log([node, linkNames]);
+            if(linkNames.length > 0) {
+                $('#network').append('<p>' + node.name + ' > ' + linkNames.join(', ') + '</p>');
+            }
         }
     };
 

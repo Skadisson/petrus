@@ -88,7 +88,7 @@ class Estimate:
         if estimation is not None:
             estimation = float(estimation)
 
-        if post_to_jira and normalized_ticket is not None and jira_id is not None and mapped_ticket is not None:
+        """if post_to_jira and normalized_ticket is not None and jira_id is not None and mapped_ticket is not None:
             comment_exists = self.cache.comment_exists(jira_id)
             if comment_exists is False:
                 normalized_ticket['Diff'] = 0.0
@@ -121,7 +121,7 @@ class Estimate:
                     elif days_to_go > 14:
                         days_to_go = 14
                     is_today = days_to_go == 0
-                    """comment_success = self.sd_api.post_estimation_comment(mapped_ticket['ID'], mapped_ticket['Key'], days_to_go, is_today, similar_jira_keys, estimation)
+                    comment_success = self.sd_api.post_estimation_comment(mapped_ticket['ID'], mapped_ticket['Key'], days_to_go, is_today, similar_jira_keys, estimation)
                     if comment_success is False:
                         self.cache.add_log_entry(self.__class__.__name__, f"Could not comment on ticket {mapped_ticket['Key']}")"""
 
