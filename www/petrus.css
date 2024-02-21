@@ -267,6 +267,8 @@ body.dark #image-copyright {
     background: black;
     border-radius: 5px;
     padding: 5px;
+    font-size: 10px;
+    font-weight: bold;
 }
 #graph {
     opacity:0.25;
