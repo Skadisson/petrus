@@ -11,6 +11,7 @@ import collections
 import re
 import numpy
 import math
+import pandas
 
 
 class Analyze:
@@ -530,3 +531,39 @@ class Analyze:
     def summarize_tickets(self, _tickets):
         texts = self.context.get_notes_for_tickets(_tickets)
         return self.scikit.summarize_texts(texts)
+
+    def get_tickets_per_board(self, boards):
+        tickets_per_board = {}
+        for board in boards:
+            tickets_per_board[board] = self.order_tickets_per_month(
+                self.cache.load_cached_tickets(board, True)
+            )
+        return tickets_per_board
+
+    def order_tickets_per_month(self, tickets):
+        tickets_per_month = {}
+        for ticket in tickets:
+            if 'Created' in ticket and ticket['Created'] is not None:
+                ticket['Created'] = self.timestamp_from_ticket_time(ticket['Created'])
+            else:
+                ticket['Created'] = 0
+            if ticket['Created'] != '' and ticket['Created'] != 0:
+                date = int(datetime.datetime.fromtimestamp(ticket['Created']).strftime("%Y%m"))
+                if date in tickets_per_month:
+                    tickets_per_month[date] += 1
+                else:
+                    tickets_per_month[date] = 1
+        sorted_months = sorted(tickets_per_month)
+        tickets_per_month_sorted = {}
+        for sorted_month in sorted_months:
+            tickets_per_month_sorted[sorted_month] = tickets_per_month[sorted_month]
+        return tickets_per_month_sorted
+
+    def get_trend_per_board(self, tickets_per_board):
+        trend_per_board = {}
+        for board in tickets_per_board:
+            trend_per_board[board] = {}
+            for month in tickets_per_board[board]:
+                """TBI"""
+
+        return trend_per_board
