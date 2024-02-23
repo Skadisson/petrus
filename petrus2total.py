@@ -4,7 +4,7 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
     import numpy as np
     analyze = Analyze.Analyze()
-    tickets_per_board = analyze.get_tickets_per_board(['SERVICE', 'BRANDBOXSUPPORT'])
+    tickets_per_board = analyze.get_tickets_per_board(['SERVICE', 'BRANDBOXSUPPORT', 'QS'])
     trend_per_board = analyze.get_trend_per_board(tickets_per_board)
     now = datetime.now()
     date = datetime.strftime(now, "%Y/%m/%d")

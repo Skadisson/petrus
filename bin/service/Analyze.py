@@ -58,7 +58,7 @@ class Analyze:
     def top_and_bottom_tickets(self, tickets, top_count=5):
         ranked_tickets = []
         for ticket in tickets:
-            concluded = len(ticket['Status']) > 0 and 'type' in ticket['Status'][0] and ticket['Status'][0]['type'] == 'Fertig'
+            concluded = ticket['Closed'] is not None
             actually_needed_effort = 'Time_Spent' in ticket and ticket['Time_Spent'] is not None and ticket['Time_Spent'] > 0
             if actually_needed_effort is True and concluded is True:
                 ranked_ticket = ticket
@@ -221,12 +221,9 @@ class Analyze:
     def lifetime_per_ticket(self, stored_tickets):
         tickets = {}
         for ticket in stored_tickets:
-            if 'Versions' in ticket and len(ticket['Versions']) > 0:
-                continue
             jira_key = self.cache.load_jira_key_for_id(ticket['ID'])
             if jira_key is not None:
-                if len(ticket['Status']) > 0 and 'type' in ticket['Status'][0] and ticket['Status'][0]['type'] in ["Fertig"] \
-                        and ticket['Created'] is not None and ticket['Closed'] is not None:
+                if ticket['Created'] is not None and ticket['Closed'] is not None:
                     time_created = self.timestamp_from_ticket_time(ticket['Created'])
                     time_closed = self.timestamp_from_ticket_time(ticket['Closed'])
                     if 0 < time_created < time_closed and time_closed > 0:
