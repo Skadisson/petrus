@@ -5,3 +5,5 @@
 /www/word_cloud.json
 /venv/
 jira_rest.py
+mail_gatherer.py
+mail_parser.py
