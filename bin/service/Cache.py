@@ -237,7 +237,6 @@ class Cache:
         for project in projects:
             offset = 0
             jira_keys = sd_api.request_service_jira_keys(offset, max_results, project)
-            print(f"{project}: {len(jira_keys)} Tickets")
             while len(jira_keys) > 0:
                 ticket_total += len(jira_keys)
                 for jira_id in jira_keys:
