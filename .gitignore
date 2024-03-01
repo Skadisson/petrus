@@ -6,4 +6,4 @@
 /venv/
 jira_rest.py
 mail_gatherer.py
-mail_parser_train.py
+mail_type_code_parser_train.py
