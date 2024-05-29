@@ -10,3 +10,4 @@ mail_type_code_parser_train.py
 mail_info_parser.py
 confluence_tidy_check.py
 mail_bounce_decision_tree.py
+decision_tree_junction*

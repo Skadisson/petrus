@@ -35,7 +35,7 @@ class Trend:
         total_score = analyze.score_tickets(filtered_tickets)
         """summary = analyze.summarize_tickets(filtered_tickets)"""
 
-        return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed, total_score
+        return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed, total_score
 
     def run(self):
         success = True
@@ -57,9 +57,9 @@ class Trend:
         total_score = 0
 
         try:
-            hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed, total_score = \
+            hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed, total_score = \
                 self.analyze_trend()
-            docx_path = self.output_docx(hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed, total_score)
+            docx_path = self.output_docx(hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed, total_score)
         except Exception as e:
             self.cache.add_log_entry(self.__class__.__name__, e)
             success = False
@@ -98,13 +98,12 @@ class Trend:
         json.dump(obj=word_cloud_output, fp=file)
         file.close()
 
-    def output_docx(self, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_version, projects_per_version, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed, total_score):
+    def output_docx(self, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed, total_score):
         docx_generator = Docx.Docx()
         docx_generator.place_headline()
         docx_generator.place_type_pie_chart(hours_per_type)
         docx_generator.place_stats(ticket_count, internal_count, external_count, hours_total, lifetime_per_ticket, hours_per_type, total_score, top_5_ticket_ranks, bottom_5_ticket_ranks, self.months)
         docx_generator.place_plot(plot_data)
-        docx_generator.place_type_weight(hours_per_version, projects_per_version, self.months)
         docx_generator.place_payed_unpayed_pie_chart(payed_unpayed, self.months)
         docx_generator.place_projects(hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, self.months)
         docx_generator.place_tickets(hours_per_ticket, self.months)
