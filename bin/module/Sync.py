@@ -13,10 +13,10 @@ class Sync:
         self.sd_api = JiraRestAPI.JiraRestAPI()
         self.context = Context.Context()
 
-    def run(self):
+    def run(self, _lite_mode=False):
         try:
             print('--- Synchronization with Jira started ---')
-            _thread.start_new_thread(self.cache.sync, (self.sd_api, self.context, ))
+            _thread.start_new_thread(self.cache.sync, (self.sd_api, self.context, _lite_mode, ))
         except Exception as e:
             self.cache.add_log_entry(self.__class__.__name__, e)
 

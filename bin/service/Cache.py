@@ -219,7 +219,7 @@ class Cache:
 
         return success, failed_jira_keys, clean_cache
 
-    def sync(self, sd_api, context):
+    def sync(self, sd_api, context, lite_mode=False):
         clean_cache = {}
         failed_jira_keys = []
         jira_keys = {}
@@ -233,37 +233,38 @@ class Cache:
         new_keys = []
         start = time.time()
 
-        projects = self.environment.get_service_projects()
-        for project in projects:
-            offset = 0
-            jira_keys = sd_api.request_service_jira_keys(offset, max_results, project)
-            while len(jira_keys) > 0:
-                ticket_total += len(jira_keys)
-                for jira_id in jira_keys:
-                    jira_key = jira_keys[jira_id]
-                    is_old_key = jira_key in leftover_keys
-                    if is_old_key:
-                        leftover_keys.remove(jira_key)
-                        self.store_jira_key_and_id(jira_key, jira_id, "low")
-                    else:
-                        new_keys.append(jira_key)
-                        success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, context, jira_key, jira_id, failed_jira_keys, clean_cache)
-                synced_current = len(clean_cache)
-                self.update_cache_diff(clean_cache)
-                print('>>> successfully synced {} new tickets out of {} total in project "{}"'.format(synced_current, ticket_total, project))
-                offset += max_results
+        if not lite_mode:
+            projects = self.environment.get_service_projects()
+            for project in projects:
+                offset = 0
                 jira_keys = sd_api.request_service_jira_keys(offset, max_results, project)
-        synced_current = len(clean_cache)
-        hours = round((time.time() - start) / 60 / 60, 2)
-        print('>>> completed syncing {} new tickets out of {} total after {} hours'.format(synced_current, ticket_total, hours))
-        self.add_jira_log_entry(self.__class__.__name__, f"{ticket_total} tickets processed after {hours} hours, {len(new_keys)} of those were new tickets")
-        if len(leftover_keys) > 0:
-            self.add_jira_log_entry(self.__class__.__name__, f"Following tickets seem to have been deleted: {', '.join(leftover_keys)}")
-            for jira_key in leftover_keys:
-                jira_key_values = list(jira_keys.values())
-                if jira_key in jira_key_values:
-                    jira_id = list(jira_keys.keys())[jira_key_values.index(jira_key)]
-                    self.store_jira_key_and_id(jira_key, jira_id, "zero")
+                while len(jira_keys) > 0:
+                    ticket_total += len(jira_keys)
+                    for jira_id in jira_keys:
+                        jira_key = jira_keys[jira_id]
+                        is_old_key = jira_key in leftover_keys
+                        if is_old_key:
+                            leftover_keys.remove(jira_key)
+                            self.store_jira_key_and_id(jira_key, jira_id, "low")
+                        else:
+                            new_keys.append(jira_key)
+                            success, failed_jira_keys, clean_cache = self.update_jira_ticket_in_cache(sd_api, context, jira_key, jira_id, failed_jira_keys, clean_cache)
+                    synced_current = len(clean_cache)
+                    self.update_cache_diff(clean_cache)
+                    print('>>> successfully synced {} new tickets out of {} total in project "{}"'.format(synced_current, ticket_total, project))
+                    offset += max_results
+                    jira_keys = sd_api.request_service_jira_keys(offset, max_results, project)
+            synced_current = len(clean_cache)
+            hours = round((time.time() - start) / 60 / 60, 2)
+            print('>>> completed syncing {} new tickets out of {} total after {} hours'.format(synced_current, ticket_total, hours))
+            self.add_jira_log_entry(self.__class__.__name__, f"{ticket_total} tickets processed after {hours} hours, {len(new_keys)} of those were new tickets")
+            if len(leftover_keys) > 0:
+                self.add_jira_log_entry(self.__class__.__name__, f"Following tickets seem to have been deleted: {', '.join(leftover_keys)}")
+                for jira_key in leftover_keys:
+                    jira_key_values = list(jira_keys.values())
+                    if jira_key in jira_key_values:
+                        jira_id = list(jira_keys.keys())[jira_key_values.index(jira_key)]
+                        self.store_jira_key_and_id(jira_key, jira_id, "zero")
 
         self.parallel_sync(sd_api, context)
 
