@@ -470,7 +470,13 @@ PS = (function(window, document, $) {
                 }
             }
             if(linkNames.length > 0) {
-                $('#network').append('<p>' + node.name + ' (' + hours + 'h)  >>  ' + linkNames.join('  ') + ' <span class="corner ' + cssClass + '">&nbsp;</span></p>');
+                var link_content = '<p>' + node.name + ' (' + hours + 'h)  >>  ';
+                for(var i = 0; i < linkNames.length; i++) {
+                    var link_name = linkNames[i];
+                    link_content = link_content + '<a href="https://konmedia.atlassian.net/browse/' + link_name + '" target="_blank">' + link_name + '</a>  ';
+                }
+                link_content = link_content + ' <span class="corner ' + cssClass + '">&nbsp;</span></p>';
+                $('#network').append(link_content);
                 $('#network').animate({ scrollTop: '100%' }, 100);
             }
         }

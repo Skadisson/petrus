@@ -259,7 +259,6 @@ body.dark #image-copyright {
     height: 20%;
     top: 0;
     left: 0;
-    pointer-events: none;
     opacity: 0.66;
     padding: 10% 5%;
 }
