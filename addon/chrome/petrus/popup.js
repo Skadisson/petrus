@@ -9,14 +9,30 @@ function estimate() {
     event.preventDefault();
 
     var jira_key = document.getElementById('jira_key');
-    var getUrl = 'http://localhost:55888/?function=Estimate&jira_key=' + encodeURIComponent(jira_key.value);
+    var getUrl = 'http://localhost:8100/?function=Estimate&jira_key=' + encodeURIComponent(jira_key.value);
     var formContentType = 'application/x-www-form-urlencoded';
     try {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', getUrl, true);
         xhr.setRequestHeader('Content-type', formContentType);
         xhr.onreadystatechange = function() {
-            statusDisplay.innerHTML = 'Done.';
+            if (xhr.readyState === xhr.DONE) {
+                if (xhr.status === 200) {
+                    statusDisplay.innerHTML = 'Done.';
+                    var json_parsed = JSON.parse(xhr.responseText);
+                    if(json_parsed && typeof json_parsed.items !== 'undefined') {
+                        var parsed_list = json_parsed.items[0].similar_keys;
+                        document.getElementById('link-list').innerHTML = '';
+                        for(var i in parsed_list) {
+                            document.getElementById('link-list').innerHTML += '<p><a href="https://konmedia.atlassian.net/browse/' + parsed_list[i] + '" target="_blank">' + parsed_list[i] + '</a></p>';
+                        }
+                    }
+                } else {
+                    statusDisplay.innerHTML = 'Error';
+                }
+            } else {
+                statusDisplay.innerHTML = 'Error';
+            }
         };
         xhr.send();
     } catch(e) {
@@ -31,7 +47,7 @@ function search() {
 
     document.getElementById('link-list').innerHTML = '';
     var query = document.getElementById('query');
-    var getUrl = 'http://localhost:55888/?function=Search&keywords=' + encodeURIComponent(query.value);
+    var getUrl = 'http://localhost:8100/?function=Search&keywords=' + encodeURIComponent(query.value);
     var formContentType = 'application/x-www-form-urlencoded';
     try {
         var xhr = new XMLHttpRequest();
@@ -60,7 +76,7 @@ function search() {
 
 function ping() {
     document.getElementById('is-online').innerHTML = 'pending';
-    var getUrl = 'http://localhost:55888/?function=Ping';
+    var getUrl = 'http://localhost:8100/?function=Ping';
     var formContentType = 'application/x-www-form-urlencoded';
     try {
         var xhr = new XMLHttpRequest();
