@@ -183,6 +183,7 @@ class Docx:
         for ticket_hours in hours_per_ticket:
             if ticket_hours[1] > 0.0:
                 title = self.cache.get_ticket_title_by_key(ticket_hours[0])
+                summary = self.cache.get_ticket_summary_by_key(ticket_hours[0])
                 get_project_name_by_key = self.cache.get_project_name_by_key(ticket_hours[0])
                 paragraph = self.document.add_paragraph('')
                 paragraph.add_run("{}".format(ticket_hours[0])).bold = True
@@ -192,6 +193,8 @@ class Docx:
                     paragraph.add_run(" - {} ".format(title))
                 paragraph.add_run(" - ")
                 paragraph.add_run("{} Stunden".format(round(ticket_hours[1], ndigits=2))).bold = True
+                if summary != '':
+                    self.document.add_paragraph(summary)
 
     @staticmethod
     def calculate_type_relation(hours_per_type):

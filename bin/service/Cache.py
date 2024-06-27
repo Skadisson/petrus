@@ -451,6 +451,14 @@ class Cache:
 
         return title
 
+    def get_ticket_summary_by_key(self, jira_key):
+        summary = ''
+        ticket = self.table_cache.find_one({'Key': str(jira_key)})
+        if ticket is not None and 'Summary' in ticket and ticket['Summary'] is not None:
+            summary = ticket['Summary']
+
+        return summary
+
     def get_project_name_by_key(self, jira_key):
         project_name = ''
         stored_relation = self.table_cache.find_one({'Key': str(jira_key)})
