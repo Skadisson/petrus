@@ -525,10 +525,6 @@ class Analyze:
     def get_year_month_day(self, _timestamp):
         return datetime.datetime.fromtimestamp(self.timestamp_from_ticket_time(_timestamp)).strftime("%Y/%m/%d")
 
-    def summarize_tickets(self, _tickets):
-        texts = self.context.get_notes_for_tickets(_tickets)
-        return self.scikit.summarize_texts(texts)
-
     def get_tickets_per_board(self, boards):
         tickets_per_board = {}
         for board in boards:

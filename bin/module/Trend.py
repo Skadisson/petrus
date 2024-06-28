@@ -33,7 +33,6 @@ class Trend:
         lifetime_per_ticket = analyze.lifetime_per_ticket(filtered_tickets)
         top_5_ticket_ranks, bottom_5_ticket_ranks = analyze.top_and_bottom_tickets(filtered_tickets, 5)
         total_score = analyze.score_tickets(filtered_tickets)
-        """summary = analyze.summarize_tickets(filtered_tickets)"""
 
         return hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed, total_score
 
