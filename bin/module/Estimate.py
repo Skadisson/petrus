@@ -4,6 +4,7 @@ from bin.service import Cache
 from bin.service import Context
 from bin.service import SciKitLearn
 from bin.service import Analyze
+from bin.service import LangChainOllama
 import time
 
 
@@ -18,6 +19,7 @@ class Estimate:
         self.context = Context.Context()
         self.sci_kit = SciKitLearn.SciKitLearn()
         self.analyze = Analyze.Analyze()
+        self.langChainOllama = LangChainOllama.LangChainOllama()
 
     def retrieve_ticket(self):
         ticket_data = self.sd_api.request_ticket_data(self.jira_key)
@@ -66,6 +68,8 @@ class Estimate:
                 self.cache.store_jira_key_and_id(self.jira_key, jira_id, "high")
                 success = self.cache.store_ticket(jira_id, mapped_ticket)
                 if success:
+                    """if "Summary" not in mapped_ticket:
+                        self.langChainOllama.generate_summary(mapped_ticket)"""
                     normalized_ticket, similar_tickets, hits, similar_jira_keys = self.format_tickets(mapped_ticket)
                     if hits == 0:
                         estimation = 900
