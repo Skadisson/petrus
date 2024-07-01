@@ -4,10 +4,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from bin.service import Cache
 from bin.service import Environment
-import nltk
-from nltk.corpus import stopwords
 import numpy
-import string
 
 
 class SciKitLearn:
