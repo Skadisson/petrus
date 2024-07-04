@@ -32,6 +32,7 @@ class LangChainOllama:
                 while True:
                     every_five_minutes = int(time.time()) % (5*60) == 0
                     if every_five_minutes:
+                        start = time.time()
                         documents = [Document(self.promptify_ticket(ticket))]
                         chain = self.init_chain()
                         result = chain.invoke(documents)
@@ -41,8 +42,9 @@ class LangChainOllama:
                         if is_stored is False:
                             self.cache.add_log_entry(self.__class__.__name__, str(f"Could not build and store summary for ticket with ID {ticket['ID']}"))
                         else:
+                            minutes = round((time.time() - start) / 60, 2)
                             current_time = self.cache.get_current_time()
-                            print(f">>> {current_time}: Completed Summary for Ticket {ticket['Key']}")
+                            print(f">>> {current_time}: Completed Summary for Ticket {ticket['Key']} after {minutes} minutes.")
                         break
 
         return summaries
