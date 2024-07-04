@@ -2,6 +2,7 @@ from bin.service import Cache
 from langchain_community.llms import Ollama
 from langchain.chains.summarize import load_summarize_chain
 from langchain_core.documents import Document
+import time
 
 
 class LangChainOllama:
@@ -28,15 +29,21 @@ class LangChainOllama:
         summaries = []
         for ticket in tickets:
             if 'Summary' not in ticket:
-                documents = [Document(self.promptify_ticket(ticket))]
-                chain = self.init_chain()
-                result = chain.invoke(documents)
-                ticket['Summary'] = result['output_text']
-                summaries.append(f"{ticket['Key']}: {ticket['Summary']}")
-                is_stored = self.cache.store_ticket(ticket['ID'], ticket)
-                if is_stored is False:
-                    self.cache.add_log_entry(self.__class__.__name__, str(f"Could not build and store summary for ticket with ID {ticket['ID']}"))
-                    break
+                while True:
+                    every_five_minutes = int(time.time()) % (5*60) == 0
+                    if every_five_minutes:
+                        documents = [Document(self.promptify_ticket(ticket))]
+                        chain = self.init_chain()
+                        result = chain.invoke(documents)
+                        ticket['Summary'] = result['output_text']
+                        summaries.append(f"{ticket['Key']}: {ticket['Summary']}")
+                        is_stored = self.cache.store_ticket(ticket['ID'], ticket)
+                        if is_stored is False:
+                            self.cache.add_log_entry(self.__class__.__name__, str(f"Could not build and store summary for ticket with ID {ticket['ID']}"))
+                        else:
+                            current_time = self.cache.get_current_time()
+                            print(f">>> {current_time}: Completed Summary for Ticket {ticket['Key']}")
+                        break
 
         return summaries
 
