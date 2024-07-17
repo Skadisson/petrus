@@ -47,6 +47,7 @@ class LangChainOllama:
                             print(f">>> {current_time}: Completed Summary for Ticket {ticket['Key']} after {minutes} minutes.")
                         break
 
+
         return summaries
 
     def init_chain(self):
@@ -66,3 +67,25 @@ class LangChainOllama:
             text += f"Comment: {comment}; "
 
         return text
+
+    def train_my_llama(self, tickets):
+        target_model_name = 'my_llama'
+        documents = []
+        for ticket in tickets:
+            if 'Summary' in ticket and ticket['Summary'] != '':
+                documents.append(
+                    Document(f"Jira Ticket Key: {ticket['Key']}; Jira Ticket Summary: {ticket['Summary']}")
+                )
+        current_time = self.cache.get_current_time()
+        print(f">>> {current_time}: Starting to train '{target_model_name}' model using '{self.model_name}' for {len(documents)} tickets.")
+        start = time.time()
+        try:
+            self.llm.train(documents)
+            self.llm.save(target_model_name)
+            minutes = round((time.time() - start) / 60, 2)
+            current_time = self.cache.get_current_time()
+            print(f">>> {current_time}: Successfully trained '{target_model_name}' model using '{self.model_name}' after {minutes} minutes.")
+        except Exception as e:
+            minutes = round((time.time() - start) / 60, 2)
+            current_time = self.cache.get_current_time()
+            print(f">>> {current_time}: Failed to train '{target_model_name}' model using '{self.model_name}' after {minutes} minutes. Error message: '{e}'")

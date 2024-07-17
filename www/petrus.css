@@ -162,10 +162,30 @@ input[type=text] {
     box-shadow: 1px 1px 3px grey;
     overflow: hidden;
     position:relative;
+    min-width: 136px;
+}
+#link-list p sub {
+    font-size: 8px;
+    line-height: 8px;
 }
 #link-list p#single {
     margin-right:0;
     width: 100%;
+}
+#link-list p.rank0 {
+    background: #96c2d2;
+}
+#link-list p.rank1 {
+    background: #afc1b2;
+}
+#link-list p.rank2 {
+    background: #c6c090;
+}
+#link-list p.rank3 {
+    background: #dcbc64;
+}
+#link-list p.rank4 {
+    background: #e8b943;
 }
 #link-list p span {
     display:inline-block;
@@ -207,6 +227,21 @@ body.dark #link-list p {
     background: #271959;
     color: #FCF7E0;
     box-shadow: 1px 1px 3px #E94792;
+}
+body.dark #link-list p.rank0 {
+    background: #c63478;
+}
+body.dark #link-list p.rank1 {
+    background: #ae3474;
+}
+body.dark #link-list p.rank2 {
+    background: #7d2f6c;
+}
+body.dark #link-list p.rank3 {
+    background: #512563;
+}
+body.dark #link-list p.rank4 {
+    background: #311a5b;
 }
 #link-list p:hover {
     background: white;

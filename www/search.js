@@ -164,12 +164,29 @@ PS = (function(window, document, $) {
                         $('#score').text(new_score.padStart(10, '0'));
                         $('#high-score').text(highest_day + ':' + high_score.padStart(10, '0'));
                         var cssClass = hours <= 2 ? 'green' : (hours <= 4 ? 'yellow' : 'red');
-                        if(days_to_go > 0) {
-                            $('#link-list').append('<p id="single">Ticket '+result.items[0].ticket.Key+' "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h and might take up to ' + days_to_go + ' days till completion <span class="corner ' + cssClass + '">&nbsp;</span></p>');
+                        if(hours > 0) {
+                            if(days_to_go > 0) {
+                                $('#link-list').append('<p id="single">Ticket '+result.items[0].ticket.Key+' "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h and might take up to ' + days_to_go + ' days till completion <span class="corner ' + cssClass + '">&nbsp;</span></p>');
+                            } else {
+                                $('#link-list').append('<p id="single">Ticket '+result.items[0].ticket.Key+' "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h <span class="corner ' + cssClass + '">&nbsp;</span></p>');
+                            }
                         } else {
-                            $('#link-list').append('<p id="single">Ticket '+result.items[0].ticket.Key+' "' + result.items[0].ticket.Title + '" estimate is ' + hours + ' h <span class="corner ' + cssClass + '">&nbsp;</span></p>');
+                            $('#link-list').append('<p id="single">No estimate possible for ticket '+result.items[0].ticket.Key+' ".</p>');
                         }
-                        self.updateNetworkGraph(result.items[0].ticket.Key, result.items[0].similar_keys, hours, cssClass);
+                        if(result.items[0].similar_keys.length == 0) {
+                            $('#search').css({'top': '50%', 'margin-top': '-100px'});
+                        } else {
+                            $('#search').css({'top': '30%', 'margin-top': '0px'});
+                            for(var index in result.items[0].similar_keys) {
+                                var key = result.items[0].similar_keys[index];
+                                var similarity = result.items[0].similarities[index];
+                                var rank = 4;
+                                if(similarity > 0) {
+                                    rank -= Math.floor(similarity / 20);
+                                }
+                                $('#link-list').append('<p class="rank' + rank + '"><a href="https://konmedia.atlassian.net/browse/' + key + '" title="'+similarity+'%" target="_blank">' + key + '</a></p>&nbsp;');
+                            }
+                        }
                         self.info();
                     }
                 }

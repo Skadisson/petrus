@@ -26,7 +26,7 @@ class SciKitLearn:
             estimation = None
         self.cache.add_log_entry(self.__class__.__name__, 'Estimation with model ' + model.__class__.__name__ + ' for ' + str(len(source_data)) + ' tickets is: ' + str(estimation))
 
-        if estimation < 900:
+        if estimation < 900 or estimation is None:
             estimation = 900
 
         return estimation
@@ -93,8 +93,10 @@ class SciKitLearn:
         most_similar_docs_indices = cosine_similarities.argsort()[::-1]
 
         similar_keys = []
-        top_k = 3
+        similarities = []
+        top_k = 5
         for idx in most_similar_docs_indices[:top_k]:
             similar_keys.append(keys[idx])
+            similarities.append(round(cosine_similarities[idx] * 100, 2))
 
-        return similar_keys
+        return similar_keys, similarities

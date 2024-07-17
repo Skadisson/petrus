@@ -32,10 +32,11 @@ class Context:
 
         suggested_keys = []
         phoenix_suggestions = []
+        similarities = []
         keyword_total = len(keywords)
         if keyword_total != 0:
-            phoenix_suggestions, suggested_keys = self.get_phoenix_ticket_suggestion(tickets, " ".join(keywords))
-        return phoenix_suggestions, suggested_keys
+            phoenix_suggestions, suggested_keys, similarities = self.get_phoenix_ticket_suggestion(tickets, " ".join(keywords))
+        return phoenix_suggestions, suggested_keys, similarities
 
     def add_to_relevancy(self, ticket, keywords, relevancy, relations):
         ticket_relevancy = self.calculate_ticket_relevancy(ticket, keywords, relations)
@@ -174,10 +175,11 @@ class Context:
     def get_phoenix_ticket_suggestion(self, tickets, query):
         suggested_keys = []
         suggested_tickets = []
+        similarities = []
 
         texts, keys, check_tickets = self.get_texts_for_tickets(tickets)
         if len(texts) > 0:
-            suggested_keys = self.scikit.get_cosine_suggestion(texts, keys, query)
+            suggested_keys, similarities = self.scikit.get_cosine_suggestion(texts, keys, query)
             for ticket in check_tickets:
                 key = ticket['Key']
                 creation = self.timestamp_from_ticket_time(ticket['Created'])
@@ -202,7 +204,7 @@ class Context:
                         'title': title
                     })
         sorted_suggested_tickets = sorted(suggested_tickets, key=lambda ticket: ticket['percentage'], reverse=True)
-        return sorted_suggested_tickets, suggested_keys
+        return sorted_suggested_tickets, suggested_keys, similarities
 
     def filter_petrus_comments(self, comments):
         filtered_comments = []
@@ -229,7 +231,7 @@ class Context:
         if functional_command == 'search':
             tickets = self.cache.load_cached_tickets()
             keywords = given_command.split(" ")
-            phoenix_suggestions, suggested_keys = self.calculate_relevancy_for_tickets(tickets, {'Keywords': keywords, 'Related': []})
+            phoenix_suggestions, suggested_keys, similarities = self.calculate_relevancy_for_tickets(tickets, {'Keywords': keywords, 'Related': []})
             if len(phoenix_suggestions) > 0:
                 feedback = f"Petrus hat zu einer Suchanfrage aus einem vorherigen Kommentar folgendes Ticket finden können: {phoenix_suggestions[0]['key']} - {phoenix_suggestions[0]['title']}"
 

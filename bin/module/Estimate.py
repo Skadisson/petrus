@@ -41,13 +41,13 @@ class Estimate:
 
     def format_tickets(self, mapped_ticket):
         cached_tickets = self.cache.load_cached_tickets_except(mapped_ticket['Key'])
-        relevancy, similar_jira_keys = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket)
+        relevancy, similar_jira_keys, similarities = self.context.calculate_relevancy_for_tickets(cached_tickets, mapped_ticket)
         normalized_ticket = self.mapper.normalize_ticket(mapped_ticket)
         similar_tickets, hits = self.context.filter_similar_tickets(
             relevancy,
             mapped_ticket['ID']
         )
-        return normalized_ticket, similar_tickets, hits, similar_jira_keys
+        return normalized_ticket, similar_tickets, hits, similar_jira_keys, similarities
 
     def run(self, post_to_jira=True):
         mapped_ticket = None
@@ -58,6 +58,7 @@ class Estimate:
         days_to_go = None
         jira_id = None
         similar_jira_keys = None
+        similarities = None
         start_time = time.time()
         self.cache.add_log_entry(self.__class__.__name__, 'Estimation started')
 
@@ -70,7 +71,7 @@ class Estimate:
                 if success:
                     """if "Summary" not in mapped_ticket:
                         self.langChainOllama.generate_summary(mapped_ticket)"""
-                    normalized_ticket, similar_tickets, hits, similar_jira_keys = self.format_tickets(mapped_ticket)
+                    normalized_ticket, similar_tickets, hits, similar_jira_keys, similarities = self.format_tickets(mapped_ticket)
                     if hits == 0:
                         estimation = 900
                     else:
@@ -152,7 +153,8 @@ class Estimate:
             'hits': hits,
             'normal_ticket': normalized_ticket,
             'score': score,
-            'similar_keys': similar_jira_keys
+            'similar_keys': similar_jira_keys,
+            'similarities': similarities
         }]
 
         time_diff = time.time() - start_time
