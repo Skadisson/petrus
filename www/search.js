@@ -121,9 +121,14 @@ PS = (function(window, document, $) {
                         }
                         for(var index in result.items[0].relevancy) {
                             var item = result.items[0].relevancy[index];
+                            var similarity = result.items[0].similarities[index];
+                            var rank = 4;
+                            if(similarity > 0) {
+                                rank -= Math.floor(similarity / 20);
+                            }
                             var date = new Date(item.creation * 1000);
-                            var $a = $('<a href="' + item.link + '" target="_blank">');
-                            var $p = $('<p data-jira-id="' + item.jira_id + '">');
+                            var $a = $('<a href="' + item.link + '" title="'+similarity+'%" target="_blank">');
+                            var $p = $('<p class="rank' + rank + '" data-jira-id="' + item.jira_id + '">');
                             $p.append('<span class="date">' + date.getFullYear() + '/' + date.getMonth() + '/' + date.getUTCDay() + '</span>');
                             $p.append('<span class="title">' + item.title + '</span>');
                             //$p.append('<span class="relevancy">' + Math.round(item.percentage) + '%</span>');

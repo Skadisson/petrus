@@ -21,12 +21,14 @@ class Search:
             relevancy, suggested_keys, similarities = self.context.calculate_relevancy_for_tickets(tickets, {'Keywords': formatted_keywords, 'Related': []})
             items = [{
                 'relevancy': relevancy,
-                'keywords': formatted_keywords
+                'keywords': formatted_keywords,
+                'similarities': similarities
             }]
         else:
             items = [{
                 'relevancy': [],
-                'keywords': formatted_keywords
+                'keywords': formatted_keywords,
+                'similarities': []
             }]
 
         success = True
