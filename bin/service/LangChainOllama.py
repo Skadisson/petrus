@@ -8,7 +8,7 @@ import time
 class LangChainOllama:
 
     def __init__(self):
-        self.model_name = "llama3:8b"
+        self.model_name = "llama3.1:8b"
         self.chain_type = "stuff"
         self.llm = Ollama(model=self.model_name)
         self.cache = Cache.Cache()
