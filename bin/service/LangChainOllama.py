@@ -13,18 +13,6 @@ class LangChainOllama:
         self.llm = Ollama(model=self.model_name)
         self.cache = Cache.Cache()
 
-    def generate_summary(self, ticket):
-
-        text = self.promptify_ticket(ticket)
-        chain = self.init_chain()
-        result = chain.invoke([Document(text)])
-        ticket['Summary'] = result['output_text']
-        is_stored = self.cache.store_ticket(ticket['ID'], ticket)
-        if is_stored is False:
-            self.cache.add_log_entry(self.__class__.__name__, str(f"Could not build and store summary for ticket with ID {ticket['ID']}"))
-
-        return is_stored
-
     def generate_summaries(self, tickets):
         summaries = []
         for ticket in tickets:
@@ -47,8 +35,19 @@ class LangChainOllama:
                             print(f">>> {current_time}: Completed Summary for Ticket {ticket['Key']} after {minutes} minutes.")
                         break
 
-
         return summaries
+
+    def generate_general_summary(self, tickets):
+        summaries = []
+        for ticket in tickets:
+            if 'Key' in ticket and 'Time_Spent' in ticket and ticket['Time_Spent'] is not None and 'Summary' in ticket and ticket['Summary'] != '':
+                summaries.append(f"{ticket['Key']}: {ticket['Summary']}")
+
+        documents = [Document(self.promptify_summaries(summaries))]
+        chain = self.init_chain()
+        result = chain.invoke(documents)
+
+        return result['output_text']
 
     def init_chain(self):
         return load_summarize_chain(self.llm, chain_type=self.chain_type)
@@ -66,6 +65,17 @@ class LangChainOllama:
         for comment in ticket["Comments"]:
             text += f"Comment: {comment}; "
 
+        return text
+
+    @staticmethod
+    def promptify_summaries(summaries):
+        text = ("Please summarize the following Jira ticket summaries into one general recap of what kind of issues "
+                "have been brought up and what systems have been the ones with the highest frequency of issues:")
+        for summary in summaries:
+            text += "\n"
+            text += '-' * 20
+            text += "\n"
+            text += f"{summary}"
         return text
 
     def train_my_llama(self, tickets):

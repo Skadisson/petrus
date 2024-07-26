@@ -4,6 +4,7 @@ from bin.service import Map
 from bin.service import Environment
 from bin.service import Ranking
 from bin.service import SciKitLearn
+from bin.service import LangChainOllama
 import time
 import datetime
 from collections import Counter
@@ -217,6 +218,11 @@ class Analyze:
 
         tickets = self.sort_tickets_and_seconds_to_hours(tickets)
         return tickets
+
+    @staticmethod
+    def summarize_tickets(stored_tickets):
+        lang_chain = LangChainOllama.LangChainOllama()
+        return lang_chain.generate_general_summary(stored_tickets)
 
     def lifetime_per_ticket(self, stored_tickets):
         tickets = {}
