@@ -235,6 +235,7 @@ class Cache:
 
         if not lite_mode:
             projects = self.environment.get_service_projects()
+            last_synced_current = 0
             for project in projects:
                 offset = 0
                 jira_keys = sd_api.request_service_jira_keys(offset, max_results, project)
@@ -254,6 +255,11 @@ class Cache:
                     print('>>> successfully synced {} new tickets out of {} total in project "{}"'.format(synced_current, ticket_total, project))
                     offset += max_results
                     jira_keys = sd_api.request_service_jira_keys(offset, max_results, project)
+                    if last_synced_current < synced_current:
+                        last_synced_current = synced_current
+                    else:
+                        print('>>> no more new tickets in project "{}", stopped syncing project'.format(project))
+                        break
             synced_current = len(clean_cache)
             hours = round((time.time() - start) / 60 / 60, 2)
             print('>>> completed syncing {} new tickets out of {} total after {} hours'.format(synced_current, ticket_total, hours))
