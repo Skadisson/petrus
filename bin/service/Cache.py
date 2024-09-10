@@ -261,9 +261,9 @@ class Cache:
                         print('>>> no more new tickets in project "{}", stopped syncing project'.format(project))
                         break
             synced_current = len(clean_cache)
-            hours = round((time.time() - start) / 60 / 60, 2)
-            print('>>> completed syncing {} new tickets out of {} total after {} hours'.format(synced_current, ticket_total, hours))
-            self.add_jira_log_entry(self.__class__.__name__, f"{ticket_total} tickets processed after {hours} hours, {len(new_keys)} of those were new tickets")
+            minutes = round((time.time() - start) / 60, 2)
+            print('>>> completed syncing {} new tickets out of {} total after {} minutes'.format(synced_current, ticket_total, minutes))
+            self.add_jira_log_entry(self.__class__.__name__, f"{ticket_total} tickets processed after {minutes} minutes, {len(new_keys)} of those were new tickets")
             if len(leftover_keys) > 0:
                 self.add_jira_log_entry(self.__class__.__name__, f"Following tickets seem to have been deleted: {', '.join(leftover_keys)}")
                 for jira_key in leftover_keys:
