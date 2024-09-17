@@ -49,11 +49,12 @@ def main():
     cache = Cache.Cache()
     start = time.time()
     page_count = 0
+    limit = 20
     for space in SPACES:
         space_content = get_confluence_space(space)
         if space_content is not None:
             offset = 0
-            pages = get_confluence_space_pages(space, offset)
+            pages = get_confluence_space_pages(space, offset, limit)
             while len(pages['results']) > 0:
                 for page_content in pages['results']:
                     page_history = get_history(page_content['id'])
@@ -66,7 +67,8 @@ def main():
                     }
                     cache.update_confluence_entry(entry)
                     page_count += 1
-                offset += 1
+                offset += limit
+                pages = get_confluence_space_pages(space, offset)
                 print(f">>> synced {page_count} pages in space {space}")
                 time.sleep(10)
             print(f">>> total pages in space {space}: {page_count}")
