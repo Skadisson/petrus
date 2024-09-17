@@ -1,10 +1,11 @@
 if __name__ == '__main__':
-    from bin.service import Analyze
+    from bin.service import Analyze, Environment
     from datetime import datetime
     import matplotlib.pyplot as plt
     import numpy as np
     analyze = Analyze.Analyze()
-    tickets_per_board = analyze.get_tickets_per_board(['SERVICE', 'BRANDBOXSUPPORT', 'QS'])
+    env = Environment.Environment()
+    tickets_per_board = analyze.get_tickets_per_board(env.get_service_projects())
     trend_per_board = analyze.get_trend_per_board(tickets_per_board)
     now = datetime.now()
     date = datetime.strftime(now, "%Y/%m/%d")
