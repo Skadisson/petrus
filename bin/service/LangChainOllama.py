@@ -2,7 +2,8 @@ from bin.service import Cache
 from langchain_community.llms import Ollama
 from langchain.chains.summarize import load_summarize_chain
 from langchain_core.documents import Document
-import time
+from langchain_core.prompts import PromptTemplate
+import time, math
 
 
 class LangChainOllama:
@@ -78,24 +79,47 @@ class LangChainOllama:
             text += f"{summary}"
         return text
 
-    def train_my_llama(self, tickets):
-        target_model_name = 'my_llama'
-        documents = []
-        for ticket in tickets:
-            if 'Summary' in ticket and ticket['Summary'] != '':
-                documents.append(
-                    Document(f"Jira Ticket Key: {ticket['Key']}; Jira Ticket Summary: {ticket['Summary']}")
-                )
-        current_time = self.cache.get_current_time()
-        print(f">>> {current_time}: Starting to train '{target_model_name}' model using '{self.model_name}' for {len(documents)} tickets.")
-        start = time.time()
-        try:
-            self.llm.train(documents)
-            self.llm.save(target_model_name)
-            minutes = round((time.time() - start) / 60, 2)
-            current_time = self.cache.get_current_time()
-            print(f">>> {current_time}: Successfully trained '{target_model_name}' model using '{self.model_name}' after {minutes} minutes.")
-        except Exception as e:
-            minutes = round((time.time() - start) / 60, 2)
-            current_time = self.cache.get_current_time()
-            print(f">>> {current_time}: Failed to train '{target_model_name}' model using '{self.model_name}' after {minutes} minutes. Error message: '{e}'")
+    def train_confluence(self, entries):
+        i = 0
+        entry_count = len(entries)
+        for entry in entries:
+            start = time.time()
+            i += 1
+            prompt = self.promptify_confluence_entry(entry)
+            response = self.llm.invoke(prompt)
+            if 'OK' not in response:
+                entry['learned'] = False
+                print(f">>> Llama did not acknowledge a training prompt with OK. Full response: {response}")
+            else:
+                entry['learned'] = True
+            self.cache.update_confluence_entry(entry)
+            minutes = round((time.time() - start) / 60 , 2)
+            print(f">>> learned {i} of {entry_count} confluence entries after {minutes} minutes ({math.ceil((i/entry_count)*100)}%): {entry['title']}")
+
+    @staticmethod
+    def promptify_confluence_entry(entry):
+        return PromptTemplate(
+            input_variables=['title', 'date', 'body'],
+            template="Beantworte den folgenden Prompt nur mit 'OK'. "
+                     "Verinnerliche folgenden Confluence Eintrag zum Thema {title}, ignoriere dabei strukturelles HTML, "
+                     "sofern es nicht Teil eines Code-Vorschlags ist. Wenn immer ein Mensch etwas zu diesem Thema frägt, "
+                     "antworte mit dem Wissen aus diesem Confluence Eintrag und lass den Menschen wissen, "
+                     "dass der Stand dieses Eintrags das folgende Datum hat: {date}. Und hier nun der Confluence "
+                     "Eintrag: {body}"
+        ).format(title=entry['title'], date=entry['date'], body=entry['body'])
+
+    def ask_confluence(self, words):
+        success = True
+        items = []
+        if len(words) > 0:
+            try:
+                query = " ".join(words)
+                response = self.llm.invoke(query)
+                items.append({'query': query, 'response': response})
+            except Exception as e:
+                self.cache.add_log_entry(self.__class__.__name__, str(e))
+        else:
+            success = False
+            self.cache.add_log_entry(self.__class__.__name__, f"No query provided.")
+
+        return items, success

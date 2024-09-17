@@ -108,7 +108,14 @@ PS = (function(window, document, $) {
                     $('body').css('cursor', 'auto');
                     $('#link-list').html('');
                     var result = JSON.parse(xhr.responseText);
-                    if(typeof result.items[0].relevancy != 'undefined') {
+                    if(typeof result.items[0].query != 'undefined') {
+                        var item = result.items[0];
+                        var $p = $('<p class="rank4">');
+                        $p.append('<span class="date">' + item.query + '</span>');
+                        $p.append('<span class="title">' + item.response + '</span>');
+                        $('#link-list').append($p);
+                        $p.fadeIn();
+                    } else if(typeof result.items[0].relevancy != 'undefined') {
                         if(result.items[0].relevancy.length == 0) {
                             $('#search').css({'top': '50%', 'margin-top': '-100px'});
                             if(keywords != '') {

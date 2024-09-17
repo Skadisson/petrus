@@ -1,6 +1,6 @@
 import requests, time
 from requests.auth import HTTPBasicAuth
-from bin.service import Environment, Cache
+from bin.service import Environment, Cache, LangChainOllama
 
 
 env = Environment.Environment()
@@ -47,7 +47,7 @@ def get_history(content_id):
 
 def main():
     cache = Cache.Cache()
-    start = time.time()
+    """start = time.time()
     total_pages = 0
     limit = 20
     for space in SPACES:
@@ -64,7 +64,8 @@ def main():
                         'id': page_content['id'],
                         'title': page_content['title'],
                         'body': page_content['body']['storage']['value'],
-                        'date': page_history['lastUpdated']['when']
+                        'date': page_history['lastUpdated']['when'],
+                        'learned': False
                     }
                     cache.update_confluence_entry(entry)
                     page_count += 1
@@ -75,7 +76,16 @@ def main():
             print(f">>> total pages in space {space}: {page_count}")
             total_pages += page_count
     minutes = round((time.time() - start) / 60, 2)
-    print(f">>> completed syncing {total_pages} total pages after {minutes} minutes")
+    print(f">>> completed syncing {total_pages} total pages after {minutes} minutes")"""
+
+    start = time.time()
+    print(f">>> starting training")
+    ollama = LangChainOllama.LangChainOllama()
+    unlearned_confluence_entries = cache.get_unlearned_confluence_entries()
+    ollama.train_confluence(list(unlearned_confluence_entries))
+    minutes = round((time.time() - start) / 60, 2)
+    print(f">>> completed training ollama with {len(list(unlearned_confluence_entries))} confluence entries after {minutes} minutes")
+
 
 
 if __name__ == "__main__":

@@ -483,3 +483,14 @@ class Cache:
 
     def get_confluence_entry_by_id(self, id):
         return self.table_confluence.find_one({'id': id})
+
+    def get_all_confluence_entries(self):
+        return self.table_confluence.find()
+
+    def get_unlearned_confluence_entries(self):
+        return self.table_confluence.find({
+            "$or": [
+                {"learned": {"$exists": False}},
+                {"learned": False}
+            ]
+        })
