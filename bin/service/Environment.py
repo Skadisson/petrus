@@ -29,6 +29,10 @@ class Environment:
         service_yaml = self.load_yaml('service')
         return service_yaml['projects']
 
+    def get_service_spaces(self):
+        service_yaml = self.load_yaml('service')
+        return service_yaml['spaces']
+
     def get_path_private_key(self):
         service_yaml = self.load_yaml('path')
         return service_yaml['private_key']
@@ -56,6 +60,14 @@ class Environment:
     def get_endpoint_tickets(self):
         service_yaml = self.load_yaml('endpoint')
         return service_yaml['tickets']
+
+    def get_endpoint_confluence(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['confluence']
+
+    def get_endpoint_user(self):
+        service_yaml = self.load_yaml('endpoint')
+        return service_yaml['user']
 
     def get_endpoint_app_key(self):
         service_yaml = self.load_yaml('endpoint')

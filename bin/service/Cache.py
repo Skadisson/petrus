@@ -23,6 +23,7 @@ class Cache:
         self.table_score = self.database.high_score
         self.table_comments = self.database.comments
         self.table_feedback = self.database.feedback
+        self.table_confluence = self.database.confluence
         self.add_text_indices()
 
     def add_text_indices(self):
@@ -472,3 +473,13 @@ class Cache:
             project_name = stored_relation['Project']
 
         return project_name
+
+    def update_confluence_entry(self, entry):
+        existing_confluence_entry = self.get_confluence_entry_by_id(entry['id'])
+        if existing_confluence_entry is not None:
+            self.table_confluence.replace_one({'id': entry['id']}, entry)
+        else:
+            self.table_confluence.insert_one(entry)
+
+    def get_confluence_entry_by_id(self, id):
+        return self.table_confluence.find_one({'id': id})
