@@ -48,10 +48,11 @@ def get_history(content_id):
 def main():
     cache = Cache.Cache()
     start = time.time()
-    page_count = 0
+    total_pages = 0
     limit = 20
     for space in SPACES:
         space_content = get_confluence_space(space)
+        page_count = 0
         if space_content is not None:
             offset = 0
             pages = get_confluence_space_pages(space, offset, limit)
@@ -72,8 +73,9 @@ def main():
                 print(f">>> synced {page_count} pages in space {space}")
                 time.sleep(10)
             print(f">>> total pages in space {space}: {page_count}")
+            total_pages += page_count
     minutes = round((time.time() - start) / 60, 2)
-    print(f">>> completed syncing {page_count} total pages after {minutes} minutes")
+    print(f">>> completed syncing {total_pages} total pages after {minutes} minutes")
 
 
 if __name__ == "__main__":
