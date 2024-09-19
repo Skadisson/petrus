@@ -180,6 +180,8 @@ class LangChainOllama:
         if len(words) > 0:
             try:
                 query = " ".join(words)
+                if words[0] == '/':
+                    return [{'query': query, 'response': "Please do not use '/' as start of your question!"}], False
                 response = self.prompt_brandbox_model(query)
                 if response is not None:
                     items.append({'query': query, 'response': response['response']})

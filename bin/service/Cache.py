@@ -346,6 +346,7 @@ class Cache:
             mapped_ticket = self.mapper.format_reporter(mapped_ticket)
             mapped_ticket = self.mapper.add_persons(mapped_ticket, (worklog_persons + comment_persons))
             mapped_ticket = self.mapper.format_versions(mapped_ticket)
+            mapped_ticket['Learned'] = False
         except Exception as e:
             self.add_log_entry(self.__class__.__name__, e)
             failed_jira_keys.append(jira_key)
