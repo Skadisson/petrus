@@ -474,12 +474,24 @@ class Cache:
 
         return project_name
 
-    def update_confluence_entry(self, entry):
+    def update_confluence_entry(self, entry, check_date=False):
+        updated = True
         existing_confluence_entry = self.get_confluence_entry_by_id(entry['id'])
-        if existing_confluence_entry is not None:
-            self.table_confluence.replace_one({'id': entry['id']}, entry)
-        else:
+        if existing_confluence_entry is None:
             self.table_confluence.insert_one(entry)
+            print(f">>> + Entry '{entry['title']}' was stored as new.")
+        elif check_date is False or (check_date is True and existing_confluence_entry['date'] != entry['date']):
+            self.table_confluence.replace_one({'id': entry['id']}, entry)
+            if check_date is True:
+                print(f">>> ~ Entry '{entry['title']}' was updated ({existing_confluence_entry['date']} => {entry['date']}).")
+        else:
+            updated = False
+            if check_date is True:
+                print(f">>> . Entry '{entry['title']}' is unchanged ({entry['date']}).")
+        return updated
+
+    def update_jira_ticket(self, ticket):
+        self.table_confluence.replace_one({'ID': ticket['ID']}, ticket)
 
     def get_confluence_entry_by_id(self, id):
         return self.table_confluence.find_one({'id': id})
@@ -492,5 +504,13 @@ class Cache:
             "$or": [
                 {"learned": {"$exists": False}},
                 {"learned": False}
+            ]
+        })
+
+    def get_unlearned_jira_tickets(self):
+        return self.table_confluence.find({
+            "$or": [
+                {"Learned": {"$exists": False}},
+                {"Learned": False}
             ]
         })

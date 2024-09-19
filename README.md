@@ -22,6 +22,7 @@ Package                         Version
 aiohttp                         3.9.5
 aiosignal                       1.3.1
 annotated-types                 0.7.0
+anyio                           4.4.0
 Aspose.Email-for-Python-via-NET 23.1
 async-timeout                   4.0.3
 attrs                           23.2.0
@@ -43,6 +44,7 @@ dataclasses-json                0.6.7
 defusedxml                      0.7.1
 dnspython                       2.2.1
 emoji                           2.12.1
+exceptiongroup                  1.2.2
 filelock                        3.15.4
 filetype                        1.2.0
 flatbuffers                     24.3.25
@@ -50,7 +52,10 @@ fonttools                       4.34.4
 frozenlist                      1.4.1
 fsspec                          2024.6.1
 greenlet                        3.0.3
+h11                             0.14.0
+httpcore                        1.0.5
 httplib2                        0.20.4
+httpx                           0.27.2
 huggingface-hub                 0.24.5
 humanfriendly                   10.0
 idna                            3.3
@@ -62,12 +67,12 @@ jsonpatch                       1.33
 jsonpath-python                 1.0.6
 jsonpointer                     3.0.0
 kiwisolver                      1.4.4
-langchain                       0.2.11
-langchain-community             0.2.10
-langchain-core                  0.2.25
-langchain-text-splitters        0.2.2
+langchain                       0.3.0
+langchain-community             0.3.0
+langchain-core                  0.3.1
+langchain-text-splitters        0.3.0
 langdetect                      1.0.9
-langsmith                       0.1.82
+langsmith                       0.1.121
 layoutparser                    0.3.4
 lxml                            4.9.1
 MarkupSafe                      2.1.1
@@ -83,6 +88,7 @@ ntlm-auth                       1.5.0
 numpy                           1.23.1
 oauth2                          1.9.0.post1
 oauthlib                        3.2.0
+ollama                          0.3.3
 onnx                            1.16.1
 onnxruntime                     1.18.1
 opencv-python                   4.10.0.84
@@ -104,6 +110,7 @@ pycparser                       2.21
 pycryptodome                    3.20.0
 pydantic                        2.7.4
 pydantic_core                   2.18.4
+pydantic-settings               2.5.2
 Pygments                        2.13.0
 pymongo                         4.2.0
 pyparsing                       3.0.9
@@ -112,6 +119,7 @@ pyreadline3                     3.4.1
 pytesseract                     0.3.10
 python-dateutil                 2.8.2
 python-docx                     0.8.11
+python-dotenv                   1.0.1
 python-iso639                   2024.4.27
 python-magic                    0.4.27
 python-multipart                0.0.9
@@ -130,6 +138,7 @@ scipy                           1.9.0
 setuptools                      61.2.0
 six                             1.16.0
 sklearn                         0.0
+sniffio                         1.3.1
 soupsieve                       2.5
 SQLAlchemy                      2.0.31
 sympy                           1.13.1

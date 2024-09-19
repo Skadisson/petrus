@@ -47,7 +47,7 @@ def get_history(content_id):
 
 def main():
     cache = Cache.Cache()
-    """start = time.time()
+    start = time.time()
     total_pages = 0
     limit = 20
     for space in SPACES:
@@ -55,6 +55,7 @@ def main():
         page_count = 0
         if space_content is not None:
             offset = 0
+            updated_count = 0
             pages = get_confluence_space_pages(space, offset, limit)
             while len(pages['results']) > 0:
                 for page_content in pages['results']:
@@ -67,16 +68,20 @@ def main():
                         'date': page_history['lastUpdated']['when'],
                         'learned': False
                     }
-                    cache.update_confluence_entry(entry)
+                    updated = cache.update_confluence_entry(entry, True)
+                    if updated:
+                        updated_count += 1
                     page_count += 1
                 offset += limit
                 pages = get_confluence_space_pages(space, offset)
                 print(f">>> synced {page_count} pages in space {space}")
+                if updated_count > 0:
+                    print(f">>> synced {updated_count} confluence entries added or updated")
                 time.sleep(10)
             print(f">>> total pages in space {space}: {page_count}")
             total_pages += page_count
     minutes = round((time.time() - start) / 60, 2)
-    print(f">>> completed syncing {total_pages} total pages after {minutes} minutes")"""
+    print(f">>> completed syncing {total_pages} total pages after {minutes} minutes")
 
     start = time.time()
     print(f">>> starting training")
