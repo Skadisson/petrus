@@ -1,6 +1,5 @@
-import requests, time
-from requests.auth import HTTPBasicAuth
-from bin.service import Environment, Cache, LangChainOllama
+import time
+from bin.service import Cache, LangChainOllama
 
 
 def main():
