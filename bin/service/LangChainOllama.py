@@ -134,12 +134,22 @@ class LangChainOllama:
 
     @staticmethod
     def promptify_confluence_entry(entry):
-        return PromptTemplate(
-            input_variables=['title', 'date', 'body'],
-            template="Bitte antworte nur mit 'OK'. "
-                     "Beachte den Confluence-Eintrag zum Thema {title} (Stand: {date}): {body}. "
-                     "Ignoriere strukturelles HTML, außer bei Code-Vorschlägen."
-        ).format(title=entry['title'], date=entry['date'], body=entry['body'])
+        if entry['body'] != '':
+            return PromptTemplate(
+                input_variables=['title', 'date', 'body'],
+                template="Lies bitte den folgenden Confluence-Eintrag zum Thema **{title}** (Stand: **{date}**). "
+                         "Ignoriere dabei strukturelles HTML, außer es ist Teil von Code-Beispielen. "
+                         "Antworte nur mit 'OK', wenn du alles verstanden hast. Gib nur **kurzes Feedback**, "
+                         "wenn du etwas nicht verstehst, nicht lesen kannst oder es ablehnst zu lesen. "
+                         "{body}"
+            ).format(title=entry['title'], date=entry['date'], body=entry['body'])
+        else:
+            return PromptTemplate(
+                input_variables=['title', 'date'],
+                template="Antworte zu diesem Prompt mit 'OK', wenn Du alles verstanden hast. "
+                         "Es gibt einen leeren Confluence-Eintrag zum Thema **{title}** (Stand: **{date}**). "
+                         "Wenn zu dem Thema Fragen gestellt werden, verweise bitte an service@konmedia.com. "
+            ).format(title=entry['title'], date=entry['date'])
 
     def train_jira(self, tickets):
         self.create_brandbox_model()
