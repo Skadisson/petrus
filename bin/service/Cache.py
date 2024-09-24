@@ -477,9 +477,11 @@ class Cache:
 
     def update_confluence_entry(self, entry, check_date=False):
         updated = True
+        created = False
         existing_confluence_entry = self.get_confluence_entry_by_id(entry['id'])
         if existing_confluence_entry is None:
             self.table_confluence.insert_one(entry)
+            created = True
             print(f">>> + Entry '{entry['title']}' was stored as new.")
         elif check_date is False or (check_date is True and existing_confluence_entry['date'] != entry['date']):
             self.table_confluence.replace_one({'id': entry['id']}, entry)
@@ -489,7 +491,7 @@ class Cache:
             updated = False
             if check_date is True:
                 print(f">>> . Entry '{entry['title']}' is unchanged ({entry['date']}).")
-        return updated
+        return created, updated
 
     def update_jira_ticket(self, ticket):
         self.table_confluence.replace_one({'ID': ticket['ID']}, ticket)

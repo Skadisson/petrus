@@ -56,6 +56,7 @@ def main():
         if space_content is not None:
             offset = 0
             updated_count = 0
+            created_count = 0
             pages = get_confluence_space_pages(space, offset, limit)
             while len(pages['results']) > 0:
                 for page_content in pages['results']:
@@ -68,15 +69,19 @@ def main():
                         'date': page_history['lastUpdated']['when'],
                         'learned': False
                     }
-                    updated = cache.update_confluence_entry(entry, True)
+                    created, updated = cache.update_confluence_entry(entry, True)
                     if updated:
                         updated_count += 1
+                    if created:
+                        created_count += 1
                     page_count += 1
                 offset += limit
                 pages = get_confluence_space_pages(space, offset)
                 print(f">>> synced {page_count} pages in space {space}")
+                if created_count > 0:
+                    print(f">>> {updated_count} new confluence entries")
                 if updated_count > 0:
-                    print(f">>> synced {updated_count} confluence entries added or updated")
+                    print(f">>> updated {updated_count} confluence entries")
                 time.sleep(10)
             print(f">>> total pages in space {space}: {page_count}")
             total_pages += page_count

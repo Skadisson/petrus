@@ -124,10 +124,8 @@ class LangChainOllama:
             prompt = self.promptify_confluence_entry(entry)
             response = self.prompt_brandbox_model(prompt)
             if response is not None and 'OK' not in response['response']:
-                entry['learned'] = False
                 print(f">>> Llama did not acknowledge a training prompt with OK. Full response: {response['response']}")
-            else:
-                entry['learned'] = True
+            entry['learned'] = True
             self.cache.update_confluence_entry(entry)
             minutes = round((time.time() - start) / 60 , 2)
             print(f">>> learned {i} of {entry_count} confluence entries after {minutes} minutes ({math.ceil((i/entry_count)*100)}%): {entry['title']}")
