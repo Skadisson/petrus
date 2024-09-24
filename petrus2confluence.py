@@ -94,7 +94,7 @@ def main():
     unlearned_confluence_entries = cache.get_unlearned_confluence_entries()
     ollama.train_confluence(list(unlearned_confluence_entries), total_pages)
     minutes = round((time.time() - start) / 60, 2)
-    print(f">>> completed training ollama with {len(list(unlearned_confluence_entries))} confluence entries after {minutes} minutes")
+    print(f">>> completed training ollama with {len(list(unlearned_confluence_entries))} previously unlearned (out of {total_pages} total) confluence entries after {minutes} minutes")
 
 
 
