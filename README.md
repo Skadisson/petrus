@@ -1,7 +1,8 @@
-# Petrus 2
-###### Pre Estimating Ticket Rates Using SciKit-Learn v2
+# Petrus 2+
+###### Pre Estimating Ticket Rates Using SciKit-Learn v2.1
 
 Self-sufficient Python 3 web service package using SciKit-Learn to estimate times to process and finish a ticket, calculate trends and communicates with the Jira Service Desk API.
+Since september 2024 Petrus 2+ additionally includes the use of the LLM llama 3.1 via Ollama in order to provide answers out of collected and trained software documentations.
 
 ![Screenshot](src/screenshot.png "Petrus 2 Screenshot")
 
