@@ -185,6 +185,7 @@ class LangChainOllama:
     def ask_brandbox_model(self, words):
         success = True
         items = []
+        start = time.time()
         if len(words) > 0:
             try:
                 query = " ".join(words)
@@ -192,7 +193,8 @@ class LangChainOllama:
                     return [{'query': query, 'response': "Please do not use '/' as start of your question!"}], False
                 response = self.prompt_brandbox_model(query)
                 if response is not None:
-                    items.append({'query': query, 'response': response['response']})
+                    minutes = round((time.time() - start) / 60, 2)
+                    items.append({'query': query, 'response': f"{response['response']} ({minutes} min.)"})
                 else:
                     success = False
                     items.append({'error': 'Could not load Ollama model'})
