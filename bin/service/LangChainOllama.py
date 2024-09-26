@@ -73,18 +73,6 @@ class LangChainOllama:
 
         return summaries
 
-    def generate_general_summary(self, tickets):
-        summaries = []
-        for ticket in tickets:
-            if 'Key' in ticket and 'Time_Spent' in ticket and ticket['Time_Spent'] is not None and 'Summary' in ticket and ticket['Summary'] != '':
-                summaries.append(f"{ticket['Key']}: {ticket['Summary']}")
-
-        documents = [Document(self.promptify_summaries(summaries))]
-        chain = self.init_chain()
-        result = chain.invoke(documents)
-
-        return result['output_text']
-
     def init_chain(self):
         return load_summarize_chain(self.llm, chain_type=self.chain_type)
 

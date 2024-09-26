@@ -86,10 +86,6 @@ class Docx:
             paragraph.add_run(f" ({bottom_5_ticket_ranks[ticket_key]})")
         paragraph.add_run(".")
 
-    def place_general_summary(self, summary):
-        self.document.add_heading('Grobe Zusammenfassung', level=1)
-        self.document.add_paragraph(summary)
-
     @staticmethod
     def months_to_days(months):
         if months > 0:

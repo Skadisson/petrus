@@ -185,27 +185,6 @@ class Analyze:
         types = self.sort_tickets_and_seconds_to_hours(types)
         return types
 
-    def hours_per_version(self, tickets):
-        versions = {}
-        projects = {}
-        for ticket in tickets:
-            if 'Keywords' in ticket:
-                version = 'n/a'
-                for keyword in ticket['Keywords']:
-                    if re.match(r"bb[0-9.]", keyword):
-                        version = keyword
-                if version not in versions:
-                    versions[version] = []
-                if version not in projects:
-                    projects[version] = []
-                if ticket['Time_Spent'] is not None:
-                    versions[version].append(ticket['Time_Spent'])
-                    if ticket['Project'] is not None and ticket['Project'] not in projects[version]:
-                        projects[version].append(ticket['Project'])
-
-        versions = self.sort_tickets_and_seconds_to_hours(versions)
-        return versions, projects
-
     def hours_per_ticket(self, stored_tickets):
         tickets = {}
         for ticket in stored_tickets:
@@ -218,11 +197,6 @@ class Analyze:
 
         tickets = self.sort_tickets_and_seconds_to_hours(tickets)
         return tickets
-
-    @staticmethod
-    def summarize_tickets(stored_tickets):
-        lang_chain = LangChainOllama.LangChainOllama()
-        return lang_chain.generate_general_summary(stored_tickets)
 
     def lifetime_per_ticket(self, stored_tickets):
         tickets = {}
