@@ -116,7 +116,7 @@ class LangChainOllama:
             entry['learned'] = True
             self.cache.update_confluence_entry(entry)
             minutes = round((time.time() - start) / 60 , 2)
-            print(f">>> learned {i} of {entry_count} previously unlearned (out of {total_count} total) confluence entries after {minutes} minutes ({math.ceil((i/total_count)*100)}%): {entry['title']}")
+            print(f">>> learned {i} of {entry_count} previously unlearned (out of {total_count} total) confluence entries after {minutes} minutes ({math.ceil((i/entry_count)*100)}%): {entry['title']}")
 
     @staticmethod
     def promptify_confluence_entry(entry):

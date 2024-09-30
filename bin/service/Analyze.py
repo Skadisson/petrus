@@ -312,7 +312,7 @@ class Analyze:
         time_updated = self.timestamp_from_ticket_time(ticket['Created'])
         current_time_stamp = datetime.datetime.now().timestamp()
         if start > 0:
-            current_time_stamp += (start * for_days * 24 * 60 * 60)
+            current_time_stamp -= (start * for_days * 24 * 60 * 60)
         if for_days > 0:
             max_gap = for_days * 24 * 60 * 60
             is_in_range = current_time_stamp >= time_updated >= (current_time_stamp - max_gap)

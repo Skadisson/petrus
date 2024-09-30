@@ -99,7 +99,8 @@ class Trend:
 
     def output_docx(self, hours_per_project, project_ticket_count, hours_per_system, system_ticket_count, system_versions, hours_total, ticket_count, internal_count, external_count, hours_per_type, hours_per_ticket, lifetime_per_ticket, top_5_ticket_ranks, bottom_5_ticket_ranks, plot_data, payed_unpayed, total_score):
         docx_generator = Docx.Docx()
-        docx_generator.place_headline()
+        days = self.months * 30
+        docx_generator.place_headline(days, self.start)
         docx_generator.place_type_pie_chart(hours_per_type)
         docx_generator.place_stats(ticket_count, internal_count, external_count, hours_total, lifetime_per_ticket, hours_per_type, total_score, top_5_ticket_ranks, bottom_5_ticket_ranks, self.months)
         docx_generator.place_plot(plot_data)

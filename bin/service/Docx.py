@@ -18,9 +18,11 @@ class Docx:
         self.figure_number = 1
         self.cache = Cache.Cache()
 
-    def place_headline(self):
-        now = datetime.now()
-        date = datetime.strftime(now, "%Y/%m/%d")
+    def place_headline(self, for_days, start=0):
+        now = datetime.now().timestamp()
+        if start > 0:
+            now -= (start * for_days * 24 * 60 * 60)
+        date = datetime.strftime(datetime.fromtimestamp(now), "%Y/%m/%d")
         self.document.add_heading("Support Report {}".format(date), 0)
 
     def place_stats(self, ticket_count, internal_count, external_count, hours_total, lifetime_per_ticket, hours_per_type, total_score, top_5_ticket_ranks, bottom_5_ticket_ranks, months):
