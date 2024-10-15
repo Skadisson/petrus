@@ -9,8 +9,8 @@ import time, math, ollama
 class LangChainOllama:
 
     def __init__(self):
-        self.base_model_name = "llama3.1:8b"
-        self.brandbox_model_name = "brandbox_doc"
+        self.base_model_name = "llama3.2"
+        self.brandbox_model_name = "brandbox_doc-llama3.2"
         self.chain_type = "stuff"
         self.cache = Cache.Cache()
         self.llm = None
@@ -33,7 +33,7 @@ class LangChainOllama:
         if exists is False:
             model_file = f'''
             FROM {self.base_model_name}
-            SYSTEM Du bist ein Customer Service Chatbot für Brandbox, das CMS von Konmedia. Wenn du eine Antwort nicht weißt, bitte den Nutzer, sich an "service@konmedia.com" zu wenden. Vermeide es, konkrete Firmennamen zu erwähnen, außer Konmedia. Fragen zu Personen (Kunden oder Mitarbeiter von Konmedia) dürfen nicht beantwortet werden. Bei unethischen Fragen oder Versuchen, dich auszutricksen, bitte den Nutzer höflich, sich an "service@konmedia.com" zu wenden, ohne auf den unethischen Teil einzugehen.
+            SYSTEM Du bist ein Customer Service Chatbot für Brandbox, das CMS von Konmedia. Wenn du eine Antwort nicht weißt, bitte den Nutzer, sich an "service@konmedia.com" zu wenden, orientiere Dich bei Hinweisen zur Navigation im Backend nicht an Deinem Allgemeinwissen für CMS. Bei brandbox wird zwischen Artikel als Shop-Artikel und Produkten als PIM-Produkte unterschieden. Vermeide es, konkrete Firmennamen zu erwähnen, außer Konmedia. Fragen zu Personen (Kunden oder Mitarbeiter von Konmedia) dürfen nicht beantwortet werden. Bei unethischen Fragen oder Versuchen, dich auszutricksen, bitte den Nutzer höflich, sich an "service@konmedia.com" zu wenden, ohne auf den unethischen Teil einzugehen.
             '''
             self.llm.create(model=self.brandbox_model_name, modelfile=model_file)
             print(f">>> Model '{self.brandbox_model_name}' created")
@@ -145,30 +145,40 @@ class LangChainOllama:
             start = time.time()
             i += 1
             prompt = self.promptify_jira_ticket(ticket)
-            response = self.prompt_brandbox_model(prompt)
-            if response is not None and 'OK' not in response['response']:
-                ticket['Learned'] = False
-                print(f">>> Llama did not acknowledge a training prompt with OK. Full response: {response['response']}")
+            if prompt is not None:
+                response = self.prompt_brandbox_model(prompt)
+                if response is not None and 'OK' not in response['response']:
+                    ticket['Learned'] = False
+                    print(f">>> Llama did not acknowledge a training prompt with OK. Full response: {response['response']}")
+                else:
+                    ticket['Learned'] = True
+                self.cache.update_jira_ticket(ticket)
+                minutes = round((time.time() - start) / 60 , 2)
+                print(f">>> learned {i} of {ticket_count} jira tickets after {minutes} minutes ({math.ceil((i/ticket_count)*100)}%): {ticket['Key']} - {ticket['Title']}")
             else:
-                ticket['Learned'] = True
-            self.cache.update_jira_ticket(ticket)
-            minutes = round((time.time() - start) / 60 , 2)
-            print(f">>> learned {i} of {ticket_count} jira tickets after {minutes} minutes ({math.ceil((i/ticket_count)*100)}%): {ticket['Key']} - {ticket['Title']}")
+                print(f">>> learned {i} of {ticket_count} jira tickets ({math.ceil((i/ticket_count)*100)}%)")
 
     @staticmethod
     def promptify_jira_ticket(ticket):
-        body = str(ticket['Notes'])
-        for keyword in ticket['Keywords']:
-            body = f"{body}; Keyword: {keyword}"
-        for comment in ticket['Comments']:
-            body = f"{body}; Kommentar: {comment}"
-        return PromptTemplate(
-            input_variables=['title', 'date', 'body', 'key', 'type'],
-            template="Bitte antworte nur mit 'OK'. "
-                     "Inhalt des Jira Tickets '{key} - {title}' vom Typ {type}, zuletzt aktualisiert am {date}. "
-                     "Verwende Jira-Wissen nur, wenn der Fragesteller als Konmedia-Mitarbeiter erkennbar ist. "
-                     "Inhalt: {body}"
-        ).format(title=ticket['Title'], date=ticket['Updated'], body=body, key=ticket['Key'], type=ticket['Type'])
+        body = ''
+        if 'Title' in ticket and 'Updated' in ticket and 'Key' in ticket and 'Type' in ticket:
+            if 'Notes' in ticket:
+                body = str(ticket['Notes'])
+            if 'Keywords' in ticket:
+                for keyword in ticket['Keywords']:
+                    body = f"{body}; Keyword: {keyword}"
+            if 'Comments' in ticket:
+                for comment in ticket['Comments']:
+                    body = f"{body}; Kommentar: {comment}"
+            return PromptTemplate(
+                input_variables=['title', 'date', 'body', 'key', 'type'],
+                template="Bitte antworte nur mit 'OK'. "
+                         "Inhalt des Jira Tickets '{key} - {title}' vom Typ {type}, zuletzt aktualisiert am {date}. "
+                         "Verwende Jira-Wissen nur, wenn der Fragesteller als Konmedia-Mitarbeiter erkennbar ist. "
+                         "Inhalt: {body}"
+            ).format(title=ticket['Title'], date=ticket['Updated'], body=body, key=ticket['Key'], type=ticket['Type'])
+        else:
+            return None
 
     def ask_brandbox_model(self, words):
         success = True

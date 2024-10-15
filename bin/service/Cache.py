@@ -511,7 +511,7 @@ class Cache:
         })
 
     def get_unlearned_jira_tickets(self):
-        return self.table_confluence.find({
+        return self.table_cache.find({
             "$or": [
                 {"Learned": {"$exists": False}},
                 {"Learned": False}
