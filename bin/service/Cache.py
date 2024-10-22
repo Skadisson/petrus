@@ -103,15 +103,24 @@ class Cache:
         return False
 
     def load_cached_tickets(self, project='SERVICE', only_worked_on=False):
-        rgx = re.compile(f"^{project}-[0-9]*", re.IGNORECASE)
-        if only_worked_on:
-            return self.table_cache.find({'Key': {'$regex': rgx}, 'Time_Spent': {'$gt': 0}})
+        if project is None:
+            if only_worked_on:
+                return self.table_cache.find({'Time_Spent': {'$gt': 0}})
+            else:
+                return self.table_cache.find()
         else:
-            return self.table_cache.find({'Key': {'$regex': rgx}})
+            rgx = re.compile(f"^{project}-[0-9]*", re.IGNORECASE)
+            if only_worked_on:
+                return self.table_cache.find({'Key': {'$regex': rgx}, 'Time_Spent': {'$gt': 0}})
+            else:
+                return self.table_cache.find({'Key': {'$regex': rgx}})
 
     def load_cached_tickets_except(self, ticket_key, project='SERVICE'):
-        rgx = re.compile(f"^{project}-[0-9]*", re.IGNORECASE)
-        return self.table_cache.find({'Key': {'$regex': rgx, '$ne': ticket_key}, 'Time_Spent': {'$gt': 0}})
+        if project is None:
+            return self.table_cache.find({'Key': {'$ne': ticket_key}, 'Time_Spent': {'$gt': 0}})
+        else:
+            rgx = re.compile(f"^{project}-[0-9]*", re.IGNORECASE)
+            return self.table_cache.find({'Key': {'$regex': rgx, '$ne': ticket_key}, 'Time_Spent': {'$gt': 0}})
 
     def load_cached_ticket(self, jira_id):
         return self.table_cache.find_one({'ID': str(jira_id)})

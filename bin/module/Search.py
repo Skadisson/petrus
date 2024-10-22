@@ -21,7 +21,7 @@ class Search:
         elif len(formatted_keywords) > 2 and f"{formatted_keywords[0]}".lower() == 'ollama':
             items, success = self.ollama.ask_brandbox_model(formatted_keywords[1:])
         elif len(formatted_keywords) > 1:
-            tickets = self.cache.load_cached_tickets('SERVICE', True)
+            tickets = self.cache.load_cached_tickets(None, True)
             relevancy, suggested_keys, similarities = self.context.calculate_relevancy_for_tickets(tickets, {'Keywords': formatted_keywords, 'Related': []})
             items = [{
                 'relevancy': relevancy,

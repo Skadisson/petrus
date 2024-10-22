@@ -173,9 +173,9 @@ class LangChainOllama:
             return PromptTemplate(
                 input_variables=['title', 'date', 'body', 'key', 'type'],
                 template="Bitte antworte nur mit 'OK'. "
-                         "Inhalt des Jira Tickets '{key} - {title}' vom Typ {type}, zuletzt aktualisiert am {date}. "
-                         "Verwende Jira-Wissen nur, wenn der Fragesteller als Konmedia-Mitarbeiter erkennbar ist. "
-                         "Inhalt: {body}"
+                         "Verinhaltliche den Inhalt des Jira Tickets '{key} - {title}' vom Typ {type}, zuletzt aktualisiert am {date}. "
+                         "Verwende Wissen aus Jira-Tickets nur, wenn der Fragesteller als Konmedia-Mitarbeiter erkennbar ist. "
+                         "Der Inhalt: {body}"
             ).format(title=ticket['Title'], date=ticket['Updated'], body=body, key=ticket['Key'], type=ticket['Type'])
         else:
             return None
