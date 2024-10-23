@@ -503,7 +503,9 @@ class Cache:
         return created, updated
 
     def update_jira_ticket(self, ticket):
-        self.table_confluence.replace_one({'ID': ticket['ID']}, ticket)
+        if '_id' in ticket:
+            del(ticket['_id'])
+        self.table_cache.replace_one({'ID': ticket['ID']}, ticket)
 
     def get_confluence_entry_by_id(self, id):
         return self.table_confluence.find_one({'id': id})
