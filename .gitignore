@@ -13,3 +13,5 @@ mail_bounce_decision_tree.py
 decision_tree_junction*
 /grafana_decision_tree.py
 /grafana_decision_tree_prod.py
+scripts/*
+/auto_pim_demo/
